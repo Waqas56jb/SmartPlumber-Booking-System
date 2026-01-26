@@ -253,14 +253,14 @@ const Portfolio = () => {
   };
 
   return (
-    <section ref={sectionRef} id="portfolio" className="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-background-alt via-white to-background-alt relative overflow-hidden">
+    <section ref={sectionRef} id="portfolio" className="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-background-alt via-white to-background-alt relative overflow-hidden w-full">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-full h-full opacity-5">
         <div className="absolute top-40 left-10 w-56 h-56 border-2 border-accent rounded-full"></div>
         <div className="absolute bottom-40 right-10 w-40 h-40 border-2 border-accent rounded-full"></div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 w-full overflow-x-hidden">
         <div className="text-center mb-14 sm:mb-18 md:mb-20">
           <div className="inline-flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-lg mb-5">
             <FaImages className="text-accent" size={16} />

@@ -56,32 +56,32 @@ const Navbar = () => {
           ? 'shadow-lg border-gray-200 bg-white/98' 
           : 'shadow-sm border-gray-100'
       }`}>
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-18 md:h-20">
+        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 w-full overflow-x-hidden">
+          <div className="flex justify-between items-center h-16 sm:h-18 md:h-20 gap-2 sm:gap-3">
             {/* Logo/Brand - Enhanced */}
             <div 
-              className="flex items-center gap-3 flex-shrink-0 group cursor-pointer"
+              className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group cursor-pointer min-w-0"
               onClick={() => scrollToSection('home')}
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent to-accent-dark rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                <div className="relative flex items-center justify-center w-12 h-12 bg-gradient-to-br from-accent via-accent to-accent-dark rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
-                  <FaWrench className="text-white" size={20} />
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent to-accent-dark rounded-lg sm:rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                <div className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-accent via-accent to-accent-dark rounded-lg sm:rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaWrench className="text-white" size={18} style={{ fontSize: 'clamp(18px, 2.5vw, 20px)' }} />
                 </div>
               </div>
-              <div>
-                <div className="text-lg font-extrabold text-gray-900 leading-tight flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-accent to-accent-dark bg-clip-text text-transparent">
+              <div className="min-w-0 hidden xs:block">
+                <div className="text-sm sm:text-base md:text-lg font-extrabold text-gray-900 leading-tight flex items-center gap-1 sm:gap-2 flex-wrap">
+                  <span className="bg-gradient-to-r from-accent to-accent-dark bg-clip-text text-transparent whitespace-nowrap">
                     BP
                   </span>
-                  <FaShieldAlt className="text-accent" size={14} />
-                  <span className="text-xs font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                  <FaShieldAlt className="text-accent flex-shrink-0" size={12} style={{ fontSize: 'clamp(12px, 2vw, 14px)' }} />
+                  <span className="text-[10px] sm:text-xs font-semibold text-accent bg-accent/10 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
                     Heating & Plumbing
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <FaCheckCircle className="text-green-500" size={10} />
-                  <span className="text-[9px] text-gray-600 font-semibold uppercase tracking-wide">
+                <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1">
+                  <FaCheckCircle className="text-green-500 flex-shrink-0" size={8} style={{ fontSize: 'clamp(8px, 1.5vw, 10px)' }} />
+                  <span className="text-[8px] sm:text-[9px] text-gray-600 font-semibold uppercase tracking-wide whitespace-nowrap">
                     Gas Safe Registered
                   </span>
                 </div>
@@ -137,27 +137,27 @@ const Navbar = () => {
               </div>
               
               {/* Action Buttons - Enhanced */}
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5">
                 {/* Request Service Button - Enhanced */}
                 <button 
                   onClick={() => scrollToSection('contact')}
-                  className="relative px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-accent via-accent to-accent-dark rounded-xl hover:from-accent-dark hover:via-accent-dark hover:to-accent transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 group overflow-hidden"
+                  className="relative px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-accent via-accent to-accent-dark rounded-lg sm:rounded-xl hover:from-accent-dark hover:via-accent-dark hover:to-accent transition-all duration-300 flex items-center gap-1.5 sm:gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 group overflow-hidden touch-manipulation min-h-[44px]"
                 >
                   <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <FaTools size={14} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="hidden sm:inline relative z-10">Request Service</span>
-                  <span className="sm:hidden relative z-10">Request</span>
+                  <FaTools size={12} className="sm:w-[14px] sm:h-[14px] relative z-10 group-hover:rotate-12 transition-transform duration-300 flex-shrink-0" />
+                  <span className="hidden sm:inline relative z-10 whitespace-nowrap">Request Service</span>
+                  <span className="sm:hidden relative z-10 whitespace-nowrap">Request</span>
                 </button>
                 
                 {/* Logout Button - Enhanced */}
                 {isAuthenticated && (
                   <button 
                     onClick={handleLogout}
-                    className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow-md hover:scale-105"
+                    className="px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 touch-manipulation min-h-[44px]"
                     title="Logout"
                   >
-                    <FaSignOutAlt size={13} />
-                    <span className="hidden sm:inline">Logout</span>
+                    <FaSignOutAlt size={12} className="sm:w-[13px] sm:h-[13px] flex-shrink-0" />
+                    <span className="hidden sm:inline whitespace-nowrap">Logout</span>
                   </button>
                 )}
               </div>
@@ -165,10 +165,10 @@ const Navbar = () => {
               {/* Mobile Menu Button - Enhanced */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden text-gray-700 p-2.5 hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-50 rounded-xl transition-all duration-300 hover:scale-110"
+                className="lg:hidden text-gray-700 p-2.5 sm:p-3 hover:bg-gradient-to-br hover:from-gray-100 hover:to-gray-50 rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation flex items-center justify-center min-w-[44px] min-h-[44px]"
                 aria-label="Toggle menu"
               >
-                {mobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+                {mobileMenuOpen ? <FaTimes size={20} className="w-5 h-5" /> : <FaBars size={20} className="w-5 h-5" />}
               </button>
             </div>
           </div>

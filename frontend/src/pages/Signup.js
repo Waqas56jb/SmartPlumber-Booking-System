@@ -53,7 +53,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Side - Logo Only */}
+        {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
           {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
@@ -66,8 +66,17 @@ const Signup = () => {
         </div>
 
         {/* Right Side - Signup Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-3xl p-5 sm:p-6 md:p-7 shadow-2xl flex flex-col">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
+          {/* Mobile Logo */}
+          <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
+            <img 
+              src="/logo.png" 
+              alt="BP Heating & Plumbing Logo" 
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+            />
+          </div>
+          
+          <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl flex flex-col mt-20 sm:mt-24 lg:mt-0">
             <div className="mb-5 sm:mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
               <p className="text-sm sm:text-base text-gray-600">Join BP Heating & Plumbing today</p>
@@ -80,8 +89,8 @@ const Signup = () => {
                   Username
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                    <FaUser className="text-gray-400" size={16} />
+                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                    <FaUser className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                   </div>
                   <input
                     type="text"
@@ -90,7 +99,7 @@ const Signup = () => {
                     value={formData.username}
                     onChange={handleChange}
                     placeholder="Enter your username"
-                    className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                    className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
                       e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -111,8 +120,8 @@ const Signup = () => {
                   Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                    <FaEnvelope className="text-gray-400" size={16} />
+                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                    <FaEnvelope className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                   </div>
                   <input
                     type="email"
@@ -121,7 +130,7 @@ const Signup = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                    className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
                       e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -142,8 +151,8 @@ const Signup = () => {
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                    <FaLock className="text-gray-400" size={16} />
+                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                    <FaLock className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -152,7 +161,7 @@ const Signup = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Create a password"
-                    className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                    className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
                       e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -167,11 +176,11 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 md:pr-4 flex items-center text-gray-400 transition-colors touch-manipulation"
                     onMouseEnter={(e) => e.target.style.color = '#D2A752'}
                     onMouseLeave={(e) => e.target.style.color = '#9CA3AF'}
                   >
-                    {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                    {showPassword ? <FaEyeSlash size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} /> : <FaEye size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />}
                   </button>
                 </div>
               </div>
@@ -182,8 +191,8 @@ const Signup = () => {
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                    <FaLock className="text-gray-400" size={16} />
+                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                    <FaLock className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                   </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -192,7 +201,7 @@ const Signup = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Confirm your password"
-                    className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                    className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
                       e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -226,7 +235,7 @@ const Signup = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full text-white py-3.5 sm:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full text-white py-3 sm:py-3.5 md:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                 style={{ background: '#D2A752' }}
               >
                 {loading ? (

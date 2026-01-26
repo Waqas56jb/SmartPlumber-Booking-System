@@ -8,14 +8,14 @@ const CTA = () => {
   const sectionRef = useScrollAnimation();
 
   return (
-    <section ref={sectionRef} id="contact" className="py-16 sm:py-20 md:py-28 bg-gradient-to-br from-primary via-secondary to-primary text-white relative overflow-hidden">
+    <section ref={sectionRef} id="contact" className="py-16 sm:py-20 md:py-28 bg-gradient-to-br from-primary via-secondary to-primary text-white relative overflow-hidden w-full">
       {/* Decorative Background */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-20 w-64 h-64 border-2 border-accent rounded-full"></div>
         <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-accent rounded-full"></div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 w-full overflow-x-hidden">
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 bg-accent/20 px-4 py-2 rounded-lg mb-5">
             <FaClock className="text-accent" size={16} />

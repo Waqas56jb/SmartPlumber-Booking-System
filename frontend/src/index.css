@@ -18,12 +18,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Add padding bottom for mobile bar on mobile devices */
-@media (max-width: 767px) {
+/* Prevent horizontal scrolling */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Ensure all containers respect viewport width */
+* {
+  max-width: 100%;
+}
+
+/* Add padding bottom for mobile bar on mobile devices - REMOVED since MobileBar is removed */
+/* @media (max-width: 767px) {
   body {
     padding-bottom: 60px;
   }
-}
+} */
 
 img {
   max-width: 100%;
@@ -207,4 +219,68 @@ a {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent text size adjustment on iOS */
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+  
+  /* Better scrolling on mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Touch manipulation for better mobile performance */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent zoom on input focus (iOS Safari) */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Responsive image handling */
+img {
+  height: auto;
+  max-width: 100%;
+  display: block;
+  width: 100%;
+}
+
+/* Prevent horizontal overflow */
+section, div, article, aside, main, header, footer, nav {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure no element causes horizontal scroll */
+.container, .max-w-\[1400px\], .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
+  overflow-x: hidden;
+}
+
+/* Better form inputs on mobile */
+@media (max-width: 640px) {
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
 }

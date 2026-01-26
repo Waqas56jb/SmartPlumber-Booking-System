@@ -91,7 +91,7 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Side - Logo Only */}
+        {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
           {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
@@ -104,13 +104,22 @@ const ResetPassword = () => {
         </div>
 
         {/* Right Side - Reset Password Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl">
-            <div className="mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
+          {/* Mobile Logo */}
+          <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
+            <img 
+              src="/logo.png" 
+              alt="BP Heating & Plumbing Logo" 
+              className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+            />
+          </div>
+          
+          <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl mt-20 sm:mt-24 lg:mt-0 flex flex-col">
+            <div className="mb-4 sm:mb-5 md:mb-6">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1.5 sm:mb-2">
                 {step === 1 ? 'Enter OTP' : 'Reset Password'}
               </h2>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+              <p className="text-xs sm:text-sm md:text-base text-gray-600">
                 {step === 1 
                   ? `We sent a code to ${email || 'your email'}`
                   : 'Create your new password'
@@ -120,20 +129,20 @@ const ResetPassword = () => {
 
             {/* Form */}
             {step === 1 ? (
-              <form onSubmit={handleOtpSubmit} className="space-y-5 sm:space-y-6">
-                <div className="rounded-lg p-4 sm:p-5" style={{ background: 'linear-gradient(to right, #F5E6D3, #E8D4B8)', border: '1px solid #D2A752' }}>
+              <form onSubmit={handleOtpSubmit} className="space-y-3.5 sm:space-y-4 md:space-y-5 flex-1 flex flex-col">
+                <div className="rounded-lg p-3 sm:p-4 md:p-5" style={{ background: 'linear-gradient(to right, #F5E6D3, #E8D4B8)', border: '1px solid #D2A752' }}>
                   <p className="text-xs sm:text-sm text-gray-700 text-center leading-relaxed">
-                    <FaEnvelope className="inline-block mr-2" size={14} style={{ color: '#D2A752' }} />
+                    <FaEnvelope className="inline-block mr-1.5 sm:mr-2" size={12} style={{ color: '#D2A752', fontSize: 'clamp(12px, 2vw, 14px)' }} />
                     Please enter the 6-digit verification code sent to your email.
                   </p>
                 </div>
 
                 {/* OTP Input */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4 text-center">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2.5 sm:mb-3 md:mb-4 text-center">
                     Verification Code
                   </label>
-                  <div className="flex justify-center gap-2 sm:gap-3">
+                  <div className="flex justify-center gap-1.5 sm:gap-2 md:gap-3">
                     {otp.map((digit, index) => (
                       <input
                         key={index}
@@ -144,7 +153,7 @@ const ResetPassword = () => {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 shadow-sm bg-gray-50"
+                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-center text-lg sm:text-xl md:text-2xl font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 shadow-sm bg-gray-50 touch-manipulation"
                         style={{ '--tw-ring-color': '#D2A752' }}
                         onFocus={(e) => {
                           e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -176,7 +185,7 @@ const ResetPassword = () => {
                 <button
                   type="submit"
                   disabled={loading || otp.join('').length !== 6}
-                  className="w-full text-white py-3.5 sm:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full text-white py-3 sm:py-3.5 md:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                   style={{ background: '#D2A752' }}
                 >
                   {loading ? (
@@ -190,15 +199,15 @@ const ResetPassword = () => {
                 </button>
               </form>
             ) : (
-              <form onSubmit={handlePasswordSubmit} className="space-y-5 sm:space-y-6">
+              <form onSubmit={handlePasswordSubmit} className="space-y-3.5 sm:space-y-4 md:space-y-5 flex-1 flex flex-col">
                 {/* New Password Field */}
                 <div>
                   <label htmlFor="newPassword" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                     New Password
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                      <FaLock className="text-gray-400" size={16} />
+                    <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                      <FaLock className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                     </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -207,7 +216,7 @@ const ResetPassword = () => {
                       value={formData.newPassword}
                       onChange={handlePasswordChange}
                       placeholder="Enter new password"
-                      className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                      className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                       style={{ '--tw-ring-color': '#D2A752' }}
                       onFocus={(e) => {
                         e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -222,11 +231,11 @@ const ResetPassword = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 md:pr-4 flex items-center text-gray-400 transition-colors touch-manipulation"
                       onMouseEnter={(e) => e.target.style.color = '#D2A752'}
                       onMouseLeave={(e) => e.target.style.color = '#9CA3AF'}
                     >
-                      {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                      {showPassword ? <FaEyeSlash size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} /> : <FaEye size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />}
                     </button>
                   </div>
                 </div>
@@ -237,8 +246,8 @@ const ResetPassword = () => {
                     Confirm New Password
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                      <FaLock className="text-gray-400" size={16} />
+                    <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
+                      <FaLock className="text-gray-400" size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />
                     </div>
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -247,7 +256,7 @@ const ResetPassword = () => {
                       value={formData.confirmPassword}
                       onChange={handlePasswordChange}
                       placeholder="Confirm new password"
-                      className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
+                      className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                       style={{ '--tw-ring-color': '#D2A752' }}
                       onFocus={(e) => {
                         e.target.style.boxShadow = '0 0 0 2px #D2A752';
@@ -262,11 +271,11 @@ const ResetPassword = () => {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 transition-colors"
+                      className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 md:pr-4 flex items-center text-gray-400 transition-colors touch-manipulation"
                       onMouseEnter={(e) => e.target.style.color = '#D2A752'}
                       onMouseLeave={(e) => e.target.style.color = '#9CA3AF'}
                     >
-                      {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                      {showConfirmPassword ? <FaEyeSlash size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} /> : <FaEye size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />}
                     </button>
                   </div>
                   {formData.confirmPassword && formData.newPassword === formData.confirmPassword && (
@@ -281,7 +290,7 @@ const ResetPassword = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full text-white py-3.5 sm:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full text-white py-3 sm:py-3.5 md:py-4 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                   style={{ background: '#D2A752' }}
                 >
                   {loading ? (
@@ -295,7 +304,7 @@ const ResetPassword = () => {
                 </button>
 
                 {/* Back to Login Link */}
-                <div className="text-center pt-4">
+                <div className="text-center pt-4 mt-auto">
                   <Link 
                     to="/login" 
                     className="text-xs sm:text-sm font-semibold transition-colors inline-flex items-center gap-2"

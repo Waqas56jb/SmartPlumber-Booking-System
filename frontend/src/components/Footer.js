@@ -32,7 +32,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-primary via-secondary to-primary text-white/90 relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-primary via-secondary to-primary text-white/90 relative overflow-hidden w-full">
       {/* Enhanced Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <div className="absolute top-20 left-10 w-40 h-40 border-2 border-accent rounded-full animate-pulse-slow"></div>
@@ -43,7 +43,7 @@ const Footer = () => {
       </div>
 
       {/* Main Footer Content */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-16 sm:py-20 md:py-24 relative z-10 w-full overflow-x-hidden">
         {/* Top Section - Company Info & Certifications */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 mb-12 sm:mb-16">
           {/* Company Info */}

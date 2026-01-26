@@ -18,7 +18,6 @@ const Home = () => {
       <Portfolio />
       <CTA />
       <Footer />
-      <MobileBar />
       <Lightbox />
       <Chatbot />
     </>
