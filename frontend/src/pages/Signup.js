@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle } from 're
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { authAPI } from '../services/apiService';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -39,15 +40,35 @@ const Signup = () => {
 
     setLoading(true);
     
-    setTimeout(() => {
-      login({
+    try {
+      const response = await authAPI.signup({
         username: formData.username,
         email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       });
-      toast.success('Account created successfully!');
+
+      if (response.success) {
+        login({
+          id: response.data.user.id,
+          username: response.data.user.username,
+          email: response.data.user.email
+        }, response.data.token);
+        
+        toast.success(response.message || 'Account created successfully!');
+        navigate('/');
+      }
+    } catch (error) {
+      // Handle validation errors
+      if (error.message.includes('Validation failed') || error.errors) {
+        const errorMessage = error.errors?.[0]?.message || error.message;
+        toast.error(errorMessage);
+      } else {
+        toast.error(error.message || 'Signup failed. Please try again.');
+      }
+    } finally {
       setLoading(false);
-      navigate('/');
-    }, 1000);
+    }
   };
 
   return (

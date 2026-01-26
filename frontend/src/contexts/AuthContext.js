@@ -23,13 +23,16 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  const login = (userData) => {
+  const login = (userData, token = null) => {
     setIsAuthenticated(true);
     setUser(userData);
     try {
       localStorage.setItem('isAuthenticated', 'true');
       if (userData) {
         localStorage.setItem('user', JSON.stringify(userData));
+      }
+      if (token) {
+        localStorage.setItem('token', token);
       }
     } catch (e) {
       console.warn('Failed to save auth state:', e);
@@ -42,6 +45,7 @@ export const AuthProvider = ({ children }) => {
     try {
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
     } catch (e) {
       console.warn('Failed to clear auth state:', e);
     }

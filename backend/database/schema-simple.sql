@@ -1,0 +1,31 @@
+-- ============================================
+-- Simple Database Schema for SmartPlumber
+-- Vercel Postgres - Quick Setup
+-- ============================================
+
+-- Users Table (Signup & Login)
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(30) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- OTP Table (Password Reset)
+CREATE TABLE IF NOT EXISTS otps (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    otp VARCHAR(6) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_used BOOLEAN DEFAULT FALSE
+);
+
+-- Indexes for Performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(LOWER(email));
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username));
+CREATE INDEX IF NOT EXISTS idx_otps_email ON otps(LOWER(email));
+CREATE INDEX IF NOT EXISTS idx_otps_expires_at ON otps(expires_at);

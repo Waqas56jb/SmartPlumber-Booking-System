@@ -2,21 +2,36 @@ import React, { useState } from 'react';
 import { FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { toast } from 'react-toastify';
+import { authAPI } from '../services/apiService';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { navigate } = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    setTimeout(() => {
-      toast.success('OTP sent to your email!');
+    try {
+      const response = await authAPI.forgotPassword(email);
+
+      if (response.success) {
+        // Store email in sessionStorage for ResetPassword page
+        try {
+          sessionStorage.setItem('reset_email', email);
+        } catch (e) {
+          console.warn('Failed to store email:', e);
+        }
+        
+        toast.success(response.message || 'OTP sent to your email!');
+        navigate('/reset-password');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to send OTP. Please try again.');
+    } finally {
       setLoading(false);
-      navigate('/reset-password', { email });
-    }, 1000);
+    }
   };
 
   return (

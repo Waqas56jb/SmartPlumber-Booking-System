@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { authAPI } from '../services/apiService';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -21,18 +22,31 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    setTimeout(() => {
-      login({
+    try {
+      const response = await authAPI.login({
         email: formData.email,
+        password: formData.password
       });
-      toast.success('Login successful!');
+
+      if (response.success) {
+        login({
+          id: response.data.user.id,
+          username: response.data.user.username,
+          email: response.data.user.email
+        }, response.data.token);
+        
+        toast.success(response.message || 'Login successful!');
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Login failed. Please check your credentials.');
+    } finally {
       setLoading(false);
-      navigate('/');
-    }, 1000);
+    }
   };
 
   return (

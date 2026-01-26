@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
 import { Link, useRouter, useLocation } from '../utils/router';
 import { toast } from 'react-toastify';
+import { authAPI } from '../services/apiService';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -15,12 +16,31 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [email] = useState(location.state?.email || '');
+  const [email] = useState(() => {
+    // Try to get email from location state or sessionStorage
+    const stateEmail = location.state?.email;
+    if (stateEmail) return stateEmail;
+    
+    // Try sessionStorage as fallback
+    try {
+      const stored = sessionStorage.getItem('reset_email');
+      return stored || '';
+    } catch {
+      return '';
+    }
+  });
 
   useEffect(() => {
     if (!email) {
       toast.error('Please enter your email first');
       navigate('/forgot-password');
+    } else {
+      // Store email in sessionStorage for persistence
+      try {
+        sessionStorage.setItem('reset_email', email);
+      } catch (e) {
+        console.warn('Failed to store email:', e);
+      }
     }
   }, [email, navigate]);
 
@@ -42,20 +62,27 @@ const ResetPassword = () => {
     }
   };
 
-  const handleOtpSubmit = (e) => {
+  const handleOtpSubmit = async (e) => {
     e.preventDefault();
     const otpValue = otp.join('');
     if (otpValue.length !== 6) {
       toast.error('Please enter complete OTP');
       return;
     }
-    // Simulate OTP verification
+    
     setLoading(true);
-    setTimeout(() => {
-      toast.success('OTP verified successfully!');
+    try {
+      const response = await authAPI.verifyOtp(email, otpValue);
+      
+      if (response.success) {
+        toast.success(response.message || 'OTP verified successfully!');
+        setStep(2);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Invalid or expired OTP. Please try again.');
+    } finally {
       setLoading(false);
-      setStep(2);
-    }, 1000);
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -65,7 +92,7 @@ const ResetPassword = () => {
     });
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.newPassword !== formData.confirmPassword) {
@@ -80,12 +107,37 @@ const ResetPassword = () => {
 
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      toast.success('Password reset successfully!');
+    try {
+      const otpValue = otp.join('');
+      const response = await authAPI.resetPassword(
+        email,
+        otpValue,
+        formData.newPassword,
+        formData.confirmPassword
+      );
+
+      if (response.success) {
+        // Clear stored email after successful reset
+        try {
+          sessionStorage.removeItem('reset_email');
+        } catch (e) {
+          // Ignore errors
+        }
+        
+        toast.success(response.message || 'Password reset successfully!');
+        navigate('/login');
+      }
+    } catch (error) {
+      // Handle validation errors
+      if (error.message.includes('Validation failed') || error.errors) {
+        const errorMessage = error.errors?.[0]?.message || error.message;
+        toast.error(errorMessage);
+      } else {
+        toast.error(error.message || 'Failed to reset password. Please try again.');
+      }
+    } finally {
       setLoading(false);
-      navigate('/login');
-    }, 1000);
+    }
   };
 
   return (
