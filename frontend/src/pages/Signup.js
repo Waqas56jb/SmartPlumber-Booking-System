@@ -38,6 +38,16 @@ const Signup = () => {
       return;
     }
 
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasLowerCase = /[a-z]/.test(formData.password);
+    const hasNumber = /\d/.test(formData.password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+      toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -60,9 +70,12 @@ const Signup = () => {
       }
     } catch (error) {
       // Handle validation errors
-      if (error.message.includes('Validation failed') || error.errors) {
-        const errorMessage = error.errors?.[0]?.message || error.message;
+      if (error.errors && error.errors.length > 0) {
+        // Show first validation error
+        const errorMessage = error.errors[0].message || error.message;
         toast.error(errorMessage);
+      } else if (error.message.includes('Validation failed')) {
+        toast.error(error.message);
       } else {
         toast.error(error.message || 'Signup failed. Please try again.');
       }
