@@ -46,8 +46,8 @@ const Portfolio = () => {
   };
 
   return (
-    <section ref={sectionRef} className="py-24 bg-background-alt">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-8">
+    <section ref={sectionRef} className="py-12 sm:py-16 md:py-24 bg-background-alt">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center mb-12 sm:mb-18">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-3 sm:mb-4 tracking-tight">
             Recent Projects

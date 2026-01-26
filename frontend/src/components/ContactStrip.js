@@ -5,43 +5,43 @@ import { FaInstagram } from 'react-icons/fa';
 
 const ContactStrip = () => {
   return (
-    <div className="bg-primary text-white py-3 text-sm">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-8">
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div className="flex gap-6 flex-wrap">
+    <div className="bg-primary text-white py-2 sm:py-3 text-xs sm:text-sm">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8">
+        <div className="flex justify-between items-center flex-wrap gap-2 sm:gap-4">
+          <div className="flex gap-3 sm:gap-6 flex-wrap">
             <a 
               href="tel:+447777998381" 
-              className="flex items-center gap-2 text-white/90 hover:text-accent transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 text-white/90 hover:text-accent transition-colors"
             >
-              <FaPhone className="flex-shrink-0" size={16} />
-              <span>+44 7777 998381</span>
+              <FaPhone className="flex-shrink-0" size={14} />
+              <span className="whitespace-nowrap">+44 7777 998381</span>
             </a>
           </div>
-          <div className="flex gap-6 flex-wrap">
+          <div className="flex gap-3 sm:gap-6 flex-wrap">
             <a 
               href="mailto:basitpk4@yahoo.com" 
-              className="flex items-center gap-2 text-white/90 hover:text-accent transition-colors"
+              className="hidden sm:flex items-center gap-1.5 sm:gap-2 text-white/90 hover:text-accent transition-colors"
             >
-              <FaEnvelope className="flex-shrink-0" size={16} />
-              <span>basitpk4@yahoo.com</span>
+              <FaEnvelope className="flex-shrink-0" size={14} />
+              <span className="hidden md:inline">basitpk4@yahoo.com</span>
             </a>
             <a 
               href="https://wa.me/447777998381" 
-              className="flex items-center gap-2 text-white/90 hover:text-whatsapp transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 text-white/90 hover:text-whatsapp transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FaWhatsapp className="flex-shrink-0" size={16} />
-              <span>WhatsApp</span>
+              <FaWhatsapp className="flex-shrink-0" size={14} />
+              <span className="hidden sm:inline">WhatsApp</span>
             </a>
             <a 
               href="https://instagram.com/abdulb05" 
-              className="flex items-center gap-2 text-white/90 hover:text-instagram transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 text-white/90 hover:text-instagram transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FaInstagram className="flex-shrink-0" size={16} />
-              <span>@abdulb05</span>
+              <FaInstagram className="flex-shrink-0" size={14} />
+              <span className="hidden sm:inline">@abdulb05</span>
             </a>
           </div>
         </div>
