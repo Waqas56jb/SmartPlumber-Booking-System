@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FaStore, FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaImage } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { productAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 import AddProductForm from '../components/AddProductForm';
 
 const SellerProducts = () => {
@@ -55,7 +54,7 @@ const SellerProducts = () => {
         setProducts(response.data.products);
       }
     } catch (error) {
-      toast.error('Failed to load products');
+      console.error('Failed to load products:', error);
     } finally {
       setLoading(false);
     }
@@ -74,11 +73,10 @@ const SellerProducts = () => {
     try {
       const response = await productAPI.deleteProduct(productId);
       if (response.success) {
-        toast.success('Product deleted successfully');
         fetchProducts();
       }
     } catch (error) {
-      toast.error('Failed to delete product');
+      console.error('Failed to delete product:', error);
     }
   };
 

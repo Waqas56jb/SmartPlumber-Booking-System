@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope, FaWrench } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
-import { toast } from 'react-toastify';
 import { plumberAPI } from '../services/apiService';
 
 const PlumberResetPassword = () => {
@@ -26,7 +25,6 @@ const PlumberResetPassword = () => {
 
   useEffect(() => {
     if (!plumber_email) {
-      toast.error('Please enter your plumber email first');
       navigate('/plumber-forgot-password');
     } else {
       try {
@@ -56,20 +54,16 @@ const PlumberResetPassword = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     const otpValue = otp.join('');
-    if (otpValue.length !== 6) {
-      toast.error('Please enter complete OTP');
-      return;
-    }
+    if (otpValue.length !== 6) return;
     
     setLoading(true);
     try {
       const response = await plumberAPI.plumberVerifyOtp(plumber_email, otpValue);
       if (response.success) {
-        toast.success(response.message || 'OTP verified successfully!');
         setStep(2);
       }
     } catch (error) {
-      toast.error(error.message || 'Invalid or expired OTP. Please try again.');
+      console.error('OTP verification failed:', error);
     } finally {
       setLoading(false);
     }
@@ -85,15 +79,8 @@ const PlumberResetPassword = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.new_plumber_password !== formData.confirm_plumber_password) {
-      toast.error('Plumber passwords do not match!');
-      return;
-    }
-
-    if (formData.new_plumber_password.length < 6) {
-      toast.error('Plumber password must be at least 6 characters!');
-      return;
-    }
+    if (formData.new_plumber_password !== formData.confirm_plumber_password) return;
+    if (formData.new_plumber_password.length < 6) return;
 
     setLoading(true);
     
@@ -110,17 +97,10 @@ const PlumberResetPassword = () => {
         try {
           sessionStorage.removeItem('plumber_reset_email');
         } catch (e) {}
-        
-        toast.success(response.message || 'Plumber password reset successfully!');
         navigate('/plumber-login');
       }
     } catch (error) {
-      if (error.message.includes('Validation failed') || error.errors) {
-        const errorMessage = error.errors?.[0]?.message || error.message;
-        toast.error(errorMessage);
-      } else {
-        toast.error(error.message || 'Failed to reset plumber password. Please try again.');
-      }
+      console.error('Password reset failed:', error);
     } finally {
       setLoading(false);
     }

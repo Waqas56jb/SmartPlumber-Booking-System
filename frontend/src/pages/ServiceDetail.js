@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from '../utils/router';
 import { FaArrowLeft, FaShoppingCart, FaStar, FaTruck, FaImage } from 'react-icons/fa';
 import { productAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 
 // Service categories mapping (moved outside component to avoid dependency warning)
 const serviceCategories = {
@@ -94,7 +93,7 @@ const ServiceDetail = () => {
         setProducts(response.data.products);
       }
     } catch (error) {
-      toast.error('Failed to load products');
+      console.error('Failed to load products:', error);
     } finally {
       setLoading(false);
     }
@@ -132,7 +131,7 @@ const ServiceDetail = () => {
 
   const handleAddToCart = (product) => {
     // TODO: Implement cart functionality
-    toast.success(`${product.product_name} added to cart!`);
+    console.log(`${product.product_name} added to cart!`);
   };
 
   if (!serviceInfo) {

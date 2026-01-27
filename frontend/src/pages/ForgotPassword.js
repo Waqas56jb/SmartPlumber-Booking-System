@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { FaEnvelope, FaArrowRight } from 'react-icons/fa';
+import { FaEnvelope, FaArrowRight, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
-import { toast } from 'react-toastify';
 import { authAPI } from '../services/apiService';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const { navigate } = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage({ type: '', text: '' });
     
     try {
       const response = await authAPI.forgotPassword(email);
@@ -24,11 +25,11 @@ const ForgotPassword = () => {
           console.warn('Failed to store email:', e);
         }
         
-        toast.success(response.message || 'OTP sent to your email!');
-        navigate('/reset-password');
+        setMessage({ type: 'success', text: 'OTP sent to your email!' });
+        setTimeout(() => navigate('/reset-password'), 1000);
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to send OTP. Please try again.');
+      setMessage({ type: 'error', text: error.message || 'Failed to send OTP. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -67,6 +68,18 @@ const ForgotPassword = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4 md:space-y-5">
+              {/* Status Message */}
+              {message.text && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {message.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {message.text}
+                </div>
+              )}
+              
               <div className="rounded-lg p-3 sm:p-4 md:p-5" style={{ background: 'linear-gradient(to right, #F5E6D3, #E8D4B8)', border: '1px solid #D2A752' }}>
                 <p className="text-xs sm:text-sm text-gray-700 text-center leading-relaxed">
                   <FaEnvelope className="inline-block mr-1.5 sm:mr-2" size={12} style={{ color: '#D2A752', fontSize: 'clamp(12px, 2vw, 14px)' }} />

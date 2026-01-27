@@ -2,6 +2,8 @@ const express = require('express');
 const { body } = require('express-validator');
 const plumberController = require('../controllers/plumberController');
 const plumberProfileController = require('../controllers/plumberProfileController');
+const plumberServicesController = require('../controllers/plumberServicesController');
+const bookingsController = require('../controllers/bookingsController');
 const { validateRequest } = require('../middleware/validation');
 
 const router = express.Router();
@@ -102,5 +104,20 @@ router.post('/reset-password', plumberResetPasswordValidation, validateRequest, 
 // Profile Routes
 router.get('/profile/:id?', plumberProfileController.getPlumberProfile);
 router.put('/profile/:id?', plumberProfileController.updatePlumberProfile);
+
+// Services Routes
+router.get('/services/:plumberId', plumberServicesController.getPlumberServices);
+router.get('/service/:serviceId', plumberServicesController.getPlumberService);
+router.post('/services', plumberServicesController.createPlumberService);
+router.put('/services/:serviceId', plumberServicesController.updatePlumberService);
+router.delete('/services/:serviceId', plumberServicesController.deletePlumberService);
+router.patch('/services/:serviceId/toggle', plumberServicesController.toggleServiceStatus);
+
+// Bookings Routes
+router.get('/bookings/:plumberId', bookingsController.getPlumberBookings);
+router.get('/bookings/:plumberId/stats', bookingsController.getBookingStats);
+router.get('/booking/:bookingId', bookingsController.getBookingDetails);
+router.patch('/booking/:bookingId/status', bookingsController.updateBookingStatus);
+router.post('/bookings', bookingsController.createBooking);
 
 module.exports = router;

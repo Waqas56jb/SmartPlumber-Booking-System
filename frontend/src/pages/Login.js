@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { authAPI } from '../services/apiService';
 
 const Login = () => {
@@ -12,6 +11,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const { login } = useAuth();
   const { navigate } = useRouter();
 
@@ -20,11 +20,14 @@ const Login = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear message when user types
+    if (message.text) setMessage({ type: '', text: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage({ type: '', text: '' });
     
     try {
       const response = await authAPI.login({
@@ -39,11 +42,11 @@ const Login = () => {
           email: response.data.user.email
         }, response.data.token);
         
-        toast.success(response.message || 'Login successful!');
-        navigate('/home');
+        setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
+        setTimeout(() => navigate('/home'), 500);
       }
     } catch (error) {
-      toast.error(error.message || 'Login failed. Please check your credentials.');
+      setMessage({ type: 'error', text: error.message || 'Login failed. Please check your credentials.' });
     } finally {
       setLoading(false);
     }
@@ -82,6 +85,18 @@ const Login = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
+              {/* Status Message */}
+              {message.text && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium animate-fade-in ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {message.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {message.text}
+                </div>
+              )}
+
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">

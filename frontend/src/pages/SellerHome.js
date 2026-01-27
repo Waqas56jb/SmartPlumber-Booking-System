@@ -3,7 +3,6 @@ import { FaStore, FaMapMarkerAlt, FaTruck, FaCreditCard, FaMoneyBillWave, FaStar
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 
 const SellerHome = () => {
   const { user, logout } = useAuth();
@@ -14,7 +13,6 @@ const SellerHome = () => {
   const handleLogout = () => {
     logout();
     navigate('/seller-login');
-    toast.success('Logged out successfully');
   };
 
   const fetchProfile = useCallback(async () => {
@@ -24,8 +22,8 @@ const SellerHome = () => {
       if (response.success) {
         setProfile(response.data.seller);
       }
-    } catch (error) {
-      toast.error('Failed to load profile');
+    } catch (err) {
+      console.error('Failed to load profile:', err);
     } finally {
       setLoading(false);
     }
@@ -65,9 +63,10 @@ const SellerHome = () => {
             </div>
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => toast.info('Profile edit feature coming soon!')}
-                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
+                onClick={() => {}} 
+                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90 cursor-not-allowed opacity-60" 
                 style={{ background: '#D2A752' }}
+                title="Coming soon"
               >
                 <FaEdit className="inline mr-2" />
                 Edit Profile
@@ -243,15 +242,17 @@ const SellerHome = () => {
               Manage Products
             </button>
             <button 
-              onClick={() => toast.info('Orders feature coming soon!')}
-              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+              onClick={() => {}}
+              className="p-4 rounded-lg border-2 border-gray-300 text-gray-400 font-semibold cursor-not-allowed flex items-center justify-center gap-2"
+              title="Coming soon"
             >
               <FaShoppingBag />
               View Orders
             </button>
             <button 
-              onClick={() => toast.info('Photo upload feature coming soon!')}
-              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+              onClick={() => {}}
+              className="p-4 rounded-lg border-2 border-gray-300 text-gray-400 font-semibold cursor-not-allowed flex items-center justify-center gap-2"
+              title="Coming soon"
             >
               <FaCamera />
               Upload Shop Photos

@@ -164,6 +164,79 @@ export const plumberAPI = {
       method: 'PUT',
       body: JSON.stringify(profileData)
     });
+  },
+
+  // Plumber Services
+  getPlumberServices: async (plumberId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICES}/${plumberId}`, {
+      method: 'GET'
+    });
+  },
+
+  getPlumberService: async (serviceId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICE}/${serviceId}`, {
+      method: 'GET'
+    });
+  },
+
+  createPlumberService: async (serviceData) => {
+    return apiRequest(API_ENDPOINTS.PLUMBER_SERVICES, {
+      method: 'POST',
+      body: JSON.stringify(serviceData)
+    });
+  },
+
+  updatePlumberService: async (serviceId, serviceData) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICES}/${serviceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(serviceData)
+    });
+  },
+
+  deletePlumberService: async (serviceId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICES}/${serviceId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  togglePlumberServiceStatus: async (serviceId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICES}/${serviceId}/toggle`, {
+      method: 'PATCH'
+    });
+  },
+
+  // Plumber Bookings
+  getPlumberBookings: async (plumberId, filters = {}) => {
+    const queryParams = new URLSearchParams();
+    if (filters.status) queryParams.append('status', filters.status);
+    if (filters.date_from) queryParams.append('date_from', filters.date_from);
+    if (filters.date_to) queryParams.append('date_to', filters.date_to);
+    
+    const queryString = queryParams.toString();
+    const url = queryString 
+      ? `${API_ENDPOINTS.PLUMBER_BOOKINGS}/${plumberId}?${queryString}`
+      : `${API_ENDPOINTS.PLUMBER_BOOKINGS}/${plumberId}`;
+    
+    return apiRequest(url, { method: 'GET' });
+  },
+
+  getBookingStats: async (plumberId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_BOOKINGS}/${plumberId}/stats`, {
+      method: 'GET'
+    });
+  },
+
+  getBookingDetails: async (bookingId) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_BOOKING}/${bookingId}`, {
+      method: 'GET'
+    });
+  },
+
+  updateBookingStatus: async (bookingId, status, notes) => {
+    return apiRequest(`${API_ENDPOINTS.PLUMBER_BOOKING}/${bookingId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, notes })
+    });
   }
 };
 

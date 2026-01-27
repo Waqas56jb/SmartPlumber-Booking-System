@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaArrowRight, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
-import { toast } from 'react-toastify';
 import { sellerAPI } from '../services/apiService';
 
 const SellerForgotPassword = () => {
@@ -22,12 +21,10 @@ const SellerForgotPassword = () => {
         } catch (e) {
           console.warn('Failed to store email:', e);
         }
-        
-        toast.success(response.message || 'OTP sent to your seller email!');
         navigate('/seller-reset-password');
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to send OTP. Please try again.');
+      console.error('Failed to send OTP:', error);
     } finally {
       setLoading(false);
     }

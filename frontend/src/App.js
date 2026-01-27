@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useRouter } from './utils/router';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Landing from './pages/Landing';
 import Home from './pages/Home';
 import PlumberHome from './pages/PlumberHome';
 import PlumberEditProfile from './pages/PlumberEditProfile';
+import PlumberServices from './pages/PlumberServices';
+import PlumberBookings from './pages/PlumberBookings';
 import SellerHome from './pages/SellerHome';
 import SellerProducts from './pages/SellerProducts';
 import ServiceDetail from './pages/ServiceDetail';
@@ -32,10 +32,15 @@ function AppContent() {
     '/', '/landing',
     '/login', '/signup', '/forgot-password', '/reset-password',
     '/plumber-login', '/plumber-signup', '/plumber-forgot-password', '/plumber-reset-password',
-    '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password',
-    '/service'
+    '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password'
   ];
-  const isPublicRoute = publicRoutes.includes(currentPath);
+  
+  // Check if it's a public route (includes service detail pages)
+  const isPublicRoute = publicRoutes.includes(currentPath) || currentPath.startsWith('/service/');
+  
+  // Protected routes that authenticated users can access
+  const protectedRoutes = ['/home', '/plumber-edit-profile', '/plumber-services', '/plumber-bookings', '/seller-products'];
+  const isProtectedRoute = protectedRoutes.includes(currentPath);
 
   // Initialize hash on first load and handle authentication redirects
   useEffect(() => {
@@ -57,10 +62,10 @@ function AppContent() {
       navigate('/home');
     }
     // Protect routes: redirect to landing if not authenticated and trying to access protected route
-    else if (!isAuthenticated && !isPublicRoute) {
+    else if (!isAuthenticated && !isPublicRoute && isProtectedRoute) {
       navigate('/');
     }
-  }, [isAuthenticated, currentPath, navigate, isPublicRoute]);
+  }, [isAuthenticated, currentPath, navigate, isPublicRoute, isProtectedRoute]);
 
   // Determine which home page to show based on user type
   const getUserHomePage = () => {
@@ -106,6 +111,14 @@ function AppContent() {
         return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
           ? <PlumberEditProfile />
           : <Landing />;
+      case '/plumber-services':
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
+          ? <PlumberServices />
+          : <Landing />;
+      case '/plumber-bookings':
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
+          ? <PlumberBookings />
+          : <Landing />;
       // Seller routes
       case '/seller-login':
         return <SellerLogin />;
@@ -134,18 +147,6 @@ function AppContent() {
   return (
     <div className="App">
       {renderPage()}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
     </div>
   );
 }

@@ -26,6 +26,14 @@ export const API_ENDPOINTS = {
   // Plumber Profile
   PLUMBER_PROFILE: `${API_BASE_URL}/api/plumber/profile`,
   
+  // Plumber Services
+  PLUMBER_SERVICES: `${API_BASE_URL}/api/plumber/services`,
+  PLUMBER_SERVICE: `${API_BASE_URL}/api/plumber/service`,
+  
+  // Plumber Bookings
+  PLUMBER_BOOKINGS: `${API_BASE_URL}/api/plumber/bookings`,
+  PLUMBER_BOOKING: `${API_BASE_URL}/api/plumber/booking`,
+  
   // Seller Profile
   SELLER_PROFILE: `${API_BASE_URL}/api/seller/profile`,
   

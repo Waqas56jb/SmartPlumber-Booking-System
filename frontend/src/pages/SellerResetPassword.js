@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
-import { toast } from 'react-toastify';
 import { sellerAPI } from '../services/apiService';
 
 const SellerResetPassword = () => {
@@ -26,7 +25,6 @@ const SellerResetPassword = () => {
 
   useEffect(() => {
     if (!seller_email) {
-      toast.error('Please enter your seller email first');
       navigate('/seller-forgot-password');
     } else {
       try {
@@ -56,20 +54,16 @@ const SellerResetPassword = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     const otpValue = otp.join('');
-    if (otpValue.length !== 6) {
-      toast.error('Please enter complete OTP');
-      return;
-    }
+    if (otpValue.length !== 6) return;
     
     setLoading(true);
     try {
       const response = await sellerAPI.sellerVerifyOtp(seller_email, otpValue);
       if (response.success) {
-        toast.success(response.message || 'OTP verified successfully!');
         setStep(2);
       }
     } catch (error) {
-      toast.error(error.message || 'Invalid or expired OTP. Please try again.');
+      console.error('OTP verification failed:', error);
     } finally {
       setLoading(false);
     }
@@ -85,15 +79,8 @@ const SellerResetPassword = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.new_seller_password !== formData.confirm_seller_password) {
-      toast.error('Seller passwords do not match!');
-      return;
-    }
-
-    if (formData.new_seller_password.length < 6) {
-      toast.error('Seller password must be at least 6 characters!');
-      return;
-    }
+    if (formData.new_seller_password !== formData.confirm_seller_password) return;
+    if (formData.new_seller_password.length < 6) return;
 
     setLoading(true);
     
@@ -110,17 +97,10 @@ const SellerResetPassword = () => {
         try {
           sessionStorage.removeItem('seller_reset_email');
         } catch (e) {}
-        
-        toast.success(response.message || 'Seller password reset successfully!');
         navigate('/seller-login');
       }
     } catch (error) {
-      if (error.message.includes('Validation failed') || error.errors) {
-        const errorMessage = error.errors?.[0]?.message || error.message;
-        toast.error(errorMessage);
-      } else {
-        toast.error(error.message || 'Failed to reset seller password. Please try again.');
-      }
+      console.error('Password reset failed:', error);
     } finally {
       setLoading(false);
     }

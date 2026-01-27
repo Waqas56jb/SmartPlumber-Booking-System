@@ -3,7 +3,6 @@ import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaPhone, FaEnvelope, FaE
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 
 // Static placeholder image for all plumbers
 const PLUMBER_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
@@ -17,7 +16,6 @@ const PlumberHome = () => {
   const handleLogout = () => {
     logout();
     navigate('/plumber-login');
-    toast.success('Logged out successfully');
   };
 
   const fetchProfile = useCallback(async () => {
@@ -27,8 +25,8 @@ const PlumberHome = () => {
       if (response.success) {
         setProfile(response.data.plumber);
       }
-    } catch (error) {
-      toast.error('Failed to load profile');
+    } catch (err) {
+      console.error('Failed to load profile:', err);
     } finally {
       setLoading(false);
     }
@@ -236,24 +234,21 @@ const PlumberHome = () => {
           <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid md:grid-cols-3 gap-4">
             <button 
-              onClick={() => toast.info('Services management feature coming soon!')}
+              onClick={() => navigate('/plumber-services')}
               className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaTools />
               Manage Services
             </button>
             <button 
-              onClick={() => toast.info('Bookings feature coming soon!')}
+              onClick={() => navigate('/plumber-bookings')}
               className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaCalendarCheck />
               View Bookings
             </button>
             <button 
-              onClick={() => {
-                const newAvailability = !profile?.is_available;
-                toast.success(`Availability ${newAvailability ? 'enabled' : 'disabled'}. Feature coming soon!`);
-              }}
+              onClick={() => navigate('/plumber-edit-profile')}
               className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaToggleOn />

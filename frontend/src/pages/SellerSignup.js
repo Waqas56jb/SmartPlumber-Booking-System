@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { sellerAPI } from '../services/apiService';
 
 const SellerSignup = () => {
@@ -28,24 +27,14 @@ const SellerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.seller_password !== formData.confirm_seller_password) {
-      toast.error('Seller passwords do not match!');
-      return;
-    }
-
-    if (formData.seller_password.length < 6) {
-      toast.error('Seller password must be at least 6 characters!');
-      return;
-    }
+    if (formData.seller_password !== formData.confirm_seller_password) return;
+    if (formData.seller_password.length < 6) return;
 
     const hasUpperCase = /[A-Z]/.test(formData.seller_password);
     const hasLowerCase = /[a-z]/.test(formData.seller_password);
     const hasNumber = /\d/.test(formData.seller_password);
     
-    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      toast.error('Seller password must contain at least one uppercase letter, one lowercase letter, and one number');
-      return;
-    }
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) return;
 
     setLoading(true);
     
@@ -64,19 +53,10 @@ const SellerSignup = () => {
           seller_email: response.data.seller.seller_email,
           userType: 'seller'
         }, response.data.token);
-        
-        toast.success(response.message || 'Seller account created successfully!');
         navigate('/home');
       }
     } catch (error) {
-      if (error.errors && error.errors.length > 0) {
-        const errorMessage = error.errors[0].message || error.message;
-        toast.error(errorMessage);
-      } else if (error.message.includes('Validation failed')) {
-        toast.error(error.message);
-      } else {
-        toast.error(error.message || 'Seller signup failed. Please try again.');
-      }
+      console.error('Signup failed:', error);
     } finally {
       setLoading(false);
     }

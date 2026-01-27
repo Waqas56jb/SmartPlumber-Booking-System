@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { authAPI } from '../services/apiService';
 
 const Signup = () => {
@@ -15,6 +14,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const { login } = useAuth();
   const { navigate } = useRouter();
 
@@ -23,18 +23,20 @@ const Signup = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (message.text) setMessage({ type: '', text: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage({ type: '', text: '' });
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
+      setMessage({ type: 'error', text: 'Passwords do not match!' });
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters!');
+      setMessage({ type: 'error', text: 'Password must be at least 6 characters!' });
       return;
     }
 
@@ -44,7 +46,7 @@ const Signup = () => {
     const hasNumber = /\d/.test(formData.password);
     
     if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      setMessage({ type: 'error', text: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' });
       return;
     }
 
@@ -65,19 +67,16 @@ const Signup = () => {
           email: response.data.user.email
         }, response.data.token);
         
-        toast.success(response.message || 'Account created successfully!');
-        navigate('/home');
+        setMessage({ type: 'success', text: 'Account created successfully! Redirecting...' });
+        setTimeout(() => navigate('/home'), 500);
       }
     } catch (error) {
       // Handle validation errors
       if (error.errors && error.errors.length > 0) {
-        // Show first validation error
         const errorMessage = error.errors[0].message || error.message;
-        toast.error(errorMessage);
-      } else if (error.message.includes('Validation failed')) {
-        toast.error(error.message);
+        setMessage({ type: 'error', text: errorMessage });
       } else {
-        toast.error(error.message || 'Signup failed. Please try again.');
+        setMessage({ type: 'error', text: error.message || 'Signup failed. Please try again.' });
       }
     } finally {
       setLoading(false);
@@ -117,6 +116,18 @@ const Signup = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
+              {/* Status Message */}
+              {message.text && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {message.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {message.text}
+                </div>
+              )}
+
               {/* Username Field */}
               <div>
                 <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">

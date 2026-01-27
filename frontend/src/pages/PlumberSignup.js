@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaWrench } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { plumberAPI } from '../services/apiService';
 
 const PlumberSignup = () => {
@@ -28,25 +27,15 @@ const PlumberSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.plumber_password !== formData.confirm_plumber_password) {
-      toast.error('Plumber passwords do not match!');
-      return;
-    }
-
-    if (formData.plumber_password.length < 6) {
-      toast.error('Plumber password must be at least 6 characters!');
-      return;
-    }
+    if (formData.plumber_password !== formData.confirm_plumber_password) return;
+    if (formData.plumber_password.length < 6) return;
 
     // Check password complexity
     const hasUpperCase = /[A-Z]/.test(formData.plumber_password);
     const hasLowerCase = /[a-z]/.test(formData.plumber_password);
     const hasNumber = /\d/.test(formData.plumber_password);
     
-    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      toast.error('Plumber password must contain at least one uppercase letter, one lowercase letter, and one number');
-      return;
-    }
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) return;
 
     setLoading(true);
     
@@ -65,19 +54,10 @@ const PlumberSignup = () => {
           plumber_email: response.data.plumber.plumber_email,
           userType: 'plumber'
         }, response.data.token);
-        
-        toast.success(response.message || 'Plumber account created successfully!');
         navigate('/home');
       }
     } catch (error) {
-      if (error.errors && error.errors.length > 0) {
-        const errorMessage = error.errors[0].message || error.message;
-        toast.error(errorMessage);
-      } else if (error.message.includes('Validation failed')) {
-        toast.error(error.message);
-      } else {
-        toast.error(error.message || 'Plumber signup failed. Please try again.');
-      }
+      console.error('Signup failed:', error);
     } finally {
       setLoading(false);
     }

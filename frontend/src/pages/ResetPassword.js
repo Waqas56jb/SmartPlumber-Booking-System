@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
 import { Link, useRouter, useLocation } from '../utils/router';
-import { toast } from 'react-toastify';
 import { authAPI } from '../services/apiService';
 
 const ResetPassword = () => {
@@ -32,7 +31,6 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (!email) {
-      toast.error('Please enter your email first');
       navigate('/forgot-password');
     } else {
       // Store email in sessionStorage for persistence
@@ -65,21 +63,17 @@ const ResetPassword = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     const otpValue = otp.join('');
-    if (otpValue.length !== 6) {
-      toast.error('Please enter complete OTP');
-      return;
-    }
+    if (otpValue.length !== 6) return;
     
     setLoading(true);
     try {
       const response = await authAPI.verifyOtp(email, otpValue);
       
       if (response.success) {
-        toast.success(response.message || 'OTP verified successfully!');
         setStep(2);
       }
     } catch (error) {
-      toast.error(error.message || 'Invalid or expired OTP. Please try again.');
+      console.error('OTP verification failed:', error);
     } finally {
       setLoading(false);
     }
@@ -95,15 +89,8 @@ const ResetPassword = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
-      return;
-    }
-
-    if (formData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters!');
-      return;
-    }
+    if (formData.newPassword !== formData.confirmPassword) return;
+    if (formData.newPassword.length < 6) return;
 
     setLoading(true);
     
@@ -123,18 +110,10 @@ const ResetPassword = () => {
         } catch (e) {
           // Ignore errors
         }
-        
-        toast.success(response.message || 'Password reset successfully!');
         navigate('/login');
       }
     } catch (error) {
-      // Handle validation errors
-      if (error.message.includes('Validation failed') || error.errors) {
-        const errorMessage = error.errors?.[0]?.message || error.message;
-        toast.error(errorMessage);
-      } else {
-        toast.error(error.message || 'Failed to reset password. Please try again.');
-      }
+      console.error('Password reset failed:', error);
     } finally {
       setLoading(false);
     }

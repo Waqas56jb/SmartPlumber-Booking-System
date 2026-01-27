@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FaTimes, FaSave } from 'react-icons/fa';
 import { productAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 
 const AddProductForm = ({ onClose, onSuccess, sellerId }) => {
   const [formData, setFormData] = useState({
@@ -71,12 +70,11 @@ const AddProductForm = ({ onClose, onSuccess, sellerId }) => {
 
       const response = await productAPI.createProduct(productData);
       if (response.success) {
-        toast.success('Product created successfully!');
         onSuccess();
         onClose();
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to create product');
+      console.error('Failed to create product:', error);
     } finally {
       setLoading(false);
     }

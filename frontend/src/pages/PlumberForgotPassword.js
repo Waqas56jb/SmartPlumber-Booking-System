@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaArrowRight, FaWrench } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
-import { toast } from 'react-toastify';
 import { plumberAPI } from '../services/apiService';
 
 const PlumberForgotPassword = () => {
@@ -22,12 +21,10 @@ const PlumberForgotPassword = () => {
         } catch (e) {
           console.warn('Failed to store email:', e);
         }
-        
-        toast.success(response.message || 'OTP sent to your plumber email!');
         navigate('/plumber-reset-password');
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to send OTP. Please try again.');
+      console.error('Failed to send OTP:', error);
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
-import { toast } from 'react-toastify';
 
 // Static placeholder image for all plumbers (no upload)
 const PLUMBER_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
@@ -95,7 +94,7 @@ const PlumberEditProfile = () => {
         // Profile photo is static - no need to load from database
       }
     } catch (error) {
-      toast.error('Failed to load profile');
+      console.error('Failed to load profile:', error);
     } finally {
       setLoading(false);
     }
@@ -182,11 +181,10 @@ const PlumberEditProfile = () => {
       const response = await plumberAPI.updatePlumberProfile(user.id, submitData);
 
       if (response.success) {
-        toast.success('Profile updated successfully!');
         navigate('/home');
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to update profile');
+      console.error('Failed to update profile:', error);
     } finally {
       setSaving(false);
     }
@@ -607,11 +605,11 @@ const PlumberEditProfile = () => {
             </div>
           </div>
 
-          {/* Availability */}
+          {/* Availability Status */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <FaClock className="text-[#D2A752]" />
-              Availability
+              Availability Status
             </h2>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-3 cursor-pointer">
@@ -635,6 +633,183 @@ const PlumberEditProfile = () => {
                 ? 'You are currently available for new bookings.'
                 : 'You are currently not available for new bookings.'}
             </p>
+          </div>
+
+          {/* Weekly Availability Schedule */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <FaClock className="text-[#D2A752]" />
+              Weekly Schedule
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Set your working hours for each day of the week. Customers will see when you're available.
+            </p>
+
+            <div className="space-y-4">
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+                const dayKey = day.toLowerCase();
+                const daySchedule = formData.availability_schedule?.[dayKey] || { enabled: false, start: '09:00', end: '17:00' };
+                
+                return (
+                  <div 
+                    key={day} 
+                    className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl transition-all ${
+                      daySchedule.enabled 
+                        ? 'bg-gradient-to-r from-[#F5E6D3] to-[#FDF8F3] border-2 border-[#D2A752]/30' 
+                        : 'bg-gray-50 border-2 border-gray-200'
+                    }`}
+                  >
+                    {/* Day Toggle */}
+                    <div className="flex items-center gap-3 min-w-[140px]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSchedule = { ...formData.availability_schedule };
+                          newSchedule[dayKey] = {
+                            ...daySchedule,
+                            enabled: !daySchedule.enabled
+                          };
+                          setFormData(prev => ({ ...prev, availability_schedule: newSchedule }));
+                        }}
+                        className={`w-12 h-6 rounded-full transition-all relative ${
+                          daySchedule.enabled ? 'bg-[#D2A752]' : 'bg-gray-300'
+                        }`}
+                      >
+                        <div 
+                          className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-all shadow-md ${
+                            daySchedule.enabled ? 'left-6' : 'left-0.5'
+                          }`}
+                        />
+                      </button>
+                      <span className={`font-semibold ${daySchedule.enabled ? 'text-gray-900' : 'text-gray-400'}`}>
+                        {day}
+                      </span>
+                    </div>
+
+                    {/* Time Inputs */}
+                    {daySchedule.enabled ? (
+                      <div className="flex flex-wrap items-center gap-3 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 font-medium">From</span>
+                          <input
+                            type="time"
+                            value={daySchedule.start || '09:00'}
+                            onChange={(e) => {
+                              const newSchedule = { ...formData.availability_schedule };
+                              newSchedule[dayKey] = { ...daySchedule, start: e.target.value };
+                              setFormData(prev => ({ ...prev, availability_schedule: newSchedule }));
+                            }}
+                            className="px-3 py-2 border-2 border-[#D2A752]/30 rounded-lg focus:outline-none focus:border-[#D2A752] bg-white text-gray-900 font-medium"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 font-medium">To</span>
+                          <input
+                            type="time"
+                            value={daySchedule.end || '17:00'}
+                            onChange={(e) => {
+                              const newSchedule = { ...formData.availability_schedule };
+                              newSchedule[dayKey] = { ...daySchedule, end: e.target.value };
+                              setFormData(prev => ({ ...prev, availability_schedule: newSchedule }));
+                            }}
+                            className="px-3 py-2 border-2 border-[#D2A752]/30 rounded-lg focus:outline-none focus:border-[#D2A752] bg-white text-gray-900 font-medium"
+                          />
+                        </div>
+                        <span className="text-sm text-[#D2A752] font-semibold hidden sm:inline">
+                          ✓ Working
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex-1">
+                        <span className="text-gray-400 italic text-sm">Day off - Not available</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-sm font-semibold text-gray-700 mb-3">Quick Actions:</p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const schedule = {};
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
+                      schedule[day] = { enabled: true, start: '09:00', end: '17:00' };
+                    });
+                    ['saturday', 'sunday'].forEach(day => {
+                      schedule[day] = { enabled: false, start: '09:00', end: '17:00' };
+                    });
+                    setFormData(prev => ({ ...prev, availability_schedule: schedule }));
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border-2 border-[#D2A752] text-[#D2A752] hover:bg-[#D2A752] hover:text-white transition-all"
+                >
+                  Standard 9-5 (Mon-Fri)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const schedule = {};
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].forEach(day => {
+                      schedule[day] = { enabled: true, start: '08:00', end: '18:00' };
+                    });
+                    schedule['sunday'] = { enabled: false, start: '09:00', end: '17:00' };
+                    setFormData(prev => ({ ...prev, availability_schedule: schedule }));
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border-2 border-[#D2A752] text-[#D2A752] hover:bg-[#D2A752] hover:text-white transition-all"
+                >
+                  Extended Hours (Mon-Sat)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const schedule = {};
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                      schedule[day] = { enabled: true, start: '00:00', end: '23:59' };
+                    });
+                    setFormData(prev => ({ ...prev, availability_schedule: schedule }));
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all"
+                >
+                  24/7 Emergency
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, availability_schedule: {} }));
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border-2 border-red-400 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            {/* Schedule Summary */}
+            {Object.keys(formData.availability_schedule || {}).some(day => formData.availability_schedule[day]?.enabled) && (
+              <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#D2A752]/10 to-[#D2A752]/5 border border-[#D2A752]/20">
+                <p className="text-sm font-semibold text-gray-700 mb-2">📅 Your Weekly Summary:</p>
+                <div className="flex flex-wrap gap-2">
+                  {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                    const schedule = formData.availability_schedule?.[day];
+                    if (schedule?.enabled) {
+                      return (
+                        <span 
+                          key={day} 
+                          className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border border-[#D2A752]/30 shadow-sm"
+                        >
+                          {day.charAt(0).toUpperCase() + day.slice(1, 3)}: {schedule.start} - {schedule.end}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Submit Buttons */}

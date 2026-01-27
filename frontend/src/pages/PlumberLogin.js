@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaWrench } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaWrench, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { plumberAPI } from '../services/apiService';
 
 const PlumberLogin = () => {
@@ -12,6 +11,7 @@ const PlumberLogin = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const { login } = useAuth();
   const { navigate } = useRouter();
 
@@ -20,11 +20,13 @@ const PlumberLogin = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (message.text) setMessage({ type: '', text: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage({ type: '', text: '' });
     
     try {
       const response = await plumberAPI.plumberLogin({
@@ -40,11 +42,11 @@ const PlumberLogin = () => {
           userType: 'plumber'
         }, response.data.token);
         
-        toast.success(response.message || 'Plumber login successful!');
-        navigate('/home');
+        setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
+        setTimeout(() => navigate('/home'), 500);
       }
     } catch (error) {
-      toast.error(error.message || 'Plumber login failed. Please check your credentials.');
+      setMessage({ type: 'error', text: error.message || 'Login failed. Please check your credentials.' });
     } finally {
       setLoading(false);
     }
@@ -87,6 +89,18 @@ const PlumberLogin = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
+              {/* Status Message */}
+              {message.text && (
+                <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {message.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {message.text}
+                </div>
+              )}
+
               {/* Email Field */}
               <div>
                 <label htmlFor="plumber_email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">

@@ -354,7 +354,43 @@ CREATE TABLE IF NOT EXISTS otps (
 );
 
 -- ============================================
--- 12. PLUMBER LOCATION HISTORY TABLE (For Live Tracking)
+-- 12. BOOKINGS TABLE (Customer to Plumber Bookings)
+-- ============================================
+CREATE TABLE IF NOT EXISTS bookings (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    plumber_id INTEGER NOT NULL REFERENCES plumbers(id) ON DELETE CASCADE,
+    service_id INTEGER REFERENCES plumber_services(id) ON DELETE SET NULL,
+    
+    -- Booking Details
+    booking_date DATE NOT NULL,
+    booking_time TIME,
+    booking_duration_hours DECIMAL(4, 2),
+    
+    -- Customer Details for the booking
+    customer_address TEXT,
+    customer_phone VARCHAR(20),
+    customer_notes TEXT,
+    
+    -- Status Management
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
+    plumber_notes TEXT,
+    
+    -- Payment
+    total_amount DECIMAL(10, 2),
+    payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded')),
+    
+    -- Timestamps
+    confirmed_at TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    cancelled_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- 13. PLUMBER LOCATION HISTORY TABLE (For Live Tracking)
 -- ============================================
 CREATE TABLE IF NOT EXISTS plumber_location_history (
     id SERIAL PRIMARY KEY,

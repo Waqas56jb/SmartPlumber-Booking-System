@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
 import { sellerAPI } from '../services/apiService';
 
 const SellerLogin = () => {
@@ -39,12 +38,10 @@ const SellerLogin = () => {
           seller_email: response.data.seller.seller_email,
           userType: 'seller'
         }, response.data.token);
-        
-        toast.success(response.message || 'Seller login successful!');
         navigate('/home');
       }
     } catch (error) {
-      toast.error(error.message || 'Seller login failed. Please check your credentials.');
+      console.error('Login failed:', error);
     } finally {
       setLoading(false);
     }
