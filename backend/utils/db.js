@@ -58,6 +58,22 @@ const initializeDatabase = async () => {
       )
     `;
 
+    // Create plumber_services table if it doesn't exist
+    await sql`
+      CREATE TABLE IF NOT EXISTS plumber_services (
+        id SERIAL PRIMARY KEY,
+        plumber_id INTEGER NOT NULL REFERENCES plumbers(id) ON DELETE CASCADE,
+        service_name VARCHAR(255) NOT NULL,
+        service_description TEXT,
+        price DECIMAL(10, 2),
+        price_type VARCHAR(20) DEFAULT 'hourly',
+        duration_hours DECIMAL(4, 2),
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
     // Create OTPs table if it doesn't exist
     await sql`
       CREATE TABLE IF NOT EXISTS otps (
@@ -99,6 +115,14 @@ const initializeDatabase = async () => {
       CREATE INDEX IF NOT EXISTS idx_sellers_username ON sellers(LOWER(seller_username))
     `;
 
+    // Create indexes for plumber_services table
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_plumber_services_plumber_id ON plumber_services(plumber_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_plumber_services_is_active ON plumber_services(is_active)
+    `;
+
     // Create indexes for OTPs table
     await sql`
       CREATE INDEX IF NOT EXISTS idx_otps_email ON otps(LOWER(email))
@@ -117,6 +141,7 @@ const initializeDatabase = async () => {
     console.log('   ✓ users table created (customers)');
     console.log('   ✓ plumbers table created');
     console.log('   ✓ sellers table created');
+    console.log('   ✓ plumber_services table created');
     console.log('   ✓ otps table created');
     console.log('   ✓ Indexes created');
     return true;
