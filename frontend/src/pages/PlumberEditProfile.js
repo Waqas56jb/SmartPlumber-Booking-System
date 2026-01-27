@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  FaWrench, FaUser, FaCamera, FaSave, FaTimes, FaMapMarkerAlt, 
+  FaWrench, FaUser, FaSave, FaTimes, FaMapMarkerAlt, 
   FaPoundSign, FaPhone, FaEnvelope, FaIdCard, FaGraduationCap, 
   FaBriefcase, FaClock, FaToggleOn, FaToggleOff, FaCheck
 } from 'react-icons/fa';
@@ -9,12 +9,14 @@ import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
 import { toast } from 'react-toastify';
 
+// Static placeholder image for all plumbers (no upload)
+const PLUMBER_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+
 const PlumberEditProfile = () => {
   const { user } = useAuth();
   const { navigate } = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profileImagePreview, setProfileImagePreview] = useState(null);
   
   const [formData, setFormData] = useState({
     // Personal Information
@@ -90,9 +92,7 @@ const PlumberEditProfile = () => {
           is_available: profile.is_available !== undefined ? profile.is_available : true,
           availability_schedule: profile.availability_schedule || {}
         });
-        if (profile.plumber_thumbnail_photo) {
-          setProfileImagePreview(profile.plumber_thumbnail_photo);
-        }
+        // Profile photo is static - no need to load from database
       }
     } catch (error) {
       toast.error('Failed to load profile');
@@ -115,70 +115,7 @@ const PlumberEditProfile = () => {
     }));
   };
 
-  // Compress image to reduce size for upload (very small for database storage)
-  const compressImage = (file, maxSize = 150, quality = 0.5) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          
-          // Calculate new dimensions - fit within maxSize x maxSize
-          const ratio = Math.min(maxSize / width, maxSize / height);
-          if (ratio < 1) {
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          const ctx = canvas.getContext('2d');
-          // Use better image smoothing
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Convert to JPEG with low quality for small size
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-          
-          // Log the size for debugging
-          const sizeKB = Math.round(compressedDataUrl.length * 0.75 / 1024);
-          console.log(`Image compressed: ${width}x${height}, ~${sizeKB}KB`);
-          
-          resolve(compressedDataUrl);
-        };
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Image size must be less than 10MB');
-        return;
-      }
-      
-      try {
-        // Compress image before preview/upload (150x150, 50% quality = ~5-15KB)
-        toast.info('Compressing image...', { autoClose: 1000 });
-        const compressedImage = await compressImage(file, 150, 0.5);
-        setProfileImagePreview(compressedImage);
-        toast.success('Image ready!', { autoClose: 1500 });
-      } catch (error) {
-        console.error('Image compression error:', error);
-        toast.error('Failed to process image');
-      }
-    }
-  };
+  // Profile photo upload removed - using static image for all plumbers
 
   const handleAddCertification = () => {
     if (newCertification.trim()) {
@@ -234,17 +171,12 @@ const PlumberEditProfile = () => {
         }
       });
 
-      // Handle image upload - store base64 data URL directly in database
-      // Vercel-compatible: No external cloud storage needed
-      if (profileImagePreview && profileImagePreview.startsWith('data:image')) {
-        // Store compressed base64 data URL directly
-        submitData.plumber_thumbnail_photo = profileImagePreview;
-      } else if (profileImagePreview && profileImagePreview.startsWith('http')) {
-        // If it's a URL (from existing profile), keep it
-        submitData.plumber_thumbnail_photo = profileImagePreview;
-      } else {
-        // No image, remove from submission
-        delete submitData.plumber_thumbnail_photo;
+      // Remove fields that shouldn't be sent
+      delete submitData.plumber_thumbnail_photo;
+      
+      // Don't send empty availability_schedule
+      if (submitData.availability_schedule && Object.keys(submitData.availability_schedule).length === 0) {
+        delete submitData.availability_schedule;
       }
 
       const response = await plumberAPI.updatePlumberProfile(user.id, submitData);
@@ -297,52 +229,25 @@ const PlumberEditProfile = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Profile Photo Section */}
+          {/* Profile Photo Section - Static Image */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FaCamera className="text-[#D2A752]" />
+              <FaUser className="text-[#D2A752]" />
               Profile Photo
             </h2>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="relative">
-                {profileImagePreview ? (
-                  <img
-                    src={profileImagePreview}
-                    alt="Profile"
-                    className="w-32 h-32 rounded-full object-cover border-4"
-                    style={{ borderColor: '#D2A752' }}
-                  />
-                ) : (
-                  <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
-                    <FaUser className="text-6xl" style={{ color: '#D2A752' }} />
-                  </div>
-                )}
-                <label
-                  htmlFor="profile-image"
-                  className="absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-all hover:scale-110"
-                  style={{ background: '#D2A752' }}
-                >
-                  <FaCamera className="text-white" />
-                  <input
-                    type="file"
-                    id="profile-image"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </label>
+                <img
+                  src={PLUMBER_AVATAR}
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full object-cover border-4 bg-gray-100"
+                  style={{ borderColor: '#D2A752' }}
+                />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-2">
-                  Upload a professional photo of yourself. Recommended size: 400x400px. Max 5MB.
+                <p className="text-sm text-gray-600">
+                  Default profile photo is used for all plumbers. Your profile information below will help customers identify you.
                 </p>
-                <label
-                  htmlFor="profile-image"
-                  className="inline-block px-4 py-2 rounded-lg font-semibold text-white cursor-pointer transition-all hover:opacity-90"
-                  style={{ background: '#D2A752' }}
-                >
-                  Choose Photo
-                </label>
               </div>
             </div>
           </div>

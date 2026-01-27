@@ -1,6 +1,4 @@
 const { sql } = require('../utils/db');
-const { findPlumberByEmail } = require('../utils/plumberService');
-const { processBase64Image } = require('../utils/imageService');
 
 // Get Plumber Profile
 const getPlumberProfile = async (req, res) => {
@@ -17,7 +15,7 @@ const getPlumberProfile = async (req, res) => {
     const result = await sql`
       SELECT 
         id, plumber_username, plumber_email, full_name, plumber_bio,
-        plumber_thumbnail_photo, phone_number, email, cnic,
+        phone_number, email, cnic,
         location_address, city, state, zip_code, country,
         latitude, longitude, location_updated_at,
         per_hour_charges, currency, minimum_charge,
@@ -65,189 +63,157 @@ const updatePlumberProfile = async (req, res) => {
       });
     }
 
-    const {
-      full_name,
-      plumber_bio,
-      // plumber_thumbnail_photo - REMOVED: Using static image instead
-      phone_number,
-      email,
-      cnic,
-      location_address,
-      city,
-      state,
-      zip_code,
-      country,
-      latitude,
-      longitude,
-      per_hour_charges,
-      currency,
-      minimum_charge,
-      experience_years,
-      license_number,
-      certifications,
-      specializations,
-      is_available,
-      availability_schedule
-    } = req.body;
-
-    // Build update fields object
-    // NOTE: plumber_thumbnail_photo is not allowed - using static image for all plumbers
-    const updateFields = {};
-    let hasUpdates = false;
-
-    if (full_name !== undefined) { updateFields.full_name = full_name; hasUpdates = true; }
-    if (plumber_bio !== undefined) { updateFields.plumber_bio = plumber_bio; hasUpdates = true; }
-    if (phone_number !== undefined) { updateFields.phone_number = phone_number; hasUpdates = true; }
-    if (email !== undefined) { updateFields.email = email; hasUpdates = true; }
-    if (cnic !== undefined) { updateFields.cnic = cnic; hasUpdates = true; }
-    if (location_address !== undefined) { updateFields.location_address = location_address; hasUpdates = true; }
-    if (city !== undefined) { updateFields.city = city; hasUpdates = true; }
-    if (state !== undefined) { updateFields.state = state; hasUpdates = true; }
-    if (zip_code !== undefined) { updateFields.zip_code = zip_code; hasUpdates = true; }
-    if (country !== undefined) { updateFields.country = country; hasUpdates = true; }
-    if (latitude !== undefined) { updateFields.latitude = latitude; hasUpdates = true; }
-    if (longitude !== undefined) { updateFields.longitude = longitude; hasUpdates = true; }
-    if (per_hour_charges !== undefined) { updateFields.per_hour_charges = per_hour_charges; hasUpdates = true; }
-    if (currency !== undefined) { updateFields.currency = currency; hasUpdates = true; }
-    if (minimum_charge !== undefined) { updateFields.minimum_charge = minimum_charge; hasUpdates = true; }
-    if (experience_years !== undefined) { updateFields.experience_years = experience_years; hasUpdates = true; }
-    if (license_number !== undefined) { updateFields.license_number = license_number; hasUpdates = true; }
-    if (certifications !== undefined) { updateFields.certifications = certifications; hasUpdates = true; }
-    if (specializations !== undefined) { updateFields.specializations = specializations; hasUpdates = true; }
-    if (is_available !== undefined) { updateFields.is_available = is_available; hasUpdates = true; }
-    if (availability_schedule !== undefined) { updateFields.availability_schedule = availability_schedule; hasUpdates = true; }
-    
-    if (latitude !== undefined || longitude !== undefined) {
-      updateFields.location_updated_at = new Date();
-    }
-
-    if (!hasUpdates) {
-      return res.status(400).json({
-        success: false,
-        message: 'No fields to update'
-      });
-    }
-
-    // Build SET clause - use individual UPDATE statements for complex types
-    // This avoids parameter type inference issues
     const { Client } = require('pg');
     const client = new Client({
       connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
     });
-    
+
     try {
       await client.connect();
-      
-      // Start transaction
       await client.query('BEGIN');
+
+      // Extract and validate fields from request
+      const {
+        full_name,
+        plumber_bio,
+        phone_number,
+        email,
+        cnic,
+        location_address,
+        city,
+        state,
+        zip_code,
+        country,
+        latitude,
+        longitude,
+        per_hour_charges,
+        currency,
+        minimum_charge,
+        experience_years,
+        license_number,
+        certifications,
+        specializations,
+        is_available,
+        availability_schedule
+      } = req.body;
+
+      // Helper function to convert empty strings to null
+      const toNull = (val) => (val === '' || val === undefined) ? null : val;
       
-      // Update regular fields first
-      const regularFields = {};
-      const arrayFields = {};
-      const jsonbFields = {};
-      
-      for (const [key, value] of Object.entries(updateFields)) {
-        if (key === 'certifications' || key === 'specializations') {
-          arrayFields[key] = Array.isArray(value) ? value.map(v => String(v)) : [];
-        } else if (key === 'availability_schedule') {
-          jsonbFields[key] = value;
-        } else if (key !== 'location_updated_at') {
-          // Text fields that can be null
-          const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code'];
-          // Numeric fields that need proper type handling
-          const numericFields = ['latitude', 'longitude', 'per_hour_charges', 'minimum_charge', 'experience_years'];
-          
-          let finalValue = value;
-          
-          if (numericFields.includes(key)) {
-            // Convert empty strings to null for numeric fields
-            if (value === '' || value === null || value === undefined) {
-              finalValue = null;
-            } else {
-              // Ensure it's a proper number
-              finalValue = parseFloat(value);
-              if (isNaN(finalValue)) {
-                finalValue = null;
-              }
-            }
-          } else if (value === '' && optionalTextFields.includes(key)) {
-            finalValue = null;
-          } else if (value === undefined) {
-            finalValue = null;
-          }
-          
-          regularFields[key] = finalValue;
+      // Helper function to convert to number or null
+      const toNumber = (val) => {
+        if (val === '' || val === null || val === undefined) return null;
+        const num = parseFloat(val);
+        return isNaN(num) ? null : num;
+      };
+
+      // Helper function to convert to integer or null
+      const toInt = (val) => {
+        if (val === '' || val === null || val === undefined) return null;
+        const num = parseInt(val);
+        return isNaN(num) ? null : num;
+      };
+
+      // Update text fields individually to avoid parameter type issues
+      if (full_name !== undefined) {
+        await client.query('UPDATE plumbers SET full_name = $1 WHERE id = $2', [toNull(full_name), plumberId]);
+      }
+      if (plumber_bio !== undefined) {
+        await client.query('UPDATE plumbers SET plumber_bio = $1 WHERE id = $2', [toNull(plumber_bio), plumberId]);
+      }
+      if (phone_number !== undefined) {
+        await client.query('UPDATE plumbers SET phone_number = $1 WHERE id = $2', [toNull(phone_number), plumberId]);
+      }
+      if (email !== undefined) {
+        await client.query('UPDATE plumbers SET email = $1 WHERE id = $2', [toNull(email), plumberId]);
+      }
+      if (cnic !== undefined) {
+        await client.query('UPDATE plumbers SET cnic = $1 WHERE id = $2', [toNull(cnic), plumberId]);
+      }
+      if (location_address !== undefined) {
+        await client.query('UPDATE plumbers SET location_address = $1 WHERE id = $2', [toNull(location_address), plumberId]);
+      }
+      if (city !== undefined) {
+        await client.query('UPDATE plumbers SET city = $1 WHERE id = $2', [toNull(city), plumberId]);
+      }
+      if (state !== undefined) {
+        await client.query('UPDATE plumbers SET state = $1 WHERE id = $2', [toNull(state), plumberId]);
+      }
+      if (zip_code !== undefined) {
+        await client.query('UPDATE plumbers SET zip_code = $1 WHERE id = $2', [toNull(zip_code), plumberId]);
+      }
+      if (country !== undefined) {
+        await client.query('UPDATE plumbers SET country = $1 WHERE id = $2', [toNull(country), plumberId]);
+      }
+      if (license_number !== undefined) {
+        await client.query('UPDATE plumbers SET license_number = $1 WHERE id = $2', [toNull(license_number), plumberId]);
+      }
+      if (currency !== undefined) {
+        await client.query('UPDATE plumbers SET currency = $1 WHERE id = $2', [toNull(currency), plumberId]);
+      }
+
+      // Update numeric fields
+      if (latitude !== undefined) {
+        await client.query('UPDATE plumbers SET latitude = $1 WHERE id = $2', [toNumber(latitude), plumberId]);
+      }
+      if (longitude !== undefined) {
+        await client.query('UPDATE plumbers SET longitude = $1 WHERE id = $2', [toNumber(longitude), plumberId]);
+      }
+      if (per_hour_charges !== undefined) {
+        await client.query('UPDATE plumbers SET per_hour_charges = $1 WHERE id = $2', [toNumber(per_hour_charges), plumberId]);
+      }
+      if (minimum_charge !== undefined) {
+        await client.query('UPDATE plumbers SET minimum_charge = $1 WHERE id = $2', [toNumber(minimum_charge), plumberId]);
+      }
+      if (experience_years !== undefined) {
+        await client.query('UPDATE plumbers SET experience_years = $1 WHERE id = $2', [toInt(experience_years), plumberId]);
+      }
+
+      // Update boolean fields
+      if (is_available !== undefined) {
+        await client.query('UPDATE plumbers SET is_available = $1 WHERE id = $2', [Boolean(is_available), plumberId]);
+      }
+
+      // Update array fields (certifications, specializations)
+      if (certifications !== undefined) {
+        const certArray = Array.isArray(certifications) ? certifications.filter(c => c) : [];
+        await client.query('UPDATE plumbers SET certifications = $1::text[] WHERE id = $2', [certArray, plumberId]);
+      }
+      if (specializations !== undefined) {
+        const specArray = Array.isArray(specializations) ? specializations.filter(s => s) : [];
+        await client.query('UPDATE plumbers SET specializations = $1::text[] WHERE id = $2', [specArray, plumberId]);
+      }
+
+      // Update JSONB fields (availability_schedule) - only if it has data
+      if (availability_schedule !== undefined && typeof availability_schedule === 'object') {
+        const hasData = availability_schedule && Object.keys(availability_schedule).length > 0;
+        if (hasData) {
+          await client.query('UPDATE plumbers SET availability_schedule = $1::jsonb WHERE id = $2', [JSON.stringify(availability_schedule), plumberId]);
         }
+        // If empty object, don't update - leave existing value
       }
-      
-      // Update regular fields
-      if (Object.keys(regularFields).length > 0) {
-        const regularSetParts = [];
-        const regularValues = [];
-        let regParamCount = 1;
-        
-        for (const [key, value] of Object.entries(regularFields)) {
-          regularSetParts.push(`${key} = $${regParamCount}`);
-          regularValues.push(value);
-          regParamCount++;
-        }
-        regularSetParts.push(`updated_at = CURRENT_TIMESTAMP`);
-        regularValues.push(plumberId);
-        
-        await client.query(
-          `UPDATE plumbers SET ${regularSetParts.join(', ')} WHERE id = $${regParamCount}`,
-          regularValues
-        );
+
+      // Update location timestamp if coordinates changed
+      if (latitude !== undefined || longitude !== undefined) {
+        await client.query('UPDATE plumbers SET location_updated_at = CURRENT_TIMESTAMP WHERE id = $1', [plumberId]);
       }
-      
-      // Update array fields
-      for (const [key, value] of Object.entries(arrayFields)) {
-        await client.query(
-          `UPDATE plumbers SET ${key} = $1::text[] WHERE id = $2`,
-          [value, plumberId]
-        );
-      }
-      
-      // Update JSONB fields
-      for (const [key, value] of Object.entries(jsonbFields)) {
-        if (value !== null && value !== undefined && typeof value === 'object' && Object.keys(value).length > 0) {
-          await client.query(
-            `UPDATE plumbers SET ${key} = $1::jsonb WHERE id = $2`,
-            [JSON.stringify(value), plumberId]
-          );
-        } else {
-          await client.query(
-            `UPDATE plumbers SET ${key} = NULL::jsonb WHERE id = $1`,
-            [plumberId]
-          );
-        }
-      }
-      
-      // Update location_updated_at if needed
-      if (updateFields.location_updated_at !== undefined) {
-        await client.query(
-          `UPDATE plumbers SET location_updated_at = $1 WHERE id = $2`,
-          [updateFields.location_updated_at, plumberId]
-        );
-      }
-      
-      // Fetch updated record before committing to verify it exists
-      const checkResult = await client.query('SELECT id FROM plumbers WHERE id = $1', [plumberId]);
-      
-      if (checkResult.rows.length === 0) {
-        await client.query('ROLLBACK');
+
+      // Update the updated_at timestamp
+      await client.query('UPDATE plumbers SET updated_at = CURRENT_TIMESTAMP WHERE id = $1', [plumberId]);
+
+      // Commit transaction
+      await client.query('COMMIT');
+
+      // Fetch updated record
+      const result = await client.query('SELECT * FROM plumbers WHERE id = $1', [plumberId]);
+
+      if (result.rows.length === 0) {
         return res.status(404).json({
           success: false,
           message: 'Plumber not found'
         });
       }
-      
-      // Commit transaction
-      await client.query('COMMIT');
-      
-      // Fetch updated record
-      const result = await client.query('SELECT * FROM plumbers WHERE id = $1', [plumberId]);
-      
+
       return res.json({
         success: true,
         message: 'Plumber profile updated successfully',
@@ -258,20 +224,16 @@ const updatePlumberProfile = async (req, res) => {
     } catch (queryError) {
       await client.query('ROLLBACK').catch(() => {});
       console.error('Query execution error:', queryError);
-      console.error('Error details:', queryError.message);
-      console.error('Error stack:', queryError.stack);
       throw queryError;
     } finally {
       await client.end();
     }
   } catch (error) {
     console.error('Update plumber profile error:', error);
-    console.error('Error details:', error.message);
-    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Error updating plumber profile',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: error.message
     });
   }
 };

@@ -5,6 +5,9 @@ import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
 import { toast } from 'react-toastify';
 
+// Static placeholder image for all plumbers
+const PLUMBER_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+
 const PlumberHome = () => {
   const { user, logout } = useAuth();
   const { navigate } = useRouter();
@@ -89,20 +92,14 @@ const PlumberHome = () => {
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Profile Image */}
+            {/* Profile Image - Static Avatar */}
             <div className="flex-shrink-0">
-              {profile?.plumber_thumbnail_photo ? (
-                <img
-                  src={profile.plumber_thumbnail_photo}
-                  alt={profile.full_name}
-                  className="w-32 h-32 rounded-full object-cover border-4"
-                  style={{ borderColor: '#D2A752' }}
-                />
-              ) : (
-                <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
-                  <FaUser className="text-6xl" style={{ color: '#D2A752' }} />
-                </div>
-              )}
+              <img
+                src={PLUMBER_AVATAR}
+                alt={profile?.full_name || 'Plumber'}
+                className="w-32 h-32 rounded-full object-cover border-4 bg-gray-100"
+                style={{ borderColor: '#D2A752' }}
+              />
             </div>
 
             {/* Profile Info */}
