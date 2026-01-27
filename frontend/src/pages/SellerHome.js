@@ -82,12 +82,12 @@ const SellerHome = () => {
                   {[...Array(5)].map((_, i) => (
                     <FaStar
                       key={i}
-                      className={i < Math.floor(profile?.seller_rating || 0) ? 'text-yellow-400' : 'text-gray-300'}
+                      className={i < Math.floor(Number(profile?.seller_rating) || 0) ? 'text-yellow-400' : 'text-gray-300'}
                     />
                   ))}
                 </div>
                 <span className="text-gray-700 font-semibold">
-                  {profile?.seller_rating?.toFixed(1) || '0.0'}
+                  {profile?.seller_rating ? Number(profile.seller_rating).toFixed(1) : '0.0'}
                 </span>
                 <span className="text-gray-500">
                   ({profile?.total_reviews || 0} reviews)
