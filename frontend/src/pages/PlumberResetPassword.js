@@ -1,29 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
-import { Link, useRouter, useLocation } from '../utils/router';
+import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope, FaWrench } from 'react-icons/fa';
+import { Link, useRouter } from '../utils/router';
 import { toast } from 'react-toastify';
-import { authAPI } from '../services/apiService';
+import { plumberAPI } from '../services/apiService';
 
-const ResetPassword = () => {
-  const location = useLocation();
+const PlumberResetPassword = () => {
   const { navigate } = useRouter();
-  const [step, setStep] = useState(1); // 1: OTP, 2: New Password
+  const [step, setStep] = useState(1);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: ''
+    new_plumber_password: '',
+    confirm_plumber_password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [email] = useState(() => {
-    // Try to get email from location state or sessionStorage
-    const stateEmail = location.state?.email;
-    if (stateEmail) return stateEmail;
-    
-    // Try sessionStorage as fallback
+  const [plumber_email] = useState(() => {
     try {
-      const stored = sessionStorage.getItem('reset_email');
+      const stored = sessionStorage.getItem('plumber_reset_email');
       return stored || '';
     } catch {
       return '';
@@ -31,34 +25,31 @@ const ResetPassword = () => {
   });
 
   useEffect(() => {
-    if (!email) {
-      toast.error('Please enter your email first');
-      navigate('/forgot-password');
+    if (!plumber_email) {
+      toast.error('Please enter your plumber email first');
+      navigate('/plumber-forgot-password');
     } else {
-      // Store email in sessionStorage for persistence
       try {
-        sessionStorage.setItem('reset_email', email);
+        sessionStorage.setItem('plumber_reset_email', plumber_email);
       } catch (e) {
         console.warn('Failed to store email:', e);
       }
     }
-  }, [email, navigate]);
+  }, [plumber_email, navigate]);
 
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // Auto-focus next input
     if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`)?.focus();
+      document.getElementById(`plumber-otp-${index + 1}`)?.focus();
     }
   };
 
   const handleOtpKeyDown = (index, e) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      document.getElementById(`otp-${index - 1}`)?.focus();
+      document.getElementById(`plumber-otp-${index - 1}`)?.focus();
     }
   };
 
@@ -72,8 +63,7 @@ const ResetPassword = () => {
     
     setLoading(true);
     try {
-      const response = await authAPI.verifyOtp(email, otpValue);
-      
+      const response = await plumberAPI.plumberVerifyOtp(plumber_email, otpValue);
       if (response.success) {
         toast.success(response.message || 'OTP verified successfully!');
         setStep(2);
@@ -95,13 +85,13 @@ const ResetPassword = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
+    if (formData.new_plumber_password !== formData.confirm_plumber_password) {
+      toast.error('Plumber passwords do not match!');
       return;
     }
 
-    if (formData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters!');
+    if (formData.new_plumber_password.length < 6) {
+      toast.error('Plumber password must be at least 6 characters!');
       return;
     }
 
@@ -109,31 +99,27 @@ const ResetPassword = () => {
     
     try {
       const otpValue = otp.join('');
-      const response = await authAPI.resetPassword(
-        email,
+      const response = await plumberAPI.plumberResetPassword(
+        plumber_email,
         otpValue,
-        formData.newPassword,
-        formData.confirmPassword
+        formData.new_plumber_password,
+        formData.confirm_plumber_password
       );
 
       if (response.success) {
-        // Clear stored email after successful reset
         try {
-          sessionStorage.removeItem('reset_email');
-        } catch (e) {
-          // Ignore errors
-        }
+          sessionStorage.removeItem('plumber_reset_email');
+        } catch (e) {}
         
-        toast.success(response.message || 'Password reset successfully!');
-        navigate('/login');
+        toast.success(response.message || 'Plumber password reset successfully!');
+        navigate('/plumber-login');
       }
     } catch (error) {
-      // Handle validation errors
       if (error.message.includes('Validation failed') || error.errors) {
         const errorMessage = error.errors?.[0]?.message || error.message;
         toast.error(errorMessage);
       } else {
-        toast.error(error.message || 'Failed to reset password. Please try again.');
+        toast.error(error.message || 'Failed to reset plumber password. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -143,9 +129,7 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
             <img 
               src="/logo.png" 
@@ -155,9 +139,7 @@ const ResetPassword = () => {
           </div>
         </div>
 
-        {/* Right Side - Reset Password Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Mobile Logo */}
           <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
             <img 
               src="/logo.png" 
@@ -167,29 +149,32 @@ const ResetPassword = () => {
           </div>
           
           <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl mt-20 sm:mt-24 lg:mt-0 flex flex-col">
-            <div className="mb-4 sm:mb-5 md:mb-6">
+            <div className="mb-4 sm:mb-5 md:mb-6 text-center">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
+                  <FaWrench className="text-2xl sm:text-3xl" style={{ color: '#D2A752' }} />
+                </div>
+              </div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1.5 sm:mb-2">
-                {step === 1 ? 'Enter OTP' : 'Reset Password'}
+                {step === 1 ? 'Enter OTP' : 'Reset Plumber Password'}
               </h2>
               <p className="text-xs sm:text-sm md:text-base text-gray-600">
                 {step === 1 
-                  ? `We sent a code to ${email || 'your email'}`
-                  : 'Create your new password'
+                  ? `We sent a code to ${plumber_email || 'your plumber email'}`
+                  : 'Create your new plumber password'
                 }
               </p>
             </div>
 
-            {/* Form */}
             {step === 1 ? (
               <form onSubmit={handleOtpSubmit} className="space-y-3.5 sm:space-y-4 md:space-y-5 flex-1 flex flex-col">
                 <div className="rounded-lg p-3 sm:p-4 md:p-5" style={{ background: 'linear-gradient(to right, #F5E6D3, #E8D4B8)', border: '1px solid #D2A752' }}>
                   <p className="text-xs sm:text-sm text-gray-700 text-center leading-relaxed">
                     <FaEnvelope className="inline-block mr-1.5 sm:mr-2" size={12} style={{ color: '#D2A752', fontSize: 'clamp(12px, 2vw, 14px)' }} />
-                    Please enter the 6-digit verification code sent to your email.
+                    Please enter the 6-digit verification code sent to your plumber email.
                   </p>
                 </div>
 
-                {/* OTP Input */}
                 <div className="w-full overflow-x-hidden">
                   <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2.5 sm:mb-3 text-center">
                     Verification Code
@@ -198,7 +183,7 @@ const ResetPassword = () => {
                     {otp.map((digit, index) => (
                       <input
                         key={index}
-                        id={`otp-${index}`}
+                        id={`plumber-otp-${index}`}
                         type="text"
                         inputMode="numeric"
                         maxLength="1"
@@ -220,7 +205,6 @@ const ResetPassword = () => {
                   </div>
                 </div>
 
-                {/* Resend OTP */}
                 <div className="text-center">
                   <button
                     type="button"
@@ -233,7 +217,6 @@ const ResetPassword = () => {
                   </button>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading || otp.join('').length !== 6}
@@ -252,10 +235,9 @@ const ResetPassword = () => {
               </form>
             ) : (
               <form onSubmit={handlePasswordSubmit} className="space-y-3.5 sm:space-y-4 md:space-y-5 flex-1 flex flex-col">
-                {/* New Password Field */}
                 <div>
-                  <label htmlFor="newPassword" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    New Password
+                  <label htmlFor="new_plumber_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    New Plumber Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -263,11 +245,11 @@ const ResetPassword = () => {
                     </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
-                      id="newPassword"
-                      name="newPassword"
-                      value={formData.newPassword}
+                      id="new_plumber_password"
+                      name="new_plumber_password"
+                      value={formData.new_plumber_password}
                       onChange={handlePasswordChange}
-                      placeholder="Enter new password"
+                      placeholder="Enter new plumber password"
                       className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                       style={{ '--tw-ring-color': '#D2A752' }}
                       onFocus={(e) => {
@@ -292,10 +274,9 @@ const ResetPassword = () => {
                   </div>
                 </div>
 
-                {/* Confirm Password Field */}
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Confirm New Password
+                  <label htmlFor="confirm_plumber_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                    Confirm New Plumber Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -303,11 +284,11 @@ const ResetPassword = () => {
                     </div>
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
+                      id="confirm_plumber_password"
+                      name="confirm_plumber_password"
+                      value={formData.confirm_plumber_password}
                       onChange={handlePasswordChange}
-                      placeholder="Confirm new password"
+                      placeholder="Confirm new plumber password"
                       className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                       style={{ '--tw-ring-color': '#D2A752' }}
                       onFocus={(e) => {
@@ -330,15 +311,14 @@ const ResetPassword = () => {
                       {showConfirmPassword ? <FaEyeSlash size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} /> : <FaEye size={14} style={{ fontSize: 'clamp(14px, 2.5vw, 16px)' }} />}
                     </button>
                   </div>
-                  {formData.confirmPassword && formData.newPassword === formData.confirmPassword && (
+                  {formData.confirm_plumber_password && formData.new_plumber_password === formData.confirm_plumber_password && (
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 mt-2">
                       <FaCheckCircle size={12} />
-                      <span className="font-medium">Passwords match</span>
+                      <span className="font-medium">Plumber passwords match</span>
                     </div>
                   )}
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -348,24 +328,23 @@ const ResetPassword = () => {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Resetting Password...</span>
+                      <span>Resetting Plumber Password...</span>
                     </>
                   ) : (
-                    <span>Reset Password</span>
+                    <span>Reset Plumber Password</span>
                   )}
                 </button>
 
-                {/* Back to Login Link */}
                 <div className="text-center pt-4 mt-auto">
                   <Link 
-                    to="/login" 
+                    to="/plumber-login" 
                     className="text-xs sm:text-sm font-semibold transition-colors inline-flex items-center gap-2"
                     style={{ color: '#D2A752' }}
                     onMouseEnter={(e) => e.target.style.color = '#B8943F'}
                     onMouseLeave={(e) => e.target.style.color = '#D2A752'}
                   >
                     <FaArrowLeft size={10} />
-                    <span>Back to Sign In</span>
+                    <span>Back to Plumber Sign In</span>
                   </Link>
                 </div>
               </form>
@@ -377,4 +356,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default PlumberResetPassword;

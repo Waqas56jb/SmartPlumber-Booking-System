@@ -9,69 +9,71 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Store OTP with expiration
-const storeOTP = (email, otp) => {
+// Store OTP with expiration and user type
+const storeOTP = (email, otp, userType = 'customer') => {
+  const key = `${email.toLowerCase()}_${userType}`;
   const expiryTime = Date.now() + OTP_EXPIRY_TIME;
-  otpStore.set(email.toLowerCase(), {
+  otpStore.set(key, {
     otp,
+    userType,
     expiresAt: expiryTime,
     attempts: 0
   });
 
   // Auto-delete expired OTPs
   setTimeout(() => {
-    if (otpStore.has(email.toLowerCase())) {
-      const stored = otpStore.get(email.toLowerCase());
+    if (otpStore.has(key)) {
+      const stored = otpStore.get(key);
       if (stored.expiresAt < Date.now()) {
-        otpStore.delete(email.toLowerCase());
+        otpStore.delete(key);
       }
     }
   }, OTP_EXPIRY_TIME + 1000); // Delete 1 second after expiry
 
-  console.log(`OTP stored for ${email}, expires at ${new Date(expiryTime).toISOString()}`);
+  console.log(`OTP stored for ${email} (${userType}), expires at ${new Date(expiryTime).toISOString()}`);
 };
 
 // Verify OTP
-const verifyOTP = (email, otp) => {
-  const emailKey = email.toLowerCase();
-  const stored = otpStore.get(emailKey);
+const verifyOTP = (email, otp, userType = 'customer') => {
+  const key = `${email.toLowerCase()}_${userType}`;
+  const stored = otpStore.get(key);
 
   if (!stored) {
-    console.log(`No OTP found for ${email}`);
+    console.log(`No OTP found for ${email} (${userType})`);
     return false;
   }
 
   // Check if OTP has expired
   if (Date.now() > stored.expiresAt) {
-    console.log(`OTP expired for ${email}`);
-    otpStore.delete(emailKey);
+    console.log(`OTP expired for ${email} (${userType})`);
+    otpStore.delete(key);
     return false;
   }
 
   // Check if OTP matches
   if (stored.otp !== otp) {
     stored.attempts += 1;
-    console.log(`Invalid OTP attempt for ${email}, attempts: ${stored.attempts}`);
+    console.log(`Invalid OTP attempt for ${email} (${userType}), attempts: ${stored.attempts}`);
     
     // Delete OTP after 3 failed attempts
     if (stored.attempts >= 3) {
-      otpStore.delete(emailKey);
-      console.log(`OTP deleted for ${email} due to too many failed attempts`);
+      otpStore.delete(key);
+      console.log(`OTP deleted for ${email} (${userType}) due to too many failed attempts`);
     }
     return false;
   }
 
   // OTP is valid
-  console.log(`OTP verified successfully for ${email}`);
+  console.log(`OTP verified successfully for ${email} (${userType})`);
   return true;
 };
 
 // Delete OTP
-const deleteOTP = (email) => {
-  const emailKey = email.toLowerCase();
-  if (otpStore.has(emailKey)) {
-    otpStore.delete(emailKey);
-    console.log(`OTP deleted for ${email}`);
+const deleteOTP = (email, userType = 'customer') => {
+  const key = `${email.toLowerCase()}_${userType}`;
+  if (otpStore.has(key)) {
+    otpStore.delete(key);
+    console.log(`OTP deleted for ${email} (${userType})`);
   }
 };
 

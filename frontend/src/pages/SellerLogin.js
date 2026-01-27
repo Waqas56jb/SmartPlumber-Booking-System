@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import { authAPI } from '../services/apiService';
+import { sellerAPI } from '../services/apiService';
 
-const Login = () => {
+const SellerLogin = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    seller_email: '',
+    seller_password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,23 +27,24 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await authAPI.login({
-        email: formData.email,
-        password: formData.password
+      const response = await sellerAPI.sellerLogin({
+        seller_email: formData.seller_email,
+        seller_password: formData.seller_password
       });
 
       if (response.success) {
         login({
-          id: response.data.user.id,
-          username: response.data.user.username,
-          email: response.data.user.email
+          id: response.data.seller.id,
+          seller_username: response.data.seller.seller_username,
+          seller_email: response.data.seller.seller_email,
+          userType: 'seller'
         }, response.data.token);
         
-        toast.success(response.message || 'Login successful!');
+        toast.success(response.message || 'Seller login successful!');
         navigate('/home');
       }
     } catch (error) {
-      toast.error(error.message || 'Login failed. Please check your credentials.');
+      toast.error(error.message || 'Seller login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -52,9 +53,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex">
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
             <img 
               src="/logo.png" 
@@ -64,9 +63,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Right Side - Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Mobile Logo */}
           <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
             <img 
               src="/logo.png" 
@@ -76,15 +73,19 @@ const Login = () => {
           </div>
           
           <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl flex flex-col mt-20 sm:mt-24 lg:mt-0">
-            <div className="mb-5 sm:mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-              <p className="text-sm sm:text-base text-gray-600">Sign in to access your account</p>
+            <div className="mb-5 sm:mb-6 text-center">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
+                  <FaStore className="text-2xl sm:text-3xl" style={{ color: '#D2A752' }} />
+                </div>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Seller Portal</h2>
+              <p className="text-sm sm:text-base text-gray-600">Sign in to your seller account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
-              {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="seller_email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Email or Username
                 </label>
                 <div className="relative">
@@ -93,9 +94,9 @@ const Login = () => {
                   </div>
                   <input
                     type="text"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    id="seller_email"
+                    name="seller_email"
+                    value={formData.seller_email}
                     onChange={handleChange}
                     placeholder="Enter your email or username"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
@@ -113,9 +114,8 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="seller_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -124,9 +124,9 @@ const Login = () => {
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    name="password"
-                    value={formData.password}
+                    id="seller_password"
+                    name="seller_password"
+                    value={formData.seller_password}
                     onChange={handleChange}
                     placeholder="Enter your password"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
@@ -153,10 +153,9 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Forgot Password Link */}
               <div className="flex items-center justify-end">
                 <Link 
-                  to="/forgot-password" 
+                  to="/seller-forgot-password" 
                   className="text-xs sm:text-sm font-medium transition-colors"
                   style={{ color: '#D2A752' }}
                   onMouseEnter={(e) => e.target.style.color = '#B8943F'}
@@ -166,7 +165,6 @@ const Login = () => {
                 </Link>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -179,16 +177,15 @@ const Login = () => {
                     <span>Signing in...</span>
                   </>
                 ) : (
-                  <span>Sign In</span>
+                  <span>Sign In as Seller</span>
                 )}
               </button>
 
-              {/* Sign Up Link */}
               <div className="text-center pt-4 mt-auto">
                 <p className="text-xs sm:text-sm text-gray-500">
-                  Don't have an account?{' '}
+                  Don't have a seller account?{' '}
                   <Link 
-                    to="/signup" 
+                    to="/seller-signup" 
                     className="font-semibold transition-colors"
                     style={{ color: '#D2A752' }}
                     onMouseEnter={(e) => e.target.style.color = '#B8943F'}
@@ -198,6 +195,15 @@ const Login = () => {
                   </Link>
                 </p>
               </div>
+
+              <div className="text-center">
+                <Link 
+                  to="/" 
+                  className="text-xs sm:text-sm text-gray-500 hover:text-[#D2A752] transition-colors"
+                >
+                  ← Back to Home
+                </Link>
+              </div>
             </form>
           </div>
         </div>
@@ -206,4 +212,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SellerLogin;

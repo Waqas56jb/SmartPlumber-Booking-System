@@ -5,20 +5,20 @@ const STATE_KEY = 'router_state';
 // Simple hash-based router
 export const useRouter = () => {
   const [currentPath, setCurrentPath] = useState(() => {
-    // Get initial path from hash or default to '/login'
+    // Get initial path from hash or default to '/'
     const hash = window.location.hash.slice(1);
-    return hash || '/login';
+    return hash || '/';
   });
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      setCurrentPath(hash || '/login');
+      setCurrentPath(hash || '/');
     };
 
-    // Set initial hash if not present - default to login
+    // Set initial hash if not present - default to landing page
     if (!window.location.hash || window.location.hash === '#') {
-      window.location.hash = '/login';
+      window.location.hash = '/';
     }
 
     window.addEventListener('hashchange', handleHashChange);

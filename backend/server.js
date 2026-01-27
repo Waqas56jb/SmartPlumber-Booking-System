@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
+const plumberRoutes = require('./routes/plumberRoutes');
+const sellerRoutes = require('./routes/sellerRoutes');
 const { verifyEmailConfig } = require('./utils/emailService');
 const { initializeDatabase } = require('./utils/db');
 
@@ -67,7 +69,10 @@ app.options('*', (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Customer routes
+app.use('/api/plumber', plumberRoutes); // Plumber routes
+app.use('/api/seller', sellerRoutes); // Seller routes
+app.use('/api/products', require('./routes/productRoutes')); // Product routes
 
 // Health check
 app.get('/api/health', (req, res) => {

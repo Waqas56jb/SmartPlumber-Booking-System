@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import { authAPI } from '../services/apiService';
+import { sellerAPI } from '../services/apiService';
 
-const Signup = () => {
+const SellerSignup = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    seller_username: '',
+    seller_email: '',
+    seller_password: '',
+    confirm_seller_password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,56 +28,54 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
+    if (formData.seller_password !== formData.confirm_seller_password) {
+      toast.error('Seller passwords do not match!');
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters!');
+    if (formData.seller_password.length < 6) {
+      toast.error('Seller password must be at least 6 characters!');
       return;
     }
 
-    // Check password complexity
-    const hasUpperCase = /[A-Z]/.test(formData.password);
-    const hasLowerCase = /[a-z]/.test(formData.password);
-    const hasNumber = /\d/.test(formData.password);
+    const hasUpperCase = /[A-Z]/.test(formData.seller_password);
+    const hasLowerCase = /[a-z]/.test(formData.seller_password);
+    const hasNumber = /\d/.test(formData.seller_password);
     
     if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      toast.error('Seller password must contain at least one uppercase letter, one lowercase letter, and one number');
       return;
     }
 
     setLoading(true);
     
     try {
-      const response = await authAPI.signup({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword
+      const response = await sellerAPI.sellerSignup({
+        seller_username: formData.seller_username,
+        seller_email: formData.seller_email,
+        seller_password: formData.seller_password,
+        confirm_seller_password: formData.confirm_seller_password
       });
 
       if (response.success) {
         login({
-          id: response.data.user.id,
-          username: response.data.user.username,
-          email: response.data.user.email
+          id: response.data.seller.id,
+          seller_username: response.data.seller.seller_username,
+          seller_email: response.data.seller.seller_email,
+          userType: 'seller'
         }, response.data.token);
         
-        toast.success(response.message || 'Account created successfully!');
+        toast.success(response.message || 'Seller account created successfully!');
         navigate('/home');
       }
     } catch (error) {
-      // Handle validation errors
       if (error.errors && error.errors.length > 0) {
-        // Show first validation error
         const errorMessage = error.errors[0].message || error.message;
         toast.error(errorMessage);
       } else if (error.message.includes('Validation failed')) {
         toast.error(error.message);
       } else {
-        toast.error(error.message || 'Signup failed. Please try again.');
+        toast.error(error.message || 'Seller signup failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -87,9 +85,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
             <img 
               src="/logo.png" 
@@ -99,9 +95,7 @@ const Signup = () => {
           </div>
         </div>
 
-        {/* Right Side - Signup Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Mobile Logo */}
           <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
             <img 
               src="/logo.png" 
@@ -111,16 +105,20 @@ const Signup = () => {
           </div>
           
           <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl flex flex-col mt-20 sm:mt-24 lg:mt-0">
-            <div className="mb-5 sm:mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-              <p className="text-sm sm:text-base text-gray-600">Join BP Heating & Plumbing today</p>
+            <div className="mb-5 sm:mb-6 text-center">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
+                  <FaStore className="text-2xl sm:text-3xl" style={{ color: '#D2A752' }} />
+                </div>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Seller Account</h2>
+              <p className="text-sm sm:text-base text-gray-600">Join as a sanitary goods seller</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
-              {/* Username Field */}
               <div>
-                <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Username
+                <label htmlFor="seller_username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Seller Username
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -128,11 +126,11 @@ const Signup = () => {
                   </div>
                   <input
                     type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
+                    id="seller_username"
+                    name="seller_username"
+                    value={formData.seller_username}
                     onChange={handleChange}
-                    placeholder="Enter your username"
+                    placeholder="Enter your seller username"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -148,10 +146,9 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Email
+                <label htmlFor="seller_email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Seller Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -159,11 +156,11 @@ const Signup = () => {
                   </div>
                   <input
                     type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    id="seller_email"
+                    name="seller_email"
+                    value={formData.seller_email}
                     onChange={handleChange}
-                    placeholder="Enter your email"
+                    placeholder="Enter your seller email"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -179,10 +176,9 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Password
+                <label htmlFor="seller_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Seller Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -190,11 +186,11 @@ const Signup = () => {
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    name="password"
-                    value={formData.password}
+                    id="seller_password"
+                    name="seller_password"
+                    value={formData.seller_password}
                     onChange={handleChange}
-                    placeholder="Create a password"
+                    placeholder="Create a seller password"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -219,10 +215,9 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Confirm Password Field */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Confirm Password
+                <label htmlFor="confirm_seller_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Confirm Seller Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -230,11 +225,11 @@ const Signup = () => {
                   </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
+                    id="confirm_seller_password"
+                    name="confirm_seller_password"
+                    value={formData.confirm_seller_password}
                     onChange={handleChange}
-                    placeholder="Confirm your password"
+                    placeholder="Confirm your seller password"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -257,15 +252,14 @@ const Signup = () => {
                     {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                   </button>
                 </div>
-                {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                {formData.confirm_seller_password && formData.seller_password === formData.confirm_seller_password && (
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 mt-2">
                     <FaCheckCircle size={12} />
-                    <span className="font-medium">Passwords match</span>
+                    <span className="font-medium">Seller passwords match</span>
                   </div>
                 )}
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -275,19 +269,18 @@ const Signup = () => {
                 {loading ? (
                   <>
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Creating Account...</span>
+                    <span>Creating Seller Account...</span>
                   </>
                 ) : (
-                  <span>Create Account</span>
+                  <span>Create Seller Account</span>
                 )}
               </button>
 
-              {/* Login Link */}
               <div className="text-center pt-4 mt-auto">
                 <p className="text-xs sm:text-sm text-gray-500">
-                  Already have an account?{' '}
+                  Already have a seller account?{' '}
                   <Link 
-                    to="/login" 
+                    to="/seller-login" 
                     className="font-semibold transition-colors"
                     style={{ color: '#D2A752' }}
                     onMouseEnter={(e) => e.target.style.color = '#B8943F'}
@@ -297,6 +290,15 @@ const Signup = () => {
                   </Link>
                 </p>
               </div>
+
+              <div className="text-center">
+                <Link 
+                  to="/" 
+                  className="text-xs sm:text-sm text-gray-500 hover:text-[#D2A752] transition-colors"
+                >
+                  ← Back to Home
+                </Link>
+              </div>
             </form>
           </div>
         </div>
@@ -305,4 +307,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SellerSignup;

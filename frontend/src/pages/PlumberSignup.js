@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaWrench } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import { authAPI } from '../services/apiService';
+import { plumberAPI } from '../services/apiService';
 
-const Signup = () => {
+const PlumberSignup = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    plumber_username: '',
+    plumber_email: '',
+    plumber_password: '',
+    confirm_plumber_password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,56 +28,55 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
+    if (formData.plumber_password !== formData.confirm_plumber_password) {
+      toast.error('Plumber passwords do not match!');
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters!');
+    if (formData.plumber_password.length < 6) {
+      toast.error('Plumber password must be at least 6 characters!');
       return;
     }
 
     // Check password complexity
-    const hasUpperCase = /[A-Z]/.test(formData.password);
-    const hasLowerCase = /[a-z]/.test(formData.password);
-    const hasNumber = /\d/.test(formData.password);
+    const hasUpperCase = /[A-Z]/.test(formData.plumber_password);
+    const hasLowerCase = /[a-z]/.test(formData.plumber_password);
+    const hasNumber = /\d/.test(formData.plumber_password);
     
     if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      toast.error('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      toast.error('Plumber password must contain at least one uppercase letter, one lowercase letter, and one number');
       return;
     }
 
     setLoading(true);
     
     try {
-      const response = await authAPI.signup({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword
+      const response = await plumberAPI.plumberSignup({
+        plumber_username: formData.plumber_username,
+        plumber_email: formData.plumber_email,
+        plumber_password: formData.plumber_password,
+        confirm_plumber_password: formData.confirm_plumber_password
       });
 
       if (response.success) {
         login({
-          id: response.data.user.id,
-          username: response.data.user.username,
-          email: response.data.user.email
+          id: response.data.plumber.id,
+          plumber_username: response.data.plumber.plumber_username,
+          plumber_email: response.data.plumber.plumber_email,
+          userType: 'plumber'
         }, response.data.token);
         
-        toast.success(response.message || 'Account created successfully!');
+        toast.success(response.message || 'Plumber account created successfully!');
         navigate('/home');
       }
     } catch (error) {
-      // Handle validation errors
       if (error.errors && error.errors.length > 0) {
-        // Show first validation error
         const errorMessage = error.errors[0].message || error.message;
         toast.error(errorMessage);
       } else if (error.message.includes('Validation failed')) {
         toast.error(error.message);
       } else {
-        toast.error(error.message || 'Signup failed. Please try again.');
+        toast.error(error.message || 'Plumber signup failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -89,7 +88,6 @@ const Signup = () => {
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Left Side - Logo Only (Desktop) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-          {/* Logo */}
           <div className="relative z-10 flex items-center justify-center w-full h-full">
             <img 
               src="/logo.png" 
@@ -99,7 +97,7 @@ const Signup = () => {
           </div>
         </div>
 
-        {/* Right Side - Signup Form */}
+        {/* Right Side - Plumber Signup Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 min-h-screen lg:min-h-0" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
           {/* Mobile Logo */}
           <div className="lg:hidden absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-10">
@@ -111,16 +109,21 @@ const Signup = () => {
           </div>
           
           <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-2xl flex flex-col mt-20 sm:mt-24 lg:mt-0">
-            <div className="mb-5 sm:mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-              <p className="text-sm sm:text-base text-gray-600">Join BP Heating & Plumbing today</p>
+            <div className="mb-5 sm:mb-6 text-center">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
+                  <FaWrench className="text-2xl sm:text-3xl" style={{ color: '#D2A752' }} />
+                </div>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Plumber Account</h2>
+              <p className="text-sm sm:text-base text-gray-600">Join as a professional plumber</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
               {/* Username Field */}
               <div>
-                <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Username
+                <label htmlFor="plumber_username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Plumber Username
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -128,11 +131,11 @@ const Signup = () => {
                   </div>
                   <input
                     type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
+                    id="plumber_username"
+                    name="plumber_username"
+                    value={formData.plumber_username}
                     onChange={handleChange}
-                    placeholder="Enter your username"
+                    placeholder="Enter your plumber username"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -150,8 +153,8 @@ const Signup = () => {
 
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Email
+                <label htmlFor="plumber_email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Plumber Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -159,11 +162,11 @@ const Signup = () => {
                   </div>
                   <input
                     type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
+                    id="plumber_email"
+                    name="plumber_email"
+                    value={formData.plumber_email}
                     onChange={handleChange}
-                    placeholder="Enter your email"
+                    placeholder="Enter your plumber email"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -181,8 +184,8 @@ const Signup = () => {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Password
+                <label htmlFor="plumber_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Plumber Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -190,11 +193,11 @@ const Signup = () => {
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    name="password"
-                    value={formData.password}
+                    id="plumber_password"
+                    name="plumber_password"
+                    value={formData.plumber_password}
                     onChange={handleChange}
-                    placeholder="Create a password"
+                    placeholder="Create a plumber password"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -221,8 +224,8 @@ const Signup = () => {
 
               {/* Confirm Password Field */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Confirm Password
+                <label htmlFor="confirm_plumber_password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                  Confirm Plumber Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 md:pl-4 flex items-center pointer-events-none">
@@ -230,11 +233,11 @@ const Signup = () => {
                   </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
+                    id="confirm_plumber_password"
+                    name="confirm_plumber_password"
+                    value={formData.confirm_plumber_password}
                     onChange={handleChange}
-                    placeholder="Confirm your password"
+                    placeholder="Confirm your plumber password"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {
@@ -257,10 +260,10 @@ const Signup = () => {
                     {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                   </button>
                 </div>
-                {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                {formData.confirm_plumber_password && formData.plumber_password === formData.confirm_plumber_password && (
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-green-600 mt-2">
                     <FaCheckCircle size={12} />
-                    <span className="font-medium">Passwords match</span>
+                    <span className="font-medium">Plumber passwords match</span>
                   </div>
                 )}
               </div>
@@ -275,19 +278,19 @@ const Signup = () => {
                 {loading ? (
                   <>
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Creating Account...</span>
+                    <span>Creating Plumber Account...</span>
                   </>
                 ) : (
-                  <span>Create Account</span>
+                  <span>Create Plumber Account</span>
                 )}
               </button>
 
               {/* Login Link */}
               <div className="text-center pt-4 mt-auto">
                 <p className="text-xs sm:text-sm text-gray-500">
-                  Already have an account?{' '}
+                  Already have a plumber account?{' '}
                   <Link 
-                    to="/login" 
+                    to="/plumber-login" 
                     className="font-semibold transition-colors"
                     style={{ color: '#D2A752' }}
                     onMouseEnter={(e) => e.target.style.color = '#B8943F'}
@@ -297,6 +300,16 @@ const Signup = () => {
                   </Link>
                 </p>
               </div>
+
+              {/* Back to Landing */}
+              <div className="text-center">
+                <Link 
+                  to="/" 
+                  className="text-xs sm:text-sm text-gray-500 hover:text-[#D2A752] transition-colors"
+                >
+                  ← Back to Home
+                </Link>
+              </div>
             </form>
           </div>
         </div>
@@ -305,4 +318,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default PlumberSignup;

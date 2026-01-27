@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaWrench, FaTools, FaShieldAlt, FaFire, FaTint, FaCog, FaCheckCircle, FaCertificate, FaBolt, FaHome, FaPlug, FaWater } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { Link } from '../utils/router';
 
 const Services = () => {
   const sectionRef = useScrollAnimation();
@@ -105,9 +106,10 @@ const Services = () => {
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <div 
+              <Link
                 key={index}
-                className="group bg-white p-7 sm:p-8 md:p-9 transition-all duration-300 border-2 border-transparent hover:border-accent hover:shadow-xl hover:-translate-y-2 rounded-xl relative overflow-hidden animate-fade-in-up hover-lift"
+                to={`/service/${service.slug}`}
+                className="group bg-white p-7 sm:p-8 md:p-9 transition-all duration-300 border-2 border-transparent hover:border-accent hover:shadow-xl hover:-translate-y-2 rounded-xl relative overflow-hidden animate-fade-in-up hover-lift cursor-pointer block"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Background Decoration */}
@@ -125,11 +127,14 @@ const Services = () => {
                   <h3 className="text-lg sm:text-xl md:text-[22px] font-bold text-primary mb-3 sm:mb-4 leading-tight">
                     {service.title}
                   </h3>
-                  <p className="text-sm sm:text-base leading-relaxed text-text-light">
+                  <p className="text-sm sm:text-base leading-relaxed text-text-light mb-4">
                     {service.description}
                   </p>
+                  <div className="text-sm font-semibold text-accent group-hover:underline">
+                    View Products →
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

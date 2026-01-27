@@ -135,7 +135,7 @@ const forgotPassword = async (req, res) => {
 
     // Generate and store OTP
     const otp = generateOTP();
-    await storeOTP(email, otp);
+    storeOTP(email, otp, 'customer');
 
     // Send OTP via email (from admin email to user's email)
     const emailSent = await sendEmail({
@@ -185,7 +185,7 @@ const verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
     // Verify OTP
-    const isValid = await verifyOTP(email, otp);
+    const isValid = verifyOTP(email, otp, 'customer');
     if (!isValid) {
       return res.status(400).json({
         success: false,
@@ -212,7 +212,7 @@ const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
 
     // Verify OTP first
-    const isValid = await verifyOTP(email, otp);
+    const isValid = verifyOTP(email, otp, 'customer');
     if (!isValid) {
       return res.status(400).json({
         success: false,
@@ -236,7 +236,7 @@ const resetPassword = async (req, res) => {
     await updateUserPassword(email, hashedPassword);
 
     // Delete OTP after successful reset
-    await deleteOTP(email);
+    deleteOTP(email, 'customer');
 
     res.json({
       success: true,
