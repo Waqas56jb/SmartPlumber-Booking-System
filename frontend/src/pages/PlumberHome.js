@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaUser, FaPhone, FaEnvelope, FaEdit, FaSignOutAlt, FaTools, FaCalendarCheck, FaToggleOn } from 'react-icons/fa';
+import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaPhone, FaEnvelope, FaEdit, FaSignOutAlt, FaTools, FaCalendarCheck, FaToggleOn } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
