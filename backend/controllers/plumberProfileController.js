@@ -127,7 +127,7 @@ const updatePlumberProfile = async (req, res) => {
       });
     }
 
-    // Build SET clause manually for safety
+    // Build SET clause manually - Vercel Postgres compatible approach
     const setParts = [];
     const values = [];
     let paramCount = 1;
@@ -135,19 +135,10 @@ const updatePlumberProfile = async (req, res) => {
     for (const [key, value] of Object.entries(updateFields)) {
       // Handle special types
       if (key === 'certifications' || key === 'specializations') {
-        // Arrays - use PostgreSQL array syntax
-        if (Array.isArray(value) && value.length > 0) {
-          // Format as PostgreSQL array literal: ARRAY['value1', 'value2']::text[]
-          const arrayLiteral = `ARRAY[${value.map((_, i) => `$${paramCount + i}`).join(', ')}]::text[]`;
-          setParts.push(`${key} = ${arrayLiteral}`);
-          // Add each array element as a separate parameter
-          value.forEach(v => values.push(v));
-          paramCount += value.length;
-        } else {
-          // Empty array
-          setParts.push(`${key} = ARRAY[]::text[]`);
-          paramCount++;
-        }
+        // Arrays - pass as array
+        setParts.push(`${key} = $${paramCount}::text[]`);
+        values.push(Array.isArray(value) ? value : []);
+        paramCount++;
       } else if (key === 'availability_schedule') {
         // JSONB fields - stringify the object
         if (value !== null && value !== undefined && typeof value === 'object' && Object.keys(value).length > 0) {
@@ -175,15 +166,31 @@ const updatePlumberProfile = async (req, res) => {
     setParts.push(`updated_at = CURRENT_TIMESTAMP`);
     values.push(plumberId);
 
-    // Build the query with proper parameterization
-    const query = `
+    // Build the query string
+    const queryString = `
       UPDATE plumbers
       SET ${setParts.join(', ')}
       WHERE id = $${paramCount}
       RETURNING *
     `;
 
-    const result = await sql.unsafe(query, values);
+    // Execute query - try sql.unsafe first, fallback to pg if needed
+    let result;
+    if (sql.unsafe && typeof sql.unsafe === 'function') {
+      result = await sql.unsafe(queryString, values);
+    } else {
+      // Fallback: Use pg library directly
+      const { Client } = require('pg');
+      const client = new Client({
+        connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
+      });
+      try {
+        await client.connect();
+        result = await client.query(queryString, values);
+      } finally {
+        await client.end();
+      }
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({
