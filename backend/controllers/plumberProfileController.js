@@ -165,13 +165,30 @@ const updatePlumberProfile = async (req, res) => {
         } else if (key === 'availability_schedule') {
           jsonbFields[key] = value;
         } else if (key !== 'location_updated_at') {
+          // Text fields that can be null
           const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code', 'plumber_thumbnail_photo'];
+          // Numeric fields that need proper type handling
+          const numericFields = ['latitude', 'longitude', 'per_hour_charges', 'minimum_charge', 'experience_years'];
+          
           let finalValue = value;
-          if (value === '' && optionalTextFields.includes(key)) {
+          
+          if (numericFields.includes(key)) {
+            // Convert empty strings to null for numeric fields
+            if (value === '' || value === null || value === undefined) {
+              finalValue = null;
+            } else {
+              // Ensure it's a proper number
+              finalValue = parseFloat(value);
+              if (isNaN(finalValue)) {
+                finalValue = null;
+              }
+            }
+          } else if (value === '' && optionalTextFields.includes(key)) {
             finalValue = null;
           } else if (value === undefined) {
             finalValue = null;
           }
+          
           regularFields[key] = finalValue;
         }
       }
@@ -260,21 +277,6 @@ const updatePlumberProfile = async (req, res) => {
     } finally {
       await client.end();
     }
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Plumber not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Plumber profile updated successfully',
-      data: {
-        plumber: result.rows[0]
-      }
-    });
   } catch (error) {
     console.error('Update plumber profile error:', error);
     console.error('Error details:', error.message);

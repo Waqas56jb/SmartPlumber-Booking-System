@@ -115,8 +115,8 @@ const PlumberEditProfile = () => {
     }));
   };
 
-  // Compress image to reduce size for upload
-  const compressImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.7) => {
+  // Compress image to reduce size for upload (very small for database storage)
+  const compressImage = (file, maxSize = 150, quality = 0.5) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -126,27 +126,29 @@ const PlumberEditProfile = () => {
           let width = img.width;
           let height = img.height;
           
-          // Calculate new dimensions while maintaining aspect ratio
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
+          // Calculate new dimensions - fit within maxSize x maxSize
+          const ratio = Math.min(maxSize / width, maxSize / height);
+          if (ratio < 1) {
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
           }
           
           canvas.width = width;
           canvas.height = height;
           
           const ctx = canvas.getContext('2d');
+          // Use better image smoothing
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Convert to JPEG for better compression
+          // Convert to JPEG with low quality for small size
           const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          
+          // Log the size for debugging
+          const sizeKB = Math.round(compressedDataUrl.length * 0.75 / 1024);
+          console.log(`Image compressed: ${width}x${height}, ~${sizeKB}KB`);
+          
           resolve(compressedDataUrl);
         };
         img.onerror = reject;
@@ -166,9 +168,9 @@ const PlumberEditProfile = () => {
       }
       
       try {
-        // Compress image before preview/upload
+        // Compress image before preview/upload (150x150, 50% quality = ~5-15KB)
         toast.info('Compressing image...', { autoClose: 1000 });
-        const compressedImage = await compressImage(file, 400, 400, 0.7);
+        const compressedImage = await compressImage(file, 150, 0.5);
         setProfileImagePreview(compressedImage);
         toast.success('Image ready!', { autoClose: 1500 });
       } catch (error) {
@@ -219,34 +221,30 @@ const PlumberEditProfile = () => {
       // Prepare data for submission
       const submitData = { ...formData };
 
-      // Convert numeric fields
-      if (submitData.per_hour_charges) {
-        submitData.per_hour_charges = parseFloat(submitData.per_hour_charges);
-      }
-      if (submitData.minimum_charge) {
-        submitData.minimum_charge = parseFloat(submitData.minimum_charge);
-      }
-      if (submitData.experience_years) {
-        submitData.experience_years = parseInt(submitData.experience_years);
-      }
-      if (submitData.latitude) {
-        submitData.latitude = parseFloat(submitData.latitude);
-      }
-      if (submitData.longitude) {
-        submitData.longitude = parseFloat(submitData.longitude);
-      }
+      // Convert numeric fields - handle empty strings as null
+      const numericFields = ['per_hour_charges', 'minimum_charge', 'experience_years', 'latitude', 'longitude'];
+      numericFields.forEach(field => {
+        if (submitData[field] === '' || submitData[field] === null || submitData[field] === undefined) {
+          submitData[field] = null;
+        } else {
+          const parsed = field === 'experience_years' 
+            ? parseInt(submitData[field]) 
+            : parseFloat(submitData[field]);
+          submitData[field] = isNaN(parsed) ? null : parsed;
+        }
+      });
 
       // Handle image upload - store base64 data URL directly in database
       // Vercel-compatible: No external cloud storage needed
       if (profileImagePreview && profileImagePreview.startsWith('data:image')) {
-        // Store base64 data URL directly (Vercel compatible approach)
+        // Store compressed base64 data URL directly
         submitData.plumber_thumbnail_photo = profileImagePreview;
-      } else if (profileImagePreview && !profileImagePreview.startsWith('http')) {
-        // If it's already a data URL but not starting with data:, use it as is
-        submitData.plumber_thumbnail_photo = profileImagePreview;
-      } else if (profileImagePreview) {
+      } else if (profileImagePreview && profileImagePreview.startsWith('http')) {
         // If it's a URL (from existing profile), keep it
         submitData.plumber_thumbnail_photo = profileImagePreview;
+      } else {
+        // No image, remove from submission
+        delete submitData.plumber_thumbnail_photo;
       }
 
       const response = await plumberAPI.updatePlumberProfile(user.id, submitData);
