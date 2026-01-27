@@ -65,7 +65,7 @@ const PlumberHome = () => {
             </div>
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => toast.info('Profile edit feature coming soon!')}
+                onClick={() => navigate('/plumber-edit-profile')}
                 className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
                 style={{ background: '#D2A752' }}
               >

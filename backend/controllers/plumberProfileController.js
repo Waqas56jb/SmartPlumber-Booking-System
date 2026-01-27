@@ -133,12 +133,49 @@ const updatePlumberProfile = async (req, res) => {
     let paramCount = 1;
 
     for (const [key, value] of Object.entries(updateFields)) {
-      setParts.push(`${key} = $${paramCount++}`);
-      values.push(value);
+      // Handle special types
+      if (key === 'certifications' || key === 'specializations') {
+        // Arrays - use PostgreSQL array syntax
+        if (Array.isArray(value) && value.length > 0) {
+          // Format as PostgreSQL array literal: ARRAY['value1', 'value2']::text[]
+          const arrayLiteral = `ARRAY[${value.map((_, i) => `$${paramCount + i}`).join(', ')}]::text[]`;
+          setParts.push(`${key} = ${arrayLiteral}`);
+          // Add each array element as a separate parameter
+          value.forEach(v => values.push(v));
+          paramCount += value.length;
+        } else {
+          // Empty array
+          setParts.push(`${key} = ARRAY[]::text[]`);
+          paramCount++;
+        }
+      } else if (key === 'availability_schedule') {
+        // JSONB fields - stringify the object
+        if (value !== null && value !== undefined && typeof value === 'object' && Object.keys(value).length > 0) {
+          setParts.push(`${key} = $${paramCount}::jsonb`);
+          values.push(JSON.stringify(value));
+        } else {
+          setParts.push(`${key} = NULL::jsonb`);
+        }
+        paramCount++;
+      } else if (key === 'location_updated_at') {
+        // Timestamp handling
+        setParts.push(`${key} = $${paramCount}`);
+        values.push(value);
+        paramCount++;
+      } else {
+        // Regular fields
+        setParts.push(`${key} = $${paramCount}`);
+        // Convert empty strings to null for optional text fields
+        const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code'];
+        const finalValue = (value === '' && optionalTextFields.includes(key)) ? null : value;
+        values.push(finalValue);
+        paramCount++;
+      }
     }
     setParts.push(`updated_at = CURRENT_TIMESTAMP`);
     values.push(plumberId);
 
+    // Build the query with proper parameterization
     const query = `
       UPDATE plumbers
       SET ${setParts.join(', ')}
@@ -164,9 +201,12 @@ const updatePlumberProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Update plumber profile error:', error);
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Error updating plumber profile'
+      message: 'Error updating plumber profile',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Landing from './pages/Landing';
 import Home from './pages/Home';
 import PlumberHome from './pages/PlumberHome';
+import PlumberEditProfile from './pages/PlumberEditProfile';
 import SellerHome from './pages/SellerHome';
 import SellerProducts from './pages/SellerProducts';
 import ServiceDetail from './pages/ServiceDetail';
@@ -31,7 +32,8 @@ function AppContent() {
     '/', '/landing',
     '/login', '/signup', '/forgot-password', '/reset-password',
     '/plumber-login', '/plumber-signup', '/plumber-forgot-password', '/plumber-reset-password',
-    '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password'
+    '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password',
+    '/service'
   ];
   const isPublicRoute = publicRoutes.includes(currentPath);
 
@@ -100,6 +102,10 @@ function AppContent() {
         return <PlumberForgotPassword />;
       case '/plumber-reset-password':
         return <PlumberResetPassword />;
+      case '/plumber-edit-profile':
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
+          ? <PlumberEditProfile />
+          : <Landing />;
       // Seller routes
       case '/seller-login':
         return <SellerLogin />;
