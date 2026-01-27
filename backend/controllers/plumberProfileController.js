@@ -65,10 +65,10 @@ const updatePlumberProfile = async (req, res) => {
       });
     }
 
-    let {
+    const {
       full_name,
       plumber_bio,
-      plumber_thumbnail_photo,
+      // plumber_thumbnail_photo - REMOVED: Using static image instead
       phone_number,
       email,
       cnic,
@@ -90,26 +90,13 @@ const updatePlumberProfile = async (req, res) => {
       availability_schedule
     } = req.body;
 
-    // Handle image upload if provided as base64
-    if (plumber_thumbnail_photo && typeof plumber_thumbnail_photo === 'string' && plumber_thumbnail_photo.startsWith('data:image')) {
-      const imageResult = processBase64Image(plumber_thumbnail_photo);
-      if (imageResult.error) {
-        return res.status(400).json({
-          success: false,
-          message: imageResult.error
-        });
-      }
-      // Store the data URL in database (Vercel compatible - no external storage needed)
-      plumber_thumbnail_photo = imageResult.dataUrl;
-    }
-
     // Build update fields object
+    // NOTE: plumber_thumbnail_photo is not allowed - using static image for all plumbers
     const updateFields = {};
     let hasUpdates = false;
 
     if (full_name !== undefined) { updateFields.full_name = full_name; hasUpdates = true; }
     if (plumber_bio !== undefined) { updateFields.plumber_bio = plumber_bio; hasUpdates = true; }
-    if (plumber_thumbnail_photo !== undefined) { updateFields.plumber_thumbnail_photo = plumber_thumbnail_photo; hasUpdates = true; }
     if (phone_number !== undefined) { updateFields.phone_number = phone_number; hasUpdates = true; }
     if (email !== undefined) { updateFields.email = email; hasUpdates = true; }
     if (cnic !== undefined) { updateFields.cnic = cnic; hasUpdates = true; }
@@ -166,7 +153,7 @@ const updatePlumberProfile = async (req, res) => {
           jsonbFields[key] = value;
         } else if (key !== 'location_updated_at') {
           // Text fields that can be null
-          const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code', 'plumber_thumbnail_photo'];
+          const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code'];
           // Numeric fields that need proper type handling
           const numericFields = ['latitude', 'longitude', 'per_hour_charges', 'minimum_charge', 'experience_years'];
           
