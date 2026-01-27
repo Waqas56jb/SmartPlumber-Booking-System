@@ -36,8 +36,9 @@ const plumberSignupValidation = [
 const plumberLoginValidation = [
   body('plumber_email')
     .trim()
-    .notEmpty()
-    .withMessage('Plumber email or username is required'),
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid plumber email address'),
   body('plumber_password')
     .notEmpty()
     .withMessage('Plumber password is required')

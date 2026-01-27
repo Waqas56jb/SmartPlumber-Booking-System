@@ -69,16 +69,13 @@ const plumberLogin = async (req, res) => {
   try {
     const { plumber_email, plumber_password } = req.body;
 
-    // Find plumber by email or username
-    let plumber = await findPlumberByEmail(plumber_email);
-    if (!plumber) {
-      plumber = await findPlumberByUsername(plumber_email);
-    }
+    // Find plumber by email only
+    const plumber = await findPlumberByEmail(plumber_email);
 
     if (!plumber) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 
@@ -87,7 +84,7 @@ const plumberLogin = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 

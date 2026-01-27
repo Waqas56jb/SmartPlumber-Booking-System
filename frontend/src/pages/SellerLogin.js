@@ -86,19 +86,19 @@ const SellerLogin = () => {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 flex-1 flex flex-col">
               <div>
                 <label htmlFor="seller_email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                  Email or Username
+                  Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                     <FaEnvelope className="text-gray-400" size={16} />
                   </div>
                   <input
-                    type="text"
+                    type="email"
                     id="seller_email"
                     name="seller_email"
                     value={formData.seller_email}
                     onChange={handleChange}
-                    placeholder="Enter your email or username"
+                    placeholder="Enter your email address"
                     className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 h-11 sm:h-12 text-sm sm:text-base bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder:text-gray-400 shadow-sm"
                     style={{ '--tw-ring-color': '#D2A752' }}
                     onFocus={(e) => {

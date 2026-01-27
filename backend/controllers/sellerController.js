@@ -69,16 +69,13 @@ const sellerLogin = async (req, res) => {
   try {
     const { seller_email, seller_password } = req.body;
 
-    // Find seller by email or username
-    let seller = await findSellerByEmail(seller_email);
-    if (!seller) {
-      seller = await findSellerByUsername(seller_email);
-    }
+    // Find seller by email only
+    const seller = await findSellerByEmail(seller_email);
 
     if (!seller) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 
@@ -87,7 +84,7 @@ const sellerLogin = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 

@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaUser, FaPhone, FaEnvelope, FaEdit } from 'react-icons/fa';
+import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaUser, FaPhone, FaEnvelope, FaEdit, FaSignOutAlt, FaTools, FaCalendarCheck, FaToggleOn } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
 import { toast } from 'react-toastify';
 
 const PlumberHome = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { navigate } = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/plumber-login');
+    toast.success('Logged out successfully');
+  };
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -55,10 +63,24 @@ const PlumberHome = () => {
                 <p className="text-sm text-gray-600">Welcome back, {profile?.full_name || user?.plumber_username || 'Plumber'}</p>
               </div>
             </div>
-            <button className="px-4 py-2 rounded-lg font-semibold text-white transition-all" style={{ background: '#D2A752' }}>
-              <FaEdit className="inline mr-2" />
-              Edit Profile
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => toast.info('Profile edit feature coming soon!')}
+                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
+                style={{ background: '#D2A752' }}
+              >
+                <FaEdit className="inline mr-2" />
+                Edit Profile
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg font-semibold text-red-600 border-2 border-red-600 transition-all hover:bg-red-600 hover:text-white"
+                title="Logout"
+              >
+                <FaSignOutAlt className="inline mr-2" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -216,13 +238,28 @@ const PlumberHome = () => {
         <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid md:grid-cols-3 gap-4">
-            <button className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all">
+            <button 
+              onClick={() => toast.info('Services management feature coming soon!')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+              <FaTools />
               Manage Services
             </button>
-            <button className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all">
+            <button 
+              onClick={() => toast.info('Bookings feature coming soon!')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+              <FaCalendarCheck />
               View Bookings
             </button>
-            <button className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all">
+            <button 
+              onClick={() => {
+                const newAvailability = !profile?.is_available;
+                toast.success(`Availability ${newAvailability ? 'enabled' : 'disabled'}. Feature coming soon!`);
+              }}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+              <FaToggleOn />
               Update Availability
             </button>
           </div>

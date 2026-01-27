@@ -37,8 +37,9 @@ const signupValidation = [
 const loginValidation = [
   body('email')
     .trim()
-    .notEmpty()
-    .withMessage('Email or username is required'),
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
   body('password')
     .notEmpty()
     .withMessage('Password is required')

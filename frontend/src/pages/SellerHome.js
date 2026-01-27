@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaStore, FaMapMarkerAlt, FaTruck, FaCreditCard, FaMoneyBillWave, FaStar, FaPhone, FaEnvelope, FaEdit, FaBox } from 'react-icons/fa';
+import { FaStore, FaMapMarkerAlt, FaTruck, FaCreditCard, FaMoneyBillWave, FaStar, FaPhone, FaEnvelope, FaEdit, FaBox, FaSignOutAlt, FaShoppingBag, FaCamera } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
 import { toast } from 'react-toastify';
 
 const SellerHome = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { navigate } = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/seller-login');
+    toast.success('Logged out successfully');
+  };
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -57,10 +63,24 @@ const SellerHome = () => {
                 <p className="text-sm text-gray-600">Welcome back, {profile?.seller_shop_name || user?.seller_username || 'Seller'}</p>
               </div>
             </div>
-            <button className="px-4 py-2 rounded-lg font-semibold text-white transition-all" style={{ background: '#D2A752' }}>
-              <FaEdit className="inline mr-2" />
-              Edit Profile
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => toast.info('Profile edit feature coming soon!')}
+                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
+                style={{ background: '#D2A752' }}
+              >
+                <FaEdit className="inline mr-2" />
+                Edit Profile
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg font-semibold text-red-600 border-2 border-red-600 transition-all hover:bg-red-600 hover:text-white"
+                title="Logout"
+              >
+                <FaSignOutAlt className="inline mr-2" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -222,10 +242,18 @@ const SellerHome = () => {
               <FaBox />
               Manage Products
             </button>
-            <button className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all">
+            <button 
+              onClick={() => toast.info('Orders feature coming soon!')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+              <FaShoppingBag />
               View Orders
             </button>
-            <button className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all">
+            <button 
+              onClick={() => toast.info('Photo upload feature coming soon!')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
+            >
+              <FaCamera />
               Upload Shop Photos
             </button>
           </div>

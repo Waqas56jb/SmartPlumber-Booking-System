@@ -69,16 +69,13 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email or username
-    let user = await findUserByEmail(email);
-    if (!user) {
-      user = await findUserByUsername(email);
-    }
+    // Find user by email only
+    const user = await findUserByEmail(email);
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 
@@ -87,7 +84,7 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email/username or password'
+        message: 'Invalid email or password'
       });
     }
 

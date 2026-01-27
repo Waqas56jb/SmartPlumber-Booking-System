@@ -36,8 +36,9 @@ const sellerSignupValidation = [
 const sellerLoginValidation = [
   body('seller_email')
     .trim()
-    .notEmpty()
-    .withMessage('Seller email or username is required'),
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid seller email address'),
   body('seller_password')
     .notEmpty()
     .withMessage('Seller password is required')
