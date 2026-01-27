@@ -50,8 +50,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase body size limit for base64 image uploads (10MB)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Explicit OPTIONS handler for all routes (must be before other routes)
 app.options('*', (req, res) => {

@@ -1,5 +1,6 @@
 const { sql } = require('../utils/db');
 const { findSellerByEmail } = require('../utils/sellerService');
+const { processBase64Image } = require('../utils/imageService');
 
 // Get Seller Profile
 const getSellerProfile = async (req, res) => {
@@ -128,46 +129,103 @@ const updateSellerProfile = async (req, res) => {
       });
     }
 
-    // Build SET clause manually for safety
-    const setParts = [];
-    const values = [];
-    let paramCount = 1;
-
+    // Handle payment_methods array if present
+    const arrayFields = {};
+    const regularFields = {};
+    
     for (const [key, value] of Object.entries(updateFields)) {
-      setParts.push(`${key} = $${paramCount++}`);
-      values.push(value);
-    }
-    setParts.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(sellerId);
-
-    const query = `
-      UPDATE sellers
-      SET ${setParts.join(', ')}
-      WHERE id = $${paramCount}
-      RETURNING *
-    `;
-
-    const result = await sql.unsafe(query, values);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Seller not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Seller profile updated successfully',
-      data: {
-        seller: result.rows[0]
+      if (key === 'payment_methods') {
+        arrayFields[key] = Array.isArray(value) ? value.map(v => String(v)) : [];
+      } else {
+        // Convert empty strings to null for optional text fields
+        const optionalTextFields = ['shop_address', 'cnic', 'business_license', 'tax_id', 'seller_bio', 'city', 'state', 'zip_code'];
+        let finalValue = value;
+        if (value === '' && optionalTextFields.includes(key)) {
+          finalValue = null;
+        } else if (value === undefined) {
+          finalValue = null;
+        }
+        regularFields[key] = finalValue;
       }
+    }
+    
+    // Use pg library directly for better array handling
+    const { Client } = require('pg');
+    const client = new Client({
+      connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
     });
+    
+    try {
+      await client.connect();
+      await client.query('BEGIN');
+      
+      // Update regular fields
+      if (Object.keys(regularFields).length > 0) {
+        const regularSetParts = [];
+        const regularValues = [];
+        let regParamCount = 1;
+        
+        for (const [key, value] of Object.entries(regularFields)) {
+          regularSetParts.push(`${key} = $${regParamCount}`);
+          regularValues.push(value);
+          regParamCount++;
+        }
+        regularSetParts.push(`updated_at = CURRENT_TIMESTAMP`);
+        regularValues.push(sellerId);
+        
+        await client.query(
+          `UPDATE sellers SET ${regularSetParts.join(', ')} WHERE id = $${regParamCount}`,
+          regularValues
+        );
+      }
+      
+      // Update array fields (payment_methods)
+      for (const [key, value] of Object.entries(arrayFields)) {
+        await client.query(
+          `UPDATE sellers SET ${key} = $1::text[] WHERE id = $2`,
+          [value, sellerId]
+        );
+      }
+      
+      await client.query('COMMIT');
+      
+      // Fetch updated record
+      const result = await client.query('SELECT * FROM sellers WHERE id = $1', [sellerId]);
+
+      if (result.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({
+          success: false,
+          message: 'Seller not found'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Seller profile updated successfully',
+        data: {
+          seller: result.rows[0]
+        }
+      });
+    } catch (error) {
+      await client.query('ROLLBACK').catch(() => {});
+      console.error('Update seller profile error:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      res.status(500).json({
+        success: false,
+        message: 'Error updating seller profile',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    } finally {
+      await client.end();
+    }
   } catch (error) {
     console.error('Update seller profile error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error updating seller profile'
+      message: 'Error updating seller profile',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

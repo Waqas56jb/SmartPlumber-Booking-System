@@ -1,5 +1,6 @@
 const { sql } = require('../utils/db');
 const { findPlumberByEmail } = require('../utils/plumberService');
+const { processBase64Image } = require('../utils/imageService');
 
 // Get Plumber Profile
 const getPlumberProfile = async (req, res) => {
@@ -64,7 +65,7 @@ const updatePlumberProfile = async (req, res) => {
       });
     }
 
-    const {
+    let {
       full_name,
       plumber_bio,
       plumber_thumbnail_photo,
@@ -88,6 +89,19 @@ const updatePlumberProfile = async (req, res) => {
       is_available,
       availability_schedule
     } = req.body;
+
+    // Handle image upload if provided as base64
+    if (plumber_thumbnail_photo && typeof plumber_thumbnail_photo === 'string' && plumber_thumbnail_photo.startsWith('data:image')) {
+      const imageResult = processBase64Image(plumber_thumbnail_photo);
+      if (imageResult.error) {
+        return res.status(400).json({
+          success: false,
+          message: imageResult.error
+        });
+      }
+      // Store the data URL in database (Vercel compatible - no external storage needed)
+      plumber_thumbnail_photo = imageResult.dataUrl;
+    }
 
     // Build update fields object
     const updateFields = {};
@@ -127,69 +141,124 @@ const updatePlumberProfile = async (req, res) => {
       });
     }
 
-    // Build SET clause manually - Vercel Postgres compatible approach
-    const setParts = [];
-    const values = [];
-    let paramCount = 1;
-
-    for (const [key, value] of Object.entries(updateFields)) {
-      // Handle special types
-      if (key === 'certifications' || key === 'specializations') {
-        // Arrays - pass as array
-        setParts.push(`${key} = $${paramCount}::text[]`);
-        values.push(Array.isArray(value) ? value : []);
-        paramCount++;
-      } else if (key === 'availability_schedule') {
-        // JSONB fields - stringify the object
-        if (value !== null && value !== undefined && typeof value === 'object' && Object.keys(value).length > 0) {
-          setParts.push(`${key} = $${paramCount}::jsonb`);
-          values.push(JSON.stringify(value));
-        } else {
-          setParts.push(`${key} = NULL::jsonb`);
+    // Build SET clause - use individual UPDATE statements for complex types
+    // This avoids parameter type inference issues
+    const { Client } = require('pg');
+    const client = new Client({
+      connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
+    });
+    
+    try {
+      await client.connect();
+      
+      // Start transaction
+      await client.query('BEGIN');
+      
+      // Update regular fields first
+      const regularFields = {};
+      const arrayFields = {};
+      const jsonbFields = {};
+      
+      for (const [key, value] of Object.entries(updateFields)) {
+        if (key === 'certifications' || key === 'specializations') {
+          arrayFields[key] = Array.isArray(value) ? value.map(v => String(v)) : [];
+        } else if (key === 'availability_schedule') {
+          jsonbFields[key] = value;
+        } else if (key !== 'location_updated_at') {
+          const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code', 'plumber_thumbnail_photo'];
+          let finalValue = value;
+          if (value === '' && optionalTextFields.includes(key)) {
+            finalValue = null;
+          } else if (value === undefined) {
+            finalValue = null;
+          }
+          regularFields[key] = finalValue;
         }
-        paramCount++;
-      } else if (key === 'location_updated_at') {
-        // Timestamp handling
-        setParts.push(`${key} = $${paramCount}`);
-        values.push(value);
-        paramCount++;
-      } else {
-        // Regular fields
-        setParts.push(`${key} = $${paramCount}`);
-        // Convert empty strings to null for optional text fields
-        const optionalTextFields = ['location_address', 'cnic', 'license_number', 'plumber_bio', 'city', 'state', 'zip_code'];
-        const finalValue = (value === '' && optionalTextFields.includes(key)) ? null : value;
-        values.push(finalValue);
-        paramCount++;
       }
-    }
-    setParts.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(plumberId);
-
-    // Build the query string
-    const queryString = `
-      UPDATE plumbers
-      SET ${setParts.join(', ')}
-      WHERE id = $${paramCount}
-      RETURNING *
-    `;
-
-    // Execute query - try sql.unsafe first, fallback to pg if needed
-    let result;
-    if (sql.unsafe && typeof sql.unsafe === 'function') {
-      result = await sql.unsafe(queryString, values);
-    } else {
-      // Fallback: Use pg library directly
-      const { Client } = require('pg');
-      const client = new Client({
-        connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
+      
+      // Update regular fields
+      if (Object.keys(regularFields).length > 0) {
+        const regularSetParts = [];
+        const regularValues = [];
+        let regParamCount = 1;
+        
+        for (const [key, value] of Object.entries(regularFields)) {
+          regularSetParts.push(`${key} = $${regParamCount}`);
+          regularValues.push(value);
+          regParamCount++;
+        }
+        regularSetParts.push(`updated_at = CURRENT_TIMESTAMP`);
+        regularValues.push(plumberId);
+        
+        await client.query(
+          `UPDATE plumbers SET ${regularSetParts.join(', ')} WHERE id = $${regParamCount}`,
+          regularValues
+        );
+      }
+      
+      // Update array fields
+      for (const [key, value] of Object.entries(arrayFields)) {
+        await client.query(
+          `UPDATE plumbers SET ${key} = $1::text[] WHERE id = $2`,
+          [value, plumberId]
+        );
+      }
+      
+      // Update JSONB fields
+      for (const [key, value] of Object.entries(jsonbFields)) {
+        if (value !== null && value !== undefined && typeof value === 'object' && Object.keys(value).length > 0) {
+          await client.query(
+            `UPDATE plumbers SET ${key} = $1::jsonb WHERE id = $2`,
+            [JSON.stringify(value), plumberId]
+          );
+        } else {
+          await client.query(
+            `UPDATE plumbers SET ${key} = NULL::jsonb WHERE id = $1`,
+            [plumberId]
+          );
+        }
+      }
+      
+      // Update location_updated_at if needed
+      if (updateFields.location_updated_at !== undefined) {
+        await client.query(
+          `UPDATE plumbers SET location_updated_at = $1 WHERE id = $2`,
+          [updateFields.location_updated_at, plumberId]
+        );
+      }
+      
+      // Fetch updated record before committing to verify it exists
+      const checkResult = await client.query('SELECT id FROM plumbers WHERE id = $1', [plumberId]);
+      
+      if (checkResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({
+          success: false,
+          message: 'Plumber not found'
+        });
+      }
+      
+      // Commit transaction
+      await client.query('COMMIT');
+      
+      // Fetch updated record
+      const result = await client.query('SELECT * FROM plumbers WHERE id = $1', [plumberId]);
+      
+      return res.json({
+        success: true,
+        message: 'Plumber profile updated successfully',
+        data: {
+          plumber: result.rows[0]
+        }
       });
-      try {
-        await client.connect();
-        result = await client.query(queryString, values);
-      } finally {
-        await client.end();
-      }
+    } catch (queryError) {
+      await client.query('ROLLBACK').catch(() => {});
+      console.error('Query execution error:', queryError);
+      console.error('Error details:', queryError.message);
+      console.error('Error stack:', queryError.stack);
+      throw queryError;
+    } finally {
+      await client.end();
     }
 
     if (result.rows.length === 0) {

@@ -50,7 +50,8 @@ const PlumberEditProfile = () => {
   });
 
   const [newCertification, setNewCertification] = useState('');
-  const [newSpecialization, setNewSpecialization] = useState('');
+  // eslint-disable-next-line no-unused-vars
+  const [newSpecialization, setNewSpecialization] = useState(''); // Reserved for custom specialization input
 
   // Common specializations for plumbers
   const commonSpecializations = [
@@ -114,18 +115,66 @@ const PlumberEditProfile = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
+  // Compress image to reduce size for upload
+  const compressImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to JPEG for better compression
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size must be less than 5MB');
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Image size must be less than 10MB');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      
+      try {
+        // Compress image before preview/upload
+        toast.info('Compressing image...', { autoClose: 1000 });
+        const compressedImage = await compressImage(file, 400, 400, 0.7);
+        setProfileImagePreview(compressedImage);
+        toast.success('Image ready!', { autoClose: 1500 });
+      } catch (error) {
+        console.error('Image compression error:', error);
+        toast.error('Failed to process image');
+      }
     }
   };
 
@@ -187,13 +236,16 @@ const PlumberEditProfile = () => {
         submitData.longitude = parseFloat(submitData.longitude);
       }
 
-      // Handle image upload (for now, we'll use the preview URL if it's a data URL)
-      // In production, you'd upload to a storage service first
-      if (profileImagePreview && profileImagePreview.startsWith('data:')) {
-        // For now, we'll skip the image URL update
-        // In production, upload to cloud storage and get URL
-        toast.info('Image upload will be implemented with cloud storage');
+      // Handle image upload - store base64 data URL directly in database
+      // Vercel-compatible: No external cloud storage needed
+      if (profileImagePreview && profileImagePreview.startsWith('data:image')) {
+        // Store base64 data URL directly (Vercel compatible approach)
+        submitData.plumber_thumbnail_photo = profileImagePreview;
+      } else if (profileImagePreview && !profileImagePreview.startsWith('http')) {
+        // If it's already a data URL but not starting with data:, use it as is
+        submitData.plumber_thumbnail_photo = profileImagePreview;
       } else if (profileImagePreview) {
+        // If it's a URL (from existing profile), keep it
         submitData.plumber_thumbnail_photo = profileImagePreview;
       }
 
