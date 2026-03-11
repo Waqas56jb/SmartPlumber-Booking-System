@@ -23,8 +23,24 @@ const Analytics = ({ apiBase }) => {
         if (bData.success) setBookingsPerDay(bData.data.points || []);
         const tpData = await tpRes.json();
         const tprData = await tprRes.json();
-        if (tpData.success) setTopPlumbers(tpData.data.points || []);
-        if (tprData.success) setTopProducts(tprData.data.points || []);
+        if (tpData.success) {
+          const raw = (tpData.data.points || []).slice(0, 4);
+          const mapped = raw.map((p) => ({
+            ...p,
+            label:
+              p.name && p.name.length > 10 ? `${p.name.slice(0, 10)}…` : p.name || 'Plumber'
+          }));
+          setTopPlumbers(mapped);
+        }
+        if (tprData.success) {
+          const raw = (tprData.data.points || []).slice(0, 4);
+          const mapped = raw.map((p) => ({
+            ...p,
+            label:
+              p.name && p.name.length > 14 ? `${p.name.slice(0, 14)}…` : p.name || 'Product'
+          }));
+          setTopProducts(mapped);
+        }
       } catch (e) {
         console.error('Analytics load error', e);
       }
@@ -92,10 +108,15 @@ const Analytics = ({ apiBase }) => {
           <h2 className="text-sm font-semibold text-slate-200 mb-3">Top plumbers (by completed jobs)</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topPlumbers} layout="vertical" margin={{ left: 60 }}>
+              <BarChart data={topPlumbers} layout="vertical" margin={{ left: 40 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis type="number" stroke="#9ca3af" />
-                <YAxis dataKey="name" type="category" stroke="#9ca3af" />
+                <YAxis
+                  dataKey="label"
+                  type="category"
+                  stroke="#9ca3af"
+                  width={80}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#020617', borderColor: '#1e293b', color: '#e5e7eb' }}
                 />
@@ -109,10 +130,15 @@ const Analytics = ({ apiBase }) => {
           <h2 className="text-sm font-semibold text-slate-200 mb-3">Top products (by sales)</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topProducts} layout="vertical" margin={{ left: 60 }}>
+              <BarChart data={topProducts} layout="vertical" margin={{ left: 40 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis type="number" stroke="#9ca3af" />
-                <YAxis dataKey="name" type="category" stroke="#9ca3af" />
+                <YAxis
+                  dataKey="label"
+                  type="category"
+                  stroke="#9ca3af"
+                  width={100}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#020617', borderColor: '#1e293b', color: '#e5e7eb' }}
                 />

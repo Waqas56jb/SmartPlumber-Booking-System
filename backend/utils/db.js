@@ -20,7 +20,9 @@ const initializeDatabase = async () => {
     return false;
   }
 
-  console.log('🔄 Initializing database tables...');
+  if (process.env.DEBUG_LOGS === 'true') {
+    console.log('🔄 Initializing database tables...');
+  }
 
   // Create users table (for customers) if it doesn't exist
   await runSQL(sql`
@@ -151,7 +153,9 @@ const initializeDatabase = async () => {
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_email ON otps(LOWER(email))`, 'Creating otps email index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_expires_at ON otps(expires_at)`, 'Creating otps expires_at index');
 
-  console.log('✅ Database initialization complete');
+  if (process.env.DEBUG_LOGS === 'true') {
+    console.log('✅ Database initialization complete');
+  }
   return true;
 };
 

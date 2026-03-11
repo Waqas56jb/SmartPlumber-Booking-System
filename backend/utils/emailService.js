@@ -37,7 +37,9 @@ const sendEmail = async ({ to, subject, html, text }) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully to ${to}:`, info.messageId);
+    if (process.env.DEBUG_LOGS === 'true') {
+      console.log(`Email sent successfully to ${to}:`, info.messageId);
+    }
     return true;
   } catch (error) {
     console.error('Error sending email:', error);
@@ -56,8 +58,10 @@ const verifyEmailConfig = async () => {
 
     const transporter = createTransporter();
     await transporter.verify();
-    console.log('✅ Email configuration verified successfully');
-    console.log(`   Admin email: ${process.env.EMAIL_USER.trim()}`);
+    if (process.env.DEBUG_LOGS === 'true') {
+      console.log('✅ Email configuration verified successfully');
+      console.log(`   Admin email: ${process.env.EMAIL_USER.trim()}`);
+    }
     return true;
   } catch (error) {
     console.error('❌ Email configuration verification failed:', error.message);

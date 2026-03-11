@@ -514,7 +514,7 @@ app.get('/api/admin/analytics/top-plumbers', async (req, res) => {
         plumber_completed_jobs
       FROM plumbers
       ORDER BY plumber_completed_jobs DESC NULLS LAST, plumber_rating DESC NULLS LAST
-      LIMIT 5
+      LIMIT 4
     `;
 
     const points = (result.rows || []).map((row) => ({
@@ -539,7 +539,7 @@ app.get('/api/admin/analytics/top-products', async (req, res) => {
         product_rating
       FROM products
       ORDER BY total_sales DESC NULLS LAST, product_rating DESC NULLS LAST
-      LIMIT 5
+      LIMIT 4
     `;
 
     const points = (result.rows || []).map((row) => ({
@@ -557,7 +557,9 @@ app.get('/api/admin/analytics/top-products', async (req, res) => {
 
 // Catch-all route for undefined routes
 app.use((req, res) => {
-  console.log(`Route not found: ${req.method} ${req.path}`);
+  if (process.env.DEBUG_LOGS === 'true') {
+    console.log(`Route not found: ${req.method} ${req.path}`);
+  }
   res.status(404).json({
     success: false,
     message: `Route ${req.method} ${req.path} not found`
@@ -580,14 +582,14 @@ module.exports = app;
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, async () => {
+    // Always show simple port info for local dev
     console.log(`🚀 Server is running on port ${PORT}`);
-    console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
     
     try {
       // Initialize database
       await initializeDatabase();
-      
-      // Verify email configuration
+
+      // Verify email configuration (quiet unless DEBUG_LOGS is true)
       await verifyEmailConfig();
     } catch (error) {
       console.error('❌ Initialization error:', error.message);

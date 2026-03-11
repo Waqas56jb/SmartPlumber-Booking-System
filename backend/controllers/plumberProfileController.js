@@ -278,7 +278,9 @@ const getAllPlumbers = async (req, res) => {
       created_at: plumber.created_at
     }));
 
-    console.log(`Found ${plumbers.length} plumbers in database`);
+    if (process.env.DEBUG_LOGS === 'true') {
+      console.log(`Found ${plumbers.length} plumbers in database`);
+    }
 
     res.json({
       success: true,
