@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
   
   // Plumber Profile
   PLUMBER_PROFILE: `${API_BASE_URL}/api/plumber/profile`,
+  ALL_PLUMBERS: `${API_BASE_URL}/api/plumber/all`,
   
   // Plumber Services
   PLUMBER_SERVICES: `${API_BASE_URL}/api/plumber/services`,
@@ -40,6 +41,9 @@ export const API_ENDPOINTS = {
   // Products
   PRODUCTS: `${API_BASE_URL}/api/products`,
   PRODUCTS_BY_CATEGORY: `${API_BASE_URL}/api/products/category`,
+  
+  // Public services summary (for landing "Our Professional Services")
+  PUBLIC_SERVICES: `${API_BASE_URL}/api/services/available`,
   
   // Health check
   HEALTH: `${API_BASE_URL}/api/health`

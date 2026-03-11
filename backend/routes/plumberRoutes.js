@@ -102,6 +102,7 @@ router.post('/verify-otp', plumberVerifyOtpValidation, validateRequest, plumberC
 router.post('/reset-password', plumberResetPasswordValidation, validateRequest, plumberController.plumberResetPassword);
 
 // Profile Routes
+router.get('/all', plumberProfileController.getAllPlumbers);  // Get all plumbers for customers
 router.get('/profile/:id?', plumberProfileController.getPlumberProfile);
 router.put('/profile/:id?', plumberProfileController.updatePlumberProfile);
 

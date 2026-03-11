@@ -85,6 +85,43 @@ const initializeDatabase = async () => {
     )
   `, 'Creating plumber_services table');
 
+  // Create products table if it doesn't exist
+  await runSQL(sql`
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+      product_name VARCHAR(255) NOT NULL,
+      product_description TEXT,
+      product_category VARCHAR(100),
+      product_brand VARCHAR(100),
+      product_model VARCHAR(100),
+      sku VARCHAR(100) UNIQUE,
+      price DECIMAL(10, 2) NOT NULL,
+      original_price DECIMAL(10, 2),
+      discount_percentage DECIMAL(5, 2) DEFAULT 0,
+      discount_amount DECIMAL(10, 2) DEFAULT 0,
+      currency VARCHAR(10) DEFAULT 'GBP',
+      stock_quantity INTEGER DEFAULT 0,
+      min_order_quantity INTEGER DEFAULT 1,
+      max_order_quantity INTEGER,
+      weight_kg DECIMAL(8, 2),
+      dimensions VARCHAR(100),
+      material VARCHAR(100),
+      color VARCHAR(50),
+      warranty_period_months INTEGER,
+      delivery_time_hours INTEGER,
+      shipping_charges DECIMAL(10, 2) DEFAULT 0,
+      product_rating DECIMAL(3, 2) DEFAULT 0,
+      total_reviews INTEGER DEFAULT 0,
+      total_sales INTEGER DEFAULT 0,
+      is_active BOOLEAN DEFAULT TRUE,
+      is_featured BOOLEAN DEFAULT FALSE,
+      is_in_stock BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `, 'Creating products table');
+
   // Create OTPs table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS otps (
@@ -108,6 +145,9 @@ const initializeDatabase = async () => {
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_sellers_username ON sellers(LOWER(seller_username))`, 'Creating sellers username index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_plumber_services_plumber_id ON plumber_services(plumber_id)`, 'Creating plumber_services plumber_id index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_plumber_services_is_active ON plumber_services(is_active)`, 'Creating plumber_services is_active index');
+  await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_products_seller_id ON products(seller_id)`, 'Creating products seller_id index');
+  await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_products_category ON products(product_category)`, 'Creating products category index');
+  await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active)`, 'Creating products is_active index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_email ON otps(LOWER(email))`, 'Creating otps email index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_expires_at ON otps(expires_at)`, 'Creating otps expires_at index');
 

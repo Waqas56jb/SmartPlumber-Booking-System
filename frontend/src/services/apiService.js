@@ -166,6 +166,21 @@ export const plumberAPI = {
     });
   },
 
+  // Get All Plumbers (for customers)
+  getAllPlumbers: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.city) params.append('city', filters.city);
+    if (filters.is_available) params.append('is_available', filters.is_available);
+    if (filters.specialization) params.append('specialization', filters.specialization);
+    
+    const queryString = params.toString();
+    const url = queryString ? `${API_ENDPOINTS.ALL_PLUMBERS}?${queryString}` : API_ENDPOINTS.ALL_PLUMBERS;
+    
+    return apiRequest(url, {
+      method: 'GET'
+    });
+  },
+
   // Plumber Services
   getPlumberServices: async (plumberId) => {
     return apiRequest(`${API_ENDPOINTS.PLUMBER_SERVICES}/${plumberId}`, {
@@ -364,6 +379,16 @@ export const productAPI = {
   deleteProduct: async (productId) => {
     return apiRequest(`${API_ENDPOINTS.PRODUCTS}/${productId}`, {
       method: 'DELETE'
+    });
+  }
+};
+
+// Public, read-only endpoints
+export const publicAPI = {
+  // Which plumber services currently exist (for landing "Our Professional Services" section)
+  getAvailableServices: async () => {
+    return apiRequest(API_ENDPOINTS.PUBLIC_SERVICES, {
+      method: 'GET'
     });
   }
 };

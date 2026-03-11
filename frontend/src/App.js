@@ -7,8 +7,11 @@ import PlumberHome from './pages/PlumberHome';
 import PlumberEditProfile from './pages/PlumberEditProfile';
 import PlumberServices from './pages/PlumberServices';
 import PlumberBookings from './pages/PlumberBookings';
+import PlumberAvailability from './pages/PlumberAvailability';
 import SellerHome from './pages/SellerHome';
 import SellerProducts from './pages/SellerProducts';
+import SellerOrders from './pages/SellerOrders';
+import SellerEditProfile from './pages/SellerEditProfile';
 import ServiceDetail from './pages/ServiceDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -39,7 +42,7 @@ function AppContent() {
   const isPublicRoute = publicRoutes.includes(currentPath) || currentPath.startsWith('/service/');
   
   // Protected routes that authenticated users can access
-  const protectedRoutes = ['/home', '/plumber-edit-profile', '/plumber-services', '/plumber-bookings', '/seller-products'];
+  const protectedRoutes = ['/home', '/plumber-edit-profile', '/plumber-services', '/plumber-bookings', '/plumber-availability', '/seller-products', '/seller-orders', '/seller-edit-profile'];
   const isProtectedRoute = protectedRoutes.includes(currentPath);
 
   // Initialize hash on first load and handle authentication redirects
@@ -119,6 +122,10 @@ function AppContent() {
         return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
           ? <PlumberBookings />
           : <Landing />;
+      case '/plumber-availability':
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
+          ? <PlumberAvailability />
+          : <Landing />;
       // Seller routes
       case '/seller-login':
         return <SellerLogin />;
@@ -135,6 +142,16 @@ function AppContent() {
       case '/seller-products':
         return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
           ? <SellerProducts /> 
+          : <Landing />;
+      // Seller Orders
+      case '/seller-orders':
+        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
+          ? <SellerOrders /> 
+          : <Landing />;
+      // Seller Edit Profile
+      case '/seller-edit-profile':
+        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
+          ? <SellerEditProfile /> 
           : <Landing />;
       default:
         if (currentPath.startsWith('/service/')) {

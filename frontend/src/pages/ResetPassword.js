@@ -89,8 +89,15 @@ const ResetPassword = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.newPassword !== formData.confirmPassword) return;
-    if (formData.newPassword.length < 6) return;
+    if (formData.newPassword !== formData.confirmPassword) {
+      window.alert('Passwords do not match!');
+      return;
+    }
+
+    if (formData.newPassword.length < 6) {
+      window.alert('Password must be at least 6 characters!');
+      return;
+    }
 
     setLoading(true);
     

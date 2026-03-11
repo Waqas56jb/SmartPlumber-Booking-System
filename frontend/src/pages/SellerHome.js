@@ -62,15 +62,14 @@ const SellerHome = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button 
-                onClick={() => {}} 
-                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90 cursor-not-allowed opacity-60" 
-                style={{ background: '#D2A752' }}
-                title="Coming soon"
-              >
-                <FaEdit className="inline mr-2" />
-                Edit Profile
-              </button>
+            <button 
+              onClick={() => navigate('/seller-edit-profile')} 
+              className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
+              style={{ background: '#D2A752' }}
+            >
+              <FaEdit className="inline mr-2" />
+              Edit Profile
+            </button>
               <button 
                 onClick={handleLogout}
                 className="px-4 py-2 rounded-lg font-semibold text-red-600 border-2 border-red-600 transition-all hover:bg-red-600 hover:text-white"
@@ -242,17 +241,15 @@ const SellerHome = () => {
               Manage Products
             </button>
             <button 
-              onClick={() => {}}
-              className="p-4 rounded-lg border-2 border-gray-300 text-gray-400 font-semibold cursor-not-allowed flex items-center justify-center gap-2"
-              title="Coming soon"
+              onClick={() => navigate('/seller-orders')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaShoppingBag />
               View Orders
             </button>
             <button 
-              onClick={() => {}}
-              className="p-4 rounded-lg border-2 border-gray-300 text-gray-400 font-semibold cursor-not-allowed flex items-center justify-center gap-2"
-              title="Coming soon"
+              onClick={() => navigate('/seller-edit-profile')}
+              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaCamera />
               Upload Shop Photos

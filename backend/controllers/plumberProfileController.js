@@ -238,7 +238,67 @@ const updatePlumberProfile = async (req, res) => {
   }
 };
 
+// Get All Plumbers (for customers to find plumbers)
+const getAllPlumbers = async (req, res) => {
+  try {
+    // Get ALL plumbers from database - no filtering
+    // Using SELECT * to get all columns that exist in the database
+    const result = await sql`
+      SELECT *
+      FROM plumbers
+      ORDER BY plumber_rating DESC NULLS LAST, plumber_total_jobs DESC NULLS LAST, created_at DESC
+    `;
+
+    // Map the results to ensure consistent structure
+    const plumbers = (result.rows || []).map(plumber => ({
+      id: plumber.id,
+      plumber_username: plumber.plumber_username,
+      plumber_email: plumber.plumber_email,
+      full_name: plumber.full_name || plumber.plumber_username,
+      plumber_bio: plumber.plumber_bio || '',
+      phone_number: plumber.phone_number || plumber.plumber_phone || '',
+      email: plumber.email || plumber.plumber_email,
+      location_address: plumber.location_address || plumber.plumber_location || '',
+      city: plumber.city || '',
+      state: plumber.state || '',
+      country: plumber.country || 'UK',
+      per_hour_charges: plumber.per_hour_charges || '0.00',
+      currency: plumber.currency || 'GBP',
+      minimum_charge: plumber.minimum_charge || '0.00',
+      experience_years: plumber.experience_years || 0,
+      license_number: plumber.license_number || '',
+      certifications: plumber.certifications || [],
+      specializations: plumber.specializations || [],
+      plumber_rating: plumber.plumber_rating || '0.00',
+      plumber_total_jobs: plumber.plumber_total_jobs || 0,
+      plumber_completed_jobs: plumber.plumber_completed_jobs || 0,
+      total_reviews: plumber.total_reviews || 0,
+      is_available: plumber.is_available !== false,
+      is_verified: plumber.is_verified || false,
+      created_at: plumber.created_at
+    }));
+
+    console.log(`Found ${plumbers.length} plumbers in database`);
+
+    res.json({
+      success: true,
+      data: {
+        plumbers: plumbers,
+        count: plumbers.length
+      }
+    });
+  } catch (error) {
+    console.error('Get all plumbers error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching plumbers',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getPlumberProfile,
-  updatePlumberProfile
+  updatePlumberProfile,
+  getAllPlumbers
 };

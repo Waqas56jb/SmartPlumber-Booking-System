@@ -2,84 +2,144 @@ import React from 'react';
 import { FaWrench, FaTools, FaShieldAlt, FaFire, FaTint, FaCog, FaCheckCircle, FaCertificate, FaBolt, FaHome, FaPlug, FaWater } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { Link } from '../utils/router';
+import { publicAPI } from '../services/apiService';
 
 const Services = () => {
   const sectionRef = useScrollAnimation();
+  const [availableNames, setAvailableNames] = React.useState(null);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    publicAPI
+      .getAvailableServices()
+      .then((response) => {
+        if (!isMounted) return;
+        if (response.success && response.data?.serviceNames) {
+          const normalized = response.data.serviceNames.map((n) => n.toLowerCase());
+          setAvailableNames(normalized);
+        } else {
+          setAvailableNames([]);
+        }
+      })
+      .catch(() => {
+        // On error, fall back to showing all cards
+        setAvailableNames(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const services = [
     {
       number: '01',
       title: 'Boiler Installations & Servicing',
       description: 'Professional boiler installation and regular servicing to keep your heating system running efficiently.',
-      icon: FaFire
+      icon: FaFire,
+      slug: 'boiler-installations',
+      match: (name) => name.includes('boiler') && (name.includes('install') || name.includes('service'))
     },
     {
       number: '02',
       title: 'Boiler Repairs & Fault Finding',
       description: 'Expert diagnosis and repair of boiler faults to restore your heating quickly and safely.',
-      icon: FaWrench
+      icon: FaWrench,
+      slug: 'boiler-repairs',
+      match: (name) => name.includes('boiler') && (name.includes('repair') || name.includes('fault'))
     },
     {
       number: '03',
       title: 'Central Heating',
       description: 'Complete central heating system installation, maintenance, and optimization for your home.',
-      icon: FaHome
+      icon: FaHome,
+      slug: 'central-heating',
+      match: (name) => name.includes('central heating') || (name.includes('heating') && name.includes('install'))
     },
     {
       number: '04',
       title: 'General Plumbing',
       description: 'All plumbing services including taps, showers, sinks, toilets, and more.',
-      icon: FaTint
+      icon: FaTint,
+      slug: 'general-plumbing',
+      match: (name) => name.includes('plumbing') || name.includes('plumber')
     },
     {
       number: '05',
       title: 'Gas Safety Inspections',
       description: 'Thorough gas safety checks and certification by Gas Safe registered engineers.',
-      icon: FaShieldAlt
+      icon: FaShieldAlt,
+      slug: 'gas-safety',
+      match: (name) => name.includes('gas') && (name.includes('safety') || name.includes('check'))
     },
     {
       number: '06',
       title: 'Leak Detection & Repairs',
       description: 'Fast and accurate leak detection with professional repair services to prevent damage.',
-      icon: FaWater
+      icon: FaWater,
+      slug: 'leak-detection',
+      match: (name) => name.includes('leak')
     },
     {
       number: '07',
       title: 'Power Flushing',
       description: 'System cleaning to improve heating efficiency and extend the life of your boiler.',
-      icon: FaBolt
+      icon: FaBolt,
+      slug: 'power-flushing',
+      match: (name) => name.includes('power flushing') || (name.includes('flush') && name.includes('system'))
     },
     {
       number: '08',
       title: 'Water Heaters',
       description: 'Professional installation and maintenance of water heating systems.',
-      icon: FaCog
+      icon: FaCog,
+      slug: 'water-heaters',
+      match: (name) => name.includes('water heater')
     },
     {
       number: '09',
       title: 'Pipe Installation & Repairs',
       description: 'Professional pipe installation and repair services for all plumbing systems.',
-      icon: FaTools
+      icon: FaTools,
+      slug: 'pipe-installation',
+      match: (name) => name.includes('pipe')
     },
     {
       number: '10',
       title: 'Hot Water Cylinders',
       description: 'Installation, repair, and replacement of hot water cylinder systems.',
-      icon: FaPlug
+      icon: FaPlug,
+      slug: 'hot-water-cylinders',
+      match: (name) => name.includes('cylinder')
     },
     {
       number: '11',
       title: 'New Appliances Installations',
       description: 'Expert installation of new heating and plumbing appliances for your home.',
-      icon: FaCertificate
+      icon: FaCertificate,
+      slug: 'appliances-installation',
+      match: (name) => name.includes('appliance')
     },
     {
       number: '12',
       title: 'Any Repairs',
       description: 'Comprehensive repair services for all your heating and plumbing needs.',
-      icon: FaCheckCircle
+      icon: FaCheckCircle,
+      slug: 'any-repairs',
+      match: (name) => name.includes('repair')
     }
   ];
+
+  // If we have a list of real services, only show cards that match at least one plumber service
+  let visibleServices = services;
+  if (Array.isArray(availableNames) && availableNames.length > 0) {
+    visibleServices = services.filter(
+      (service) =>
+        typeof service.match === 'function' &&
+        availableNames.some((n) => service.match(n))
+    );
+  }
 
   return (
     <section ref={sectionRef} id="services" className="py-16 sm:py-20 md:py-28 bg-gradient-to-b from-white via-background-alt to-white relative overflow-hidden w-full">
@@ -103,7 +163,7 @@ const Services = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-7 md:gap-8">
-          {services.map((service, index) => {
+          {visibleServices.map((service, index) => {
             const Icon = service.icon;
             return (
               <Link

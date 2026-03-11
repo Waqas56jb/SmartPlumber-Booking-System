@@ -1,6 +1,6 @@
 // Vercel serverless function - handles all API routes
 // This file is the entry point for Vercel serverless functions
-// Build timestamp: 2026-01-27T19:00:00Z - Added plumber_services table to DB init
+// Build timestamp: 2026-01-27T21:30:00Z - Fixed getAllPlumbers to return ALL registered plumbers
 
 const app = require('../server');
 

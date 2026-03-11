@@ -248,7 +248,7 @@ const PlumberHome = () => {
               View Bookings
             </button>
             <button 
-              onClick={() => navigate('/plumber-edit-profile')}
+              onClick={() => navigate('/plumber-availability')}
               className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
             >
               <FaToggleOn />
