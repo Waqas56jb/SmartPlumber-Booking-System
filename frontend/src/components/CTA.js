@@ -3,13 +3,10 @@ import { FaPhone, FaEnvelope, FaClock, FaShieldAlt, FaCheckCircle, FaArrowRight 
 import { FaWhatsapp } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
-
 const CTA = () => {
   const sectionRef = useScrollAnimation();
-
-  return (
-    <section ref={sectionRef} id="contact" className="py-16 sm:py-20 md:py-28 bg-gradient-to-br from-primary via-secondary to-primary text-white relative overflow-hidden w-full">
-      {/* Decorative Background */}
+  return <section ref={sectionRef} id="contact" className="py-16 sm:py-20 md:py-28 bg-gradient-to-br from-primary via-secondary to-primary text-white relative overflow-hidden w-full">
+      {}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-20 w-64 h-64 border-2 border-accent rounded-full"></div>
         <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-accent rounded-full"></div>
@@ -42,11 +39,9 @@ const CTA = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 max-w-[1000px] mx-auto">
-            <a
-              href="tel:+447777998381"
-              className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift"
-              style={{ animationDelay: '0.1s' }}
-            >
+            <a href="tel:+447777998381" className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift" style={{
+            animationDelay: '0.1s'
+          }}>
               <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
                 <FaPhone className="text-primary group-hover:text-white transition-colors duration-300" size={28} />
               </div>
@@ -61,13 +56,9 @@ const CTA = () => {
               </div>
               <FaArrowRight className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" size={20} />
             </a>
-            <a
-              href="https://wa.me/447777998381"
-              className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ animationDelay: '0.2s' }}
-            >
+            <a href="https://wa.me/447777998381" className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift" target="_blank" rel="noopener noreferrer" style={{
+            animationDelay: '0.2s'
+          }}>
               <div className="w-16 h-16 bg-whatsapp/10 rounded-xl flex items-center justify-center group-hover:bg-whatsapp group-hover:scale-110 transition-all duration-300">
                 <FaWhatsapp className="text-whatsapp group-hover:text-white transition-colors duration-300" size={28} />
               </div>
@@ -82,11 +73,9 @@ const CTA = () => {
               </div>
               <FaArrowRight className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" size={20} />
             </a>
-            <a
-              href="mailto:basitpk4@yahoo.com"
-              className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift"
-              style={{ animationDelay: '0.3s' }}
-            >
+            <a href="mailto:basitpk4@yahoo.com" className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift" style={{
+            animationDelay: '0.3s'
+          }}>
               <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
                 <FaEnvelope className="text-primary group-hover:text-white transition-colors" size={28} />
               </div>
@@ -101,13 +90,9 @@ const CTA = () => {
               </div>
               <FaArrowRight className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" size={20} />
             </a>
-            <a
-              href="https://instagram.com/abdulb05"
-              className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ animationDelay: '0.4s' }}
-            >
+            <a href="https://instagram.com/abdulb05" className="bg-white p-6 sm:p-8 flex items-center gap-5 sm:gap-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group rounded-xl animate-fade-in-up hover-lift" target="_blank" rel="noopener noreferrer" style={{
+            animationDelay: '0.4s'
+          }}>
               <div className="w-16 h-16 bg-instagram/10 rounded-xl flex items-center justify-center group-hover:bg-instagram group-hover:scale-110 transition-all duration-300">
                 <FaInstagram className="text-instagram group-hover:text-white transition-colors duration-300" size={28} />
               </div>
@@ -125,8 +110,6 @@ const CTA = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default CTA;

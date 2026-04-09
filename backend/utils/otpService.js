@@ -1,15 +1,8 @@
-// In-memory OTP storage (in production, use Redis or database)
 const otpStore = new Map();
-
-// OTP expiration time: 1 minute (60000 milliseconds)
 const OTP_EXPIRY_TIME = 60 * 1000;
-
-// Generate 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
-
-// Store OTP with expiration and user type
 const storeOTP = (email, otp, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   const expiryTime = Date.now() + OTP_EXPIRY_TIME;
@@ -19,8 +12,6 @@ const storeOTP = (email, otp, userType = 'customer') => {
     expiresAt: expiryTime,
     attempts: 0
   });
-
-  // Auto-delete expired OTPs
   setTimeout(() => {
     if (otpStore.has(key)) {
       const stored = otpStore.get(key);
@@ -28,85 +19,66 @@ const storeOTP = (email, otp, userType = 'customer') => {
         otpStore.delete(key);
       }
     }
-  }, OTP_EXPIRY_TIME + 1000); // Delete 1 second after expiry
-
+  }, OTP_EXPIRY_TIME + 1000);
   if (process.env.DEBUG_LOGS === 'true') {
-    console.log(`OTP stored for ${email} (${userType}), expires at ${new Date(expiryTime).toISOString()}`);
+    console.log('otp stored', email, userType);
   }
 };
-
-// Verify OTP
 const verifyOTP = (email, otp, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   const stored = otpStore.get(key);
-
   if (!stored) {
     if (process.env.DEBUG_LOGS === 'true') {
-      console.log(`No OTP found for ${email} (${userType})`);
+      console.log('no otp', email);
     }
     return false;
   }
-
-  // Check if OTP has expired
   if (Date.now() > stored.expiresAt) {
     if (process.env.DEBUG_LOGS === 'true') {
-      console.log(`OTP expired for ${email} (${userType})`);
+      console.log('otp expired', email);
     }
     otpStore.delete(key);
     return false;
   }
-
-  // Check if OTP matches
   if (stored.otp !== otp) {
     stored.attempts += 1;
     if (process.env.DEBUG_LOGS === 'true') {
-      console.log(`Invalid OTP attempt for ${email} (${userType}), attempts: ${stored.attempts}`);
+      console.log('bad otp', email, stored.attempts);
     }
-    
-    // Delete OTP after 3 failed attempts
     if (stored.attempts >= 3) {
       otpStore.delete(key);
       if (process.env.DEBUG_LOGS === 'true') {
-        console.log(`OTP deleted for ${email} (${userType}) due to too many failed attempts`);
+        console.log('otp removed max tries', email);
       }
     }
     return false;
   }
-
-  // OTP is valid
   if (process.env.DEBUG_LOGS === 'true') {
-    console.log(`OTP verified successfully for ${email} (${userType})`);
+    console.log('otp ok', email);
   }
   return true;
 };
-
-// Delete OTP
 const deleteOTP = (email, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   if (otpStore.has(key)) {
     otpStore.delete(key);
-      if (process.env.DEBUG_LOGS === 'true') {
-        console.log(`OTP deleted for ${email} (${userType})`);
-      }
+    if (process.env.DEBUG_LOGS === 'true') {
+      console.log('otp deleted', email);
+    }
   }
 };
-
-// Clean up expired OTPs (run periodically)
 const cleanupExpiredOTPs = () => {
   const now = Date.now();
   for (const [email, data] of otpStore.entries()) {
     if (now > data.expiresAt) {
       otpStore.delete(email);
       if (process.env.DEBUG_LOGS === 'true') {
-        console.log(`Cleaned up expired OTP for ${email}`);
+        console.log('otp cleanup', email);
       }
     }
   }
 };
-
-// Run cleanup every 5 minutes
 setInterval(cleanupExpiredOTPs, 5 * 60 * 1000);
-
 module.exports = {
   generateOTP,
   storeOTP,

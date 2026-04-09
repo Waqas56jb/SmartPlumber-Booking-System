@@ -1,9 +1,11 @@
 import React from 'react';
 import { FiUsers, FiTool, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
-
-const number = (v) => (typeof v === 'number' ? v : 0);
-
-const Dashboard = ({ overview, loading, apiBase }) => {
+const number = v => typeof v === 'number' ? v : 0;
+const Dashboard = ({
+  overview,
+  loading,
+  apiBase
+}) => {
   const totalCustomers = number(overview?.totalCustomers);
   const totalPlumbers = number(overview?.totalPlumbers);
   const totalSellers = number(overview?.totalSellers);
@@ -11,16 +13,12 @@ const Dashboard = ({ overview, loading, apiBase }) => {
   const totalJobs = number(overview?.totalPlumberJobs);
   const completedJobs = number(overview?.totalCompletedJobs);
   const totalSales = number(overview?.totalSellerSales);
-
   const customersPerPlumber = totalPlumbers ? (totalCustomers / totalPlumbers).toFixed(1) : '0.0';
   const jobsPerPlumber = totalPlumbers ? (totalJobs / totalPlumbers).toFixed(1) : '0.0';
   const productsPerSeller = totalSellers ? (totalProducts / totalSellers).toFixed(1) : '0.0';
   const salesPerSeller = totalSellers ? (totalSales / totalSellers).toFixed(1) : '0.0';
-  const completionRate =
-    totalJobs > 0 ? `${((completedJobs / totalJobs) * 100).toFixed(1)}%` : '0%';
-
-  return (
-    <div className="space-y-6">
+  const completionRate = totalJobs > 0 ? `${(completedJobs / totalJobs * 100).toFixed(1)}%` : '0%';
+  return <div className="space-y-6">
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl md:text-3xl font-bold text-white">Admin Overview</h1>
         <p className="text-sm text-slate-400">
@@ -28,7 +26,7 @@ const Dashboard = ({ overview, loading, apiBase }) => {
         </p>
       </header>
 
-      {/* Primary counters */}
+      {}
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400 text-xl">
@@ -85,7 +83,7 @@ const Dashboard = ({ overview, loading, apiBase }) => {
         </div>
       </section>
 
-      {/* KPI cards */}
+      {}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
           <div className="text-xs uppercase tracking-wider text-slate-400 mb-1">
@@ -134,9 +132,6 @@ const Dashboard = ({ overview, loading, apiBase }) => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
-

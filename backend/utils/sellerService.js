@@ -1,32 +1,25 @@
-const { sql } = require('./db');
-
-// Create seller
-const createSeller = async (sellerData) => {
+const {
+  sql
+} = require('./db');
+const createSeller = async sellerData => {
   try {
-    // Check if seller already exists
     const existingSellerByEmail = await sql`
       SELECT * FROM sellers WHERE LOWER(seller_email) = LOWER(${sellerData.seller_email})
     `;
-
     if (existingSellerByEmail.rows.length > 0) {
       throw new Error('Seller with this email already exists');
     }
-
     const existingSellerByUsername = await sql`
       SELECT * FROM sellers WHERE LOWER(seller_username) = LOWER(${sellerData.seller_username})
     `;
-
     if (existingSellerByUsername.rows.length > 0) {
       throw new Error('Seller username is already taken');
     }
-
-    // Insert new seller
     const result = await sql`
       INSERT INTO sellers (seller_username, seller_email, seller_password, created_at, updated_at)
       VALUES (${sellerData.seller_username}, LOWER(${sellerData.seller_email}), ${sellerData.seller_password}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING id, seller_username, seller_email, created_at, updated_at
     `;
-
     return {
       id: result.rows[0].id.toString(),
       seller_username: result.rows[0].seller_username,
@@ -43,18 +36,14 @@ const createSeller = async (sellerData) => {
     throw new Error('Error creating seller account');
   }
 };
-
-// Find seller by email
-const findSellerByEmail = async (seller_email) => {
+const findSellerByEmail = async seller_email => {
   try {
     const result = await sql`
       SELECT * FROM sellers WHERE LOWER(seller_email) = LOWER(${seller_email})
     `;
-
     if (result.rows.length === 0) {
       return null;
     }
-
     const seller = result.rows[0];
     return {
       id: seller.id.toString(),
@@ -69,18 +58,14 @@ const findSellerByEmail = async (seller_email) => {
     return null;
   }
 };
-
-// Find seller by username
-const findSellerByUsername = async (seller_username) => {
+const findSellerByUsername = async seller_username => {
   try {
     const result = await sql`
       SELECT * FROM sellers WHERE LOWER(seller_username) = LOWER(${seller_username})
     `;
-
     if (result.rows.length === 0) {
       return null;
     }
-
     const seller = result.rows[0];
     return {
       id: seller.id.toString(),
@@ -95,8 +80,6 @@ const findSellerByUsername = async (seller_username) => {
     return null;
   }
 };
-
-// Update seller password
 const updateSellerPassword = async (seller_email, hashedPassword) => {
   try {
     const result = await sql`
@@ -105,11 +88,9 @@ const updateSellerPassword = async (seller_email, hashedPassword) => {
       WHERE LOWER(seller_email) = LOWER(${seller_email})
       RETURNING id, seller_username, seller_email, updated_at
     `;
-
     if (result.rows.length === 0) {
       throw new Error('Seller not found');
     }
-
     const seller = result.rows[0];
     return {
       id: seller.id.toString(),
@@ -122,21 +103,17 @@ const updateSellerPassword = async (seller_email, hashedPassword) => {
     throw error;
   }
 };
-
-// Check if seller email exists
-const sellerEmailExists = async (seller_email) => {
+const sellerEmailExists = async seller_email => {
   try {
     const result = await sql`
       SELECT id FROM sellers WHERE LOWER(seller_email) = LOWER(${seller_email})
     `;
-
     return result.rows.length > 0;
   } catch (error) {
     console.error('Error checking seller email existence:', error);
     return false;
   }
 };
-
 module.exports = {
   createSeller,
   findSellerByEmail,

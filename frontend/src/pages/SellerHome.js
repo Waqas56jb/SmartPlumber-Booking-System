@@ -3,18 +3,20 @@ import { FaStore, FaMapMarkerAlt, FaTruck, FaCreditCard, FaMoneyBillWave, FaStar
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
-
 const SellerHome = () => {
-  const { user, logout } = useAuth();
-  const { navigate } = useRouter();
+  const {
+    user,
+    logout
+  } = useAuth();
+  const {
+    navigate
+  } = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const handleLogout = () => {
     logout();
     navigate('/seller-login');
   };
-
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
@@ -28,33 +30,35 @@ const SellerHome = () => {
       setLoading(false);
     }
   }, [user]);
-
   useEffect(() => {
     if (user?.id) {
       fetchProfile();
     }
   }, [user, fetchProfile]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
+    return <div className="min-h-screen flex items-center justify-center" style={{
+      background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)'
+    }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#D2A752] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading profile...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)' }}>
-      {/* Header */}
+  return <div className="min-h-screen" style={{
+    background: 'linear-gradient(to bottom, #FEFEFE, #F5E6D3)'
+  }}>
+      {}
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#F5E6D3' }}>
-                <FaStore className="text-2xl" style={{ color: '#D2A752' }} />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+              background: '#F5E6D3'
+            }}>
+                <FaStore className="text-2xl" style={{
+                color: '#D2A752'
+              }} />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Seller Portal</h1>
@@ -62,19 +66,13 @@ const SellerHome = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-            <button 
-              onClick={() => navigate('/seller-edit-profile')} 
-              className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" 
-              style={{ background: '#D2A752' }}
-            >
+            <button onClick={() => navigate('/seller-edit-profile')} className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90" style={{
+              background: '#D2A752'
+            }}>
               <FaEdit className="inline mr-2" />
               Edit Profile
             </button>
-              <button 
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-lg font-semibold text-red-600 border-2 border-red-600 transition-all hover:bg-red-600 hover:text-white"
-                title="Logout"
-              >
+              <button onClick={handleLogout} className="px-4 py-2 rounded-lg font-semibold text-red-600 border-2 border-red-600 transition-all hover:bg-red-600 hover:text-white" title="Logout">
                 <FaSignOutAlt className="inline mr-2" />
                 Logout
               </button>
@@ -84,25 +82,20 @@ const SellerHome = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Profile Card */}
+        {}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Shop Info */}
+            {}
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
                 {profile?.seller_shop_name || user?.seller_username || 'Shop Name'}
               </h2>
               <p className="text-gray-600 mb-2">{profile?.seller_bio || 'No bio available'}</p>
               
-              {/* Rating */}
+              {}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={i < Math.floor(Number(profile?.seller_rating) || 0) ? 'text-yellow-400' : 'text-gray-300'}
-                    />
-                  ))}
+                  {[...Array(5)].map((_, i) => <FaStar key={i} className={i < Math.floor(Number(profile?.seller_rating) || 0) ? 'text-yellow-400' : 'text-gray-300'} />)}
                 </div>
                 <span className="text-gray-700 font-semibold">
                   {profile?.seller_rating ? Number(profile.seller_rating).toFixed(1) : '0.0'}
@@ -112,28 +105,44 @@ const SellerHome = () => {
                 </span>
               </div>
 
-              {/* Stats Grid */}
+              {}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                <div className="text-center p-3 rounded-lg" style={{ background: '#F5E6D3' }}>
-                  <div className="text-2xl font-bold" style={{ color: '#D2A752' }}>
+                <div className="text-center p-3 rounded-lg" style={{
+                background: '#F5E6D3'
+              }}>
+                  <div className="text-2xl font-bold" style={{
+                  color: '#D2A752'
+                }}>
                     {profile?.seller_total_orders || 0}
                   </div>
                   <div className="text-sm text-gray-600">Total Orders</div>
                 </div>
-                <div className="text-center p-3 rounded-lg" style={{ background: '#F5E6D3' }}>
-                  <div className="text-2xl font-bold" style={{ color: '#D2A752' }}>
+                <div className="text-center p-3 rounded-lg" style={{
+                background: '#F5E6D3'
+              }}>
+                  <div className="text-2xl font-bold" style={{
+                  color: '#D2A752'
+                }}>
                     {profile?.seller_completed_orders || 0}
                   </div>
                   <div className="text-sm text-gray-600">Completed</div>
                 </div>
-                <div className="text-center p-3 rounded-lg" style={{ background: '#F5E6D3' }}>
-                  <div className="text-2xl font-bold" style={{ color: '#D2A752' }}>
+                <div className="text-center p-3 rounded-lg" style={{
+                background: '#F5E6D3'
+              }}>
+                  <div className="text-2xl font-bold" style={{
+                  color: '#D2A752'
+                }}>
                     {profile?.seller_total_sales || 0}
                   </div>
                   <div className="text-sm text-gray-600">Total Sales</div>
                 </div>
-                <div className="text-center p-3 rounded-lg" style={{ background: '#F5E6D3' }}>
-                  <div className="text-2xl font-bold" style={{ color: '#D2A752' }}>
+                <div className="text-center p-3 rounded-lg" style={{
+                background: '#F5E6D3'
+              }}>
+                  <div className="text-2xl font-bold" style={{
+                  color: '#D2A752'
+                }}>
                     {profile?.experience_years || 0}
                   </div>
                   <div className="text-sm text-gray-600">Years Experience</div>
@@ -143,122 +152,87 @@ const SellerHome = () => {
           </div>
         </div>
 
-        {/* Details Grid */}
+        {}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Contact Information */}
+          {}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Information</h3>
             <div className="space-y-3">
-              {profile?.phone_number && (
-                <div className="flex items-center gap-3">
+              {profile?.phone_number && <div className="flex items-center gap-3">
                   <FaPhone className="text-[#D2A752]" />
                   <span className="text-gray-700">{profile.phone_number}</span>
-                </div>
-              )}
-              {profile?.email && (
-                <div className="flex items-center gap-3">
+                </div>}
+              {profile?.email && <div className="flex items-center gap-3">
                   <FaEnvelope className="text-[#D2A752]" />
                   <span className="text-gray-700">{profile.email}</span>
-                </div>
-              )}
-              {profile?.shop_address && (
-                <div className="flex items-start gap-3">
+                </div>}
+              {profile?.shop_address && <div className="flex items-start gap-3">
                   <FaMapMarkerAlt className="text-[#D2A752] mt-1" />
                   <div>
                     <div className="text-gray-700">{profile.shop_address}</div>
                     {profile.city && <div className="text-gray-500 text-sm">{profile.city}, {profile.state || ''}</div>}
                   </div>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
 
-          {/* Delivery & Payment */}
+          {}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Delivery & Payment</h3>
             <div className="space-y-3">
-              {profile?.delivery_available && (
-                <div className="flex items-center gap-3">
+              {profile?.delivery_available && <div className="flex items-center gap-3">
                   <FaTruck className="text-[#D2A752]" />
                   <div>
                     <div className="text-gray-700 font-semibold">Delivery Available</div>
-                    {profile.delivery_time_hours && (
-                      <div className="text-gray-500 text-sm">
+                    {profile.delivery_time_hours && <div className="text-gray-500 text-sm">
                         Delivery Time: {profile.delivery_time_hours} hours
-                      </div>
-                    )}
-                    {profile.delivery_radius_km && (
-                      <div className="text-gray-500 text-sm">
+                      </div>}
+                    {profile.delivery_radius_km && <div className="text-gray-500 text-sm">
                         Radius: {profile.delivery_radius_km} km
-                      </div>
-                    )}
+                      </div>}
                   </div>
-                </div>
-              )}
+                </div>}
               <div className="flex items-center gap-3">
-                {profile?.accepts_online_payment ? (
-                  <FaCreditCard className="text-green-500" />
-                ) : (
-                  <FaCreditCard className="text-gray-300" />
-                )}
+                {profile?.accepts_online_payment ? <FaCreditCard className="text-green-500" /> : <FaCreditCard className="text-gray-300" />}
                 <span className="text-gray-700">
                   Online Payment: {profile?.accepts_online_payment ? 'Accepted' : 'Not Accepted'}
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {profile?.accepts_cash_on_delivery ? (
-                  <FaMoneyBillWave className="text-green-500" />
-                ) : (
-                  <FaMoneyBillWave className="text-gray-300" />
-                )}
+                {profile?.accepts_cash_on_delivery ? <FaMoneyBillWave className="text-green-500" /> : <FaMoneyBillWave className="text-gray-300" />}
                 <span className="text-gray-700">
                   Cash on Delivery: {profile?.accepts_cash_on_delivery ? 'Accepted' : 'Not Accepted'}
                 </span>
               </div>
-              {profile?.delivery_charges !== undefined && (
-                <div className="text-gray-700">
+              {profile?.delivery_charges !== undefined && <div className="text-gray-700">
                   <span className="font-semibold">Delivery Charges:</span> GBP {profile.delivery_charges}
-                  {profile.free_delivery_above && (
-                    <span className="text-gray-500 text-sm ml-2">
+                  {profile.free_delivery_above && <span className="text-gray-500 text-sm ml-2">
                       (Free above GBP {profile.free_delivery_above})
-                    </span>
-                  )}
-                </div>
-              )}
+                    </span>}
+                </div>}
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {}
         <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid md:grid-cols-3 gap-4">
-            <button 
-              onClick={() => navigate('/seller-products')}
-              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
-            >
+            <button onClick={() => navigate('/seller-products')} className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2">
               <FaBox />
               Manage Products
             </button>
-            <button 
-              onClick={() => navigate('/seller-orders')}
-              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
-            >
+            <button onClick={() => navigate('/seller-orders')} className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2">
               <FaShoppingBag />
               View Orders
             </button>
-            <button 
-              onClick={() => navigate('/seller-edit-profile')}
-              className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2"
-            >
+            <button onClick={() => navigate('/seller-edit-profile')} className="p-4 rounded-lg border-2 border-[#D2A752] text-[#D2A752] font-semibold hover:bg-[#D2A752] hover:text-white transition-all flex items-center justify-center gap-2">
               <FaCamera />
               Upload Shop Photos
             </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SellerHome;

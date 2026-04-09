@@ -1,18 +1,20 @@
-const { sql } = require('../utils/db');
-
-// Get all bookings for a plumber
+const {
+  sql
+} = require('../utils/db');
 const getPlumberBookings = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
-    const { status, date_from, date_to } = req.query;
-    
+    const {
+      status,
+      date_from,
+      date_to
+    } = req.query;
     if (!plumberId) {
       return res.status(400).json({
         success: false,
         message: 'Plumber ID is required'
       });
     }
-
     let query = `
       SELECT 
         b.*,
@@ -24,39 +26,33 @@ const getPlumberBookings = async (req, res) => {
       LEFT JOIN plumber_services ps ON b.service_id = ps.id
       WHERE b.plumber_id = $1
     `;
-    
     const params = [plumberId];
     let paramIndex = 2;
-    
     if (status && status !== 'all') {
       query += ` AND b.status = $${paramIndex}`;
       params.push(status);
       paramIndex++;
     }
-    
     if (date_from) {
       query += ` AND b.booking_date >= $${paramIndex}`;
       params.push(date_from);
       paramIndex++;
     }
-    
     if (date_to) {
       query += ` AND b.booking_date <= $${paramIndex}`;
       params.push(date_to);
       paramIndex++;
     }
-    
     query += ` ORDER BY b.booking_date DESC, b.booking_time DESC`;
-
-    const { Client } = require('pg');
+    const {
+      Client
+    } = require('pg');
     const client = new Client({
       connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
     });
-
     try {
       await client.connect();
       const result = await client.query(query, params);
-      
       res.json({
         success: true,
         data: {
@@ -75,19 +71,15 @@ const getPlumberBookings = async (req, res) => {
     });
   }
 };
-
-// Get booking statistics for a plumber
 const getBookingStats = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
-    
     if (!plumberId) {
       return res.status(400).json({
         success: false,
         message: 'Plumber ID is required'
       });
     }
-
     const result = await sql`
       SELECT 
         COUNT(*) FILTER (WHERE status = 'pending') as pending_count,
@@ -102,7 +94,6 @@ const getBookingStats = async (req, res) => {
       FROM bookings 
       WHERE plumber_id = ${plumberId}
     `;
-
     const stats = result.rows?.[0] || result[0] || {
       pending_count: 0,
       confirmed_count: 0,
@@ -114,10 +105,11 @@ const getBookingStats = async (req, res) => {
       today_count: 0,
       week_count: 0
     };
-
     res.json({
       success: true,
-      data: { stats }
+      data: {
+        stats
+      }
     });
   } catch (error) {
     console.error('Get booking stats error:', error);
@@ -128,13 +120,15 @@ const getBookingStats = async (req, res) => {
     });
   }
 };
-
-// Update booking status
 const updateBookingStatus = async (req, res) => {
   try {
-    const { bookingId } = req.params;
-    const { status, notes } = req.body;
-    
+    const {
+      bookingId
+    } = req.params;
+    const {
+      status,
+      notes
+    } = req.body;
     const validStatuses = ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -142,7 +136,6 @@ const updateBookingStatus = async (req, res) => {
         message: 'Invalid status. Must be one of: ' + validStatuses.join(', ')
       });
     }
-
     const result = await sql`
       UPDATE bookings SET
         status = ${status},
@@ -151,15 +144,12 @@ const updateBookingStatus = async (req, res) => {
       WHERE id = ${bookingId}
       RETURNING *
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
       });
     }
-
-    // Update plumber stats if completed or cancelled
     const booking = result.rows?.[0] || result[0];
     if (status === 'completed') {
       await sql`
@@ -175,11 +165,12 @@ const updateBookingStatus = async (req, res) => {
         WHERE id = ${booking.plumber_id}
       `;
     }
-
     res.json({
       success: true,
       message: 'Booking status updated successfully',
-      data: { booking }
+      data: {
+        booking
+      }
     });
   } catch (error) {
     console.error('Update booking status error:', error);
@@ -190,12 +181,11 @@ const updateBookingStatus = async (req, res) => {
     });
   }
 };
-
-// Get single booking details
 const getBookingDetails = async (req, res) => {
   try {
-    const { bookingId } = req.params;
-    
+    const {
+      bookingId
+    } = req.params;
     const result = await sql`
       SELECT 
         b.*,
@@ -211,14 +201,12 @@ const getBookingDetails = async (req, res) => {
       LEFT JOIN plumbers p ON b.plumber_id = p.id
       WHERE b.id = ${bookingId}
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Booking not found'
       });
     }
-
     res.json({
       success: true,
       data: {
@@ -234,24 +222,25 @@ const getBookingDetails = async (req, res) => {
     });
   }
 };
-
-// Create a new booking (for customers)
 const createBooking = async (req, res) => {
   try {
     const {
-      customer_id, plumber_id, service_id,
-      booking_date, booking_time, 
-      customer_address, customer_phone, customer_notes,
+      customer_id,
+      plumber_id,
+      service_id,
+      booking_date,
+      booking_time,
+      customer_address,
+      customer_phone,
+      customer_notes,
       total_amount
     } = req.body;
-    
     if (!customer_id || !plumber_id || !booking_date) {
       return res.status(400).json({
         success: false,
         message: 'Customer ID, Plumber ID, and booking date are required'
       });
     }
-
     const result = await sql`
       INSERT INTO bookings (
         customer_id, plumber_id, service_id,
@@ -266,7 +255,6 @@ const createBooking = async (req, res) => {
       )
       RETURNING *
     `;
-
     res.status(201).json({
       success: true,
       message: 'Booking created successfully',
@@ -283,7 +271,6 @@ const createBooking = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   getPlumberBookings,
   getBookingStats,

@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
-
 const AuthContext = createContext(null);
-
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({
+  children
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Check if user is logged in from localStorage
     try {
       const authStatus = localStorage.getItem('isAuthenticated');
       return authStatus === 'true';
@@ -12,9 +11,7 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   });
-
   const [user, setUser] = useState(() => {
-    // Get user data from localStorage
     try {
       const userData = localStorage.getItem('user');
       return userData ? JSON.parse(userData) : null;
@@ -22,7 +19,6 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-
   const login = (userData, token = null) => {
     setIsAuthenticated(true);
     setUser(userData);
@@ -38,7 +34,6 @@ export const AuthProvider = ({ children }) => {
       console.warn('Failed to save auth state:', e);
     }
   };
-
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
@@ -50,14 +45,15 @@ export const AuthProvider = ({ children }) => {
       console.warn('Failed to clear auth state:', e);
     }
   };
-
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+  return <AuthContext.Provider value={{
+    isAuthenticated,
+    user,
+    login,
+    logout
+  }}>
       {children}
-    </AuthContext.Provider>
-  );
+    </AuthContext.Provider>;
 };
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

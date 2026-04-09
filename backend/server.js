@@ -4,29 +4,20 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const plumberRoutes = require('./routes/plumberRoutes');
 const sellerRoutes = require('./routes/sellerRoutes');
-const { verifyEmailConfig } = require('./utils/emailService');
-const { initializeDatabase, sql } = require('./utils/db');
-
-// Load environment variables
+const {
+  verifyEmailConfig
+} = require('./utils/emailService');
+const {
+  initializeDatabase,
+  sql
+} = require('./utils/db');
 dotenv.config();
-
 const app = express();
-
-// Middleware - CORS configuration
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://smart-plumber-booking-system-7cbo.vercel.app',
-  'https://smart-plumber-booking-system.vercel.app',
-  process.env.FRONTEND_URL
-].filter(Boolean); // Remove undefined values
-
-// CORS middleware - must be first
+const allowedOrigins = ['http://localhost:3000', 'https://smart-plumber-booking-system-7cbo.vercel.app', 'https://smart-plumber-booking-system.vercel.app', process.env.FRONTEND_URL].filter(Boolean);
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  
-  // Handle OPTIONS requests (preflight)
   if (req.method === 'OPTIONS') {
-    if (allowedOrigins.includes(origin) || (origin && origin.includes('vercel.app'))) {
+    if (allowedOrigins.includes(origin) || origin && origin.includes('vercel.app')) {
       res.header('Access-Control-Allow-Origin', origin);
     } else {
       res.header('Access-Control-Allow-Origin', '*');
@@ -34,12 +25,10 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    res.header('Access-Control-Max-Age', '86400');
     return res.sendStatus(204);
   }
-  
-  // Handle actual requests
-  if (allowedOrigins.includes(origin) || (origin && origin.includes('vercel.app'))) {
+  if (allowedOrigins.includes(origin) || origin && origin.includes('vercel.app')) {
     res.header('Access-Control-Allow-Origin', origin);
   } else {
     res.header('Access-Control-Allow-Origin', '*');
@@ -49,15 +38,16 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   next();
 });
-
-// Increase body size limit for base64 image uploads (10MB)
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Explicit OPTIONS handler for all routes (must be before other routes)
+app.use(express.json({
+  limit: '10mb'
+}));
+app.use(express.urlencoded({
+  extended: true,
+  limit: '10mb'
+}));
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin) || (origin && origin.includes('vercel.app'))) {
+  if (allowedOrigins.includes(origin) || origin && origin.includes('vercel.app')) {
     res.header('Access-Control-Allow-Origin', origin);
   } else {
     res.header('Access-Control-Allow-Origin', '*');
@@ -68,19 +58,16 @@ app.options('*', (req, res) => {
   res.header('Access-Control-Max-Age', '86400');
   return res.sendStatus(204);
 });
-
-// Routes
-app.use('/api/auth', authRoutes); // Customer routes
-app.use('/api/plumber', plumberRoutes); // Plumber routes
-app.use('/api/seller', sellerRoutes); // Seller routes
-app.use('/api/products', require('./routes/productRoutes')); // Product routes
-
-// Health check
+app.use('/api/auth', authRoutes);
+app.use('/api/plumber', plumberRoutes);
+app.use('/api/seller', sellerRoutes);
+app.use('/api/products', require('./routes/productRoutes'));
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({
+    status: 'OK',
+    message: 'Server is running'
+  });
 });
-
-// Public services summary – which service names plumbers actually offer
 app.get('/api/services/available', async (req, res) => {
   try {
     const result = await sql`
@@ -88,9 +75,7 @@ app.get('/api/services/available', async (req, res) => {
       FROM plumber_services
       WHERE is_active = TRUE
     `;
-
-    const names = (result.rows || result || []).map((row) => row.service_name).filter(Boolean);
-
+    const names = (result.rows || result || []).map(row => row.service_name).filter(Boolean);
     res.json({
       success: true,
       data: {
@@ -98,31 +83,23 @@ app.get('/api/services/available', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Public services available error:', error);
+    console.error('services', error.message);
     res.status(500).json({
       success: false,
       message: 'Error fetching available services'
     });
   }
 });
-
-// Admin analytics routes (read-only)
 app.get('/api/admin/overview', async (req, res) => {
   try {
-    const [userResult, plumberResult, sellerResult, productResult] = await Promise.all([
-      sql`SELECT COUNT(*)::int AS count FROM users`,
-      sql`SELECT 
+    const [userResult, plumberResult, sellerResult, productResult] = await Promise.all([sql`SELECT COUNT(*)::int AS count FROM users`, sql`SELECT 
             COUNT(*)::int AS count,
             COALESCE(SUM(plumber_total_jobs), 0)::int AS total_jobs,
             COALESCE(SUM(plumber_completed_jobs), 0)::int AS completed_jobs
-          FROM plumbers`,
-      sql`SELECT 
+          FROM plumbers`, sql`SELECT 
             COUNT(*)::int AS count,
             COALESCE(SUM(seller_total_sales), 0)::int AS total_sales
-          FROM sellers`,
-      sql`SELECT COUNT(*)::int AS count FROM products`
-    ]);
-
+          FROM sellers`, sql`SELECT COUNT(*)::int AS count FROM products`]);
     const overview = {
       totalCustomers: userResult.rows?.[0]?.count || 0,
       totalPlumbers: plumberResult.rows?.[0]?.count || 0,
@@ -132,14 +109,18 @@ app.get('/api/admin/overview', async (req, res) => {
       totalCompletedJobs: plumberResult.rows?.[0]?.completed_jobs || 0,
       totalSellerSales: sellerResult.rows?.[0]?.total_sales || 0
     };
-
-    res.json({ success: true, data: overview });
+    res.json({
+      success: true,
+      data: overview
+    });
   } catch (error) {
-    console.error('Admin overview error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching admin overview' });
+    console.error('admin overview', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching admin overview'
+    });
   }
 });
-
 app.get('/api/admin/plumbers', async (req, res) => {
   try {
     const result = await sql`
@@ -160,7 +141,6 @@ app.get('/api/admin/plumbers', async (req, res) => {
       FROM plumbers
       ORDER BY created_at DESC
     `;
-
     res.json({
       success: true,
       data: {
@@ -168,11 +148,13 @@ app.get('/api/admin/plumbers', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Admin plumbers error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching plumbers' });
+    console.error('admin plumbers', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching plumbers'
+    });
   }
 });
-
 app.get('/api/admin/customers', async (req, res) => {
   try {
     const result = await sql`
@@ -185,7 +167,6 @@ app.get('/api/admin/customers', async (req, res) => {
       ORDER BY created_at DESC
       LIMIT 200
     `;
-
     res.json({
       success: true,
       data: {
@@ -193,11 +174,13 @@ app.get('/api/admin/customers', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Admin customers error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching customers' });
+    console.error('admin customers', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching customers'
+    });
   }
 });
-
 app.get('/api/admin/sellers', async (req, res) => {
   try {
     const result = await sql`
@@ -217,7 +200,6 @@ app.get('/api/admin/sellers', async (req, res) => {
       FROM sellers
       ORDER BY created_at DESC
     `;
-
     res.json({
       success: true,
       data: {
@@ -225,11 +207,13 @@ app.get('/api/admin/sellers', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Admin sellers error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching sellers' });
+    console.error('admin sellers', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sellers'
+    });
   }
 });
-
 app.get('/api/admin/products', async (req, res) => {
   try {
     const result = await sql`
@@ -255,7 +239,6 @@ app.get('/api/admin/products', async (req, res) => {
       ORDER BY p.created_at DESC
       LIMIT 300
     `;
-
     res.json({
       success: true,
       data: {
@@ -263,15 +246,18 @@ app.get('/api/admin/products', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Admin products error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching products' });
+    console.error('admin products', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching products'
+    });
   }
 });
-
-// Admin CRUD (limited, safe fields only)
 app.patch('/api/admin/plumbers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     const {
       full_name,
       city,
@@ -280,7 +266,6 @@ app.patch('/api/admin/plumbers/:id', async (req, res) => {
       is_verified,
       is_available
     } = req.body;
-
     const result = await sql`
       UPDATE plumbers SET
         full_name = COALESCE(${full_name}, full_name),
@@ -295,23 +280,35 @@ app.patch('/api/admin/plumbers/:id', async (req, res) => {
         plumber_rating, plumber_total_jobs, plumber_completed_jobs, plumber_cancelled_jobs,
         is_available, is_verified, created_at
     `;
-
     if (!result.rows?.length) {
-      return res.status(404).json({ success: false, message: 'Plumber not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Plumber not found'
+      });
     }
-
-    res.json({ success: true, data: { plumber: result.rows[0] } });
+    res.json({
+      success: true,
+      data: {
+        plumber: result.rows[0]
+      }
+    });
   } catch (error) {
-    console.error('Admin update plumber error:', error);
-    res.status(500).json({ success: false, message: 'Error updating plumber' });
+    console.error('admin update plumber', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating plumber'
+    });
   }
 });
-
 app.patch('/api/admin/customers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { username, email } = req.body;
-
+    const {
+      id
+    } = req.params;
+    const {
+      username,
+      email
+    } = req.body;
     const result = await sql`
       UPDATE users SET
         username = COALESCE(${username}, username),
@@ -320,21 +317,31 @@ app.patch('/api/admin/customers/:id', async (req, res) => {
       WHERE id = ${id}
       RETURNING id, username, email, created_at
     `;
-
     if (!result.rows?.length) {
-      return res.status(404).json({ success: false, message: 'Customer not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Customer not found'
+      });
     }
-
-    res.json({ success: true, data: { customer: result.rows[0] } });
+    res.json({
+      success: true,
+      data: {
+        customer: result.rows[0]
+      }
+    });
   } catch (error) {
-    console.error('Admin update customer error:', error);
-    res.status(500).json({ success: false, message: 'Error updating customer' });
+    console.error('admin update customer', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating customer'
+    });
   }
 });
-
 app.patch('/api/admin/sellers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     const {
       seller_shop_name,
       city,
@@ -343,7 +350,6 @@ app.patch('/api/admin/sellers/:id', async (req, res) => {
       is_verified,
       is_active
     } = req.body;
-
     const result = await sql`
       UPDATE sellers SET
         seller_shop_name = COALESCE(${seller_shop_name}, seller_shop_name),
@@ -358,21 +364,31 @@ app.patch('/api/admin/sellers/:id', async (req, res) => {
         seller_rating, seller_total_sales, seller_total_orders, seller_completed_orders,
         seller_cancelled_orders, is_verified, is_active, created_at
     `;
-
     if (!result.rows?.length) {
-      return res.status(404).json({ success: false, message: 'Seller not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Seller not found'
+      });
     }
-
-    res.json({ success: true, data: { seller: result.rows[0] } });
+    res.json({
+      success: true,
+      data: {
+        seller: result.rows[0]
+      }
+    });
   } catch (error) {
-    console.error('Admin update seller error:', error);
-    res.status(500).json({ success: false, message: 'Error updating seller' });
+    console.error('admin update seller', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating seller'
+    });
   }
 });
-
 app.patch('/api/admin/products/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     const {
       product_name,
       product_category,
@@ -380,7 +396,6 @@ app.patch('/api/admin/products/:id', async (req, res) => {
       stock_quantity,
       is_active
     } = req.body;
-
     const result = await sql`
       UPDATE products SET
         product_name = COALESCE(${product_name}, product_name),
@@ -395,64 +410,94 @@ app.patch('/api/admin/products/:id', async (req, res) => {
         currency, stock_quantity, total_sales, product_rating, total_reviews, is_active, is_in_stock,
         created_at
     `;
-
     if (!result.rows?.length) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
     }
-
-    res.json({ success: true, data: { product: result.rows[0] } });
+    res.json({
+      success: true,
+      data: {
+        product: result.rows[0]
+      }
+    });
   } catch (error) {
-    console.error('Admin update product error:', error);
-    res.status(500).json({ success: false, message: 'Error updating product' });
+    console.error('admin update product', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating product'
+    });
   }
 });
-
-// Hard delete endpoints for admin (use with care)
 app.delete('/api/admin/plumbers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     await sql`DELETE FROM plumbers WHERE id = ${id}`;
-    res.json({ success: true });
+    res.json({
+      success: true
+    });
   } catch (error) {
-    console.error('Admin delete plumber error:', error);
-    res.status(500).json({ success: false, message: 'Error deleting plumber' });
+    console.error('admin delete plumber', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting plumber'
+    });
   }
 });
-
 app.delete('/api/admin/customers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     await sql`DELETE FROM users WHERE id = ${id}`;
-    res.json({ success: true });
+    res.json({
+      success: true
+    });
   } catch (error) {
-    console.error('Admin delete customer error:', error);
-    res.status(500).json({ success: false, message: 'Error deleting customer' });
+    console.error('admin delete customer', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting customer'
+    });
   }
 });
-
 app.delete('/api/admin/sellers/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     await sql`DELETE FROM sellers WHERE id = ${id}`;
-    res.json({ success: true });
+    res.json({
+      success: true
+    });
   } catch (error) {
-    console.error('Admin delete seller error:', error);
-    res.status(500).json({ success: false, message: 'Error deleting seller' });
+    console.error('admin delete seller', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting seller'
+    });
   }
 });
-
 app.delete('/api/admin/products/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
     await sql`DELETE FROM products WHERE id = ${id}`;
-    res.json({ success: true });
+    res.json({
+      success: true
+    });
   } catch (error) {
-    console.error('Admin delete product error:', error);
-    res.status(500).json({ success: false, message: 'Error deleting product' });
+    console.error('admin delete product', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting product'
+    });
   }
 });
-
-// Admin analytics time‑series
 app.get('/api/admin/analytics/users-per-week', async (req, res) => {
   try {
     const result = await sql`
@@ -464,21 +509,26 @@ app.get('/api/admin/analytics/users-per-week', async (req, res) => {
       ORDER BY week ASC
       LIMIT 12
     `;
-
-    const points = (result.rows || []).map((row) => ({
+    const points = (result.rows || []).map(row => ({
       label: row.week.toISOString().slice(0, 10),
       customers: row.total,
       plumbers: 0,
       sellers: 0
     }));
-
-    res.json({ success: true, data: { points } });
+    res.json({
+      success: true,
+      data: {
+        points
+      }
+    });
   } catch (error) {
-    console.error('Admin users-per-week error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching user analytics' });
+    console.error('admin users week', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user analytics'
+    });
   }
 });
-
 app.get('/api/admin/analytics/bookings-per-day', async (req, res) => {
   try {
     const result = await sql`
@@ -490,20 +540,26 @@ app.get('/api/admin/analytics/bookings-per-day', async (req, res) => {
       ORDER BY booking_date ASC
       LIMIT 14
     `;
-
-    const points = (result.rows || []).map((row) => ({
+    const points = (result.rows || []).map(row => ({
       label: row.day.toISOString().slice(0, 10),
       count: row.count
     }));
-
-    res.json({ success: true, data: { points } });
+    res.json({
+      success: true,
+      data: {
+        points
+      }
+    });
   } catch (error) {
-    console.error('Admin bookings-per-day error:', error);
-    // If bookings table doesn't exist yet, just return empty set
-    res.json({ success: true, data: { points: [] } });
+    console.error('admin bookings day', error.message);
+    res.json({
+      success: true,
+      data: {
+        points: []
+      }
+    });
   }
 });
-
 app.get('/api/admin/analytics/top-plumbers', async (req, res) => {
   try {
     const result = await sql`
@@ -516,20 +572,25 @@ app.get('/api/admin/analytics/top-plumbers', async (req, res) => {
       ORDER BY plumber_completed_jobs DESC NULLS LAST, plumber_rating DESC NULLS LAST
       LIMIT 4
     `;
-
-    const points = (result.rows || []).map((row) => ({
+    const points = (result.rows || []).map(row => ({
       name: row.name || 'Plumber',
       completed: row.plumber_completed_jobs || 0,
       rating: parseFloat(row.plumber_rating) || 0
     }));
-
-    res.json({ success: true, data: { points } });
+    res.json({
+      success: true,
+      data: {
+        points
+      }
+    });
   } catch (error) {
-    console.error('Admin top-plumbers error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching top plumbers' });
+    console.error('admin top plumbers', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching top plumbers'
+    });
   }
 });
-
 app.get('/api/admin/analytics/top-products', async (req, res) => {
   try {
     const result = await sql`
@@ -541,59 +602,51 @@ app.get('/api/admin/analytics/top-products', async (req, res) => {
       ORDER BY total_sales DESC NULLS LAST, product_rating DESC NULLS LAST
       LIMIT 4
     `;
-
-    const points = (result.rows || []).map((row) => ({
+    const points = (result.rows || []).map(row => ({
       name: row.product_name || 'Product',
       sales: row.total_sales || 0,
       rating: parseFloat(row.product_rating) || 0
     }));
-
-    res.json({ success: true, data: { points } });
+    res.json({
+      success: true,
+      data: {
+        points
+      }
+    });
   } catch (error) {
-    console.error('Admin top-products error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching top products' });
+    console.error('admin top products', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching top products'
+    });
   }
 });
-
-// Catch-all route for undefined routes
 app.use((req, res) => {
   if (process.env.DEBUG_LOGS === 'true') {
-    console.log(`Route not found: ${req.method} ${req.path}`);
+    console.log('404', req.method, req.path);
   }
   res.status(404).json({
     success: false,
     message: `Route ${req.method} ${req.path} not found`
   });
 });
-
-// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('handler', err.message);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error'
   });
 });
-
-// For Vercel serverless functions
 module.exports = app;
-
-// For local development
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, async () => {
-    // Always show simple port info for local dev
-    console.log(`🚀 Server is running on port ${PORT}`);
-    
+    console.log('port', PORT);
     try {
-      // Initialize database
       await initializeDatabase();
-
-      // Verify email configuration (quiet unless DEBUG_LOGS is true)
       await verifyEmailConfig();
     } catch (error) {
-      console.error('❌ Initialization error:', error.message);
-      console.error('   Server will continue but some features may not work.');
+      console.error('init error', error.message);
     }
   });
 }

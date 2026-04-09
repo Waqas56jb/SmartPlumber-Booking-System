@@ -1,19 +1,21 @@
-const { sql } = require('../utils/db');
-const { findSellerByEmail } = require('../utils/sellerService');
-const { processBase64Image } = require('../utils/imageService');
-
-// Get Seller Profile
+const {
+  sql
+} = require('../utils/db');
+const {
+  findSellerByEmail
+} = require('../utils/sellerService');
+const {
+  processBase64Image
+} = require('../utils/imageService');
 const getSellerProfile = async (req, res) => {
   try {
     const sellerId = req.params.id || req.user?.sellerId;
-    
     if (!sellerId) {
       return res.status(401).json({
         success: false,
         message: 'Seller ID is required'
       });
     }
-
     const result = await sql`
       SELECT 
         id, seller_username, seller_email, full_name, seller_shop_name, seller_bio,
@@ -31,14 +33,12 @@ const getSellerProfile = async (req, res) => {
       FROM sellers
       WHERE id = ${sellerId}
     `;
-
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Seller not found'
       });
     }
-
     res.json({
       success: true,
       data: {
@@ -53,19 +53,15 @@ const getSellerProfile = async (req, res) => {
     });
   }
 };
-
-// Update Seller Profile
 const updateSellerProfile = async (req, res) => {
   try {
     const sellerId = req.params.id || req.user?.sellerId;
-    
     if (!sellerId) {
       return res.status(401).json({
         success: false,
         message: 'Seller ID is required'
       });
     }
-
     const {
       full_name,
       seller_shop_name,
@@ -92,52 +88,116 @@ const updateSellerProfile = async (req, res) => {
       tax_id,
       experience_years
     } = req.body;
-
-    // Build update fields object
     const updateFields = {};
     let hasUpdates = false;
-
-    if (full_name !== undefined) { updateFields.full_name = full_name; hasUpdates = true; }
-    if (seller_shop_name !== undefined) { updateFields.seller_shop_name = seller_shop_name; hasUpdates = true; }
-    if (seller_bio !== undefined) { updateFields.seller_bio = seller_bio; hasUpdates = true; }
-    if (phone_number !== undefined) { updateFields.phone_number = phone_number; hasUpdates = true; }
-    if (email !== undefined) { updateFields.email = email; hasUpdates = true; }
-    if (cnic !== undefined) { updateFields.cnic = cnic; hasUpdates = true; }
-    if (shop_address !== undefined) { updateFields.shop_address = shop_address; hasUpdates = true; }
-    if (city !== undefined) { updateFields.city = city; hasUpdates = true; }
-    if (state !== undefined) { updateFields.state = state; hasUpdates = true; }
-    if (zip_code !== undefined) { updateFields.zip_code = zip_code; hasUpdates = true; }
-    if (country !== undefined) { updateFields.country = country; hasUpdates = true; }
-    if (latitude !== undefined) { updateFields.latitude = latitude; hasUpdates = true; }
-    if (longitude !== undefined) { updateFields.longitude = longitude; hasUpdates = true; }
-    if (delivery_available !== undefined) { updateFields.delivery_available = delivery_available; hasUpdates = true; }
-    if (delivery_radius_km !== undefined) { updateFields.delivery_radius_km = delivery_radius_km; hasUpdates = true; }
-    if (delivery_time_hours !== undefined) { updateFields.delivery_time_hours = delivery_time_hours; hasUpdates = true; }
-    if (delivery_charges !== undefined) { updateFields.delivery_charges = delivery_charges; hasUpdates = true; }
-    if (free_delivery_above !== undefined) { updateFields.free_delivery_above = free_delivery_above; hasUpdates = true; }
-    if (accepts_online_payment !== undefined) { updateFields.accepts_online_payment = accepts_online_payment; hasUpdates = true; }
-    if (accepts_cash_on_delivery !== undefined) { updateFields.accepts_cash_on_delivery = accepts_cash_on_delivery; hasUpdates = true; }
-    if (payment_methods !== undefined) { updateFields.payment_methods = payment_methods; hasUpdates = true; }
-    if (business_license !== undefined) { updateFields.business_license = business_license; hasUpdates = true; }
-    if (tax_id !== undefined) { updateFields.tax_id = tax_id; hasUpdates = true; }
-    if (experience_years !== undefined) { updateFields.experience_years = experience_years; hasUpdates = true; }
-
+    if (full_name !== undefined) {
+      updateFields.full_name = full_name;
+      hasUpdates = true;
+    }
+    if (seller_shop_name !== undefined) {
+      updateFields.seller_shop_name = seller_shop_name;
+      hasUpdates = true;
+    }
+    if (seller_bio !== undefined) {
+      updateFields.seller_bio = seller_bio;
+      hasUpdates = true;
+    }
+    if (phone_number !== undefined) {
+      updateFields.phone_number = phone_number;
+      hasUpdates = true;
+    }
+    if (email !== undefined) {
+      updateFields.email = email;
+      hasUpdates = true;
+    }
+    if (cnic !== undefined) {
+      updateFields.cnic = cnic;
+      hasUpdates = true;
+    }
+    if (shop_address !== undefined) {
+      updateFields.shop_address = shop_address;
+      hasUpdates = true;
+    }
+    if (city !== undefined) {
+      updateFields.city = city;
+      hasUpdates = true;
+    }
+    if (state !== undefined) {
+      updateFields.state = state;
+      hasUpdates = true;
+    }
+    if (zip_code !== undefined) {
+      updateFields.zip_code = zip_code;
+      hasUpdates = true;
+    }
+    if (country !== undefined) {
+      updateFields.country = country;
+      hasUpdates = true;
+    }
+    if (latitude !== undefined) {
+      updateFields.latitude = latitude;
+      hasUpdates = true;
+    }
+    if (longitude !== undefined) {
+      updateFields.longitude = longitude;
+      hasUpdates = true;
+    }
+    if (delivery_available !== undefined) {
+      updateFields.delivery_available = delivery_available;
+      hasUpdates = true;
+    }
+    if (delivery_radius_km !== undefined) {
+      updateFields.delivery_radius_km = delivery_radius_km;
+      hasUpdates = true;
+    }
+    if (delivery_time_hours !== undefined) {
+      updateFields.delivery_time_hours = delivery_time_hours;
+      hasUpdates = true;
+    }
+    if (delivery_charges !== undefined) {
+      updateFields.delivery_charges = delivery_charges;
+      hasUpdates = true;
+    }
+    if (free_delivery_above !== undefined) {
+      updateFields.free_delivery_above = free_delivery_above;
+      hasUpdates = true;
+    }
+    if (accepts_online_payment !== undefined) {
+      updateFields.accepts_online_payment = accepts_online_payment;
+      hasUpdates = true;
+    }
+    if (accepts_cash_on_delivery !== undefined) {
+      updateFields.accepts_cash_on_delivery = accepts_cash_on_delivery;
+      hasUpdates = true;
+    }
+    if (payment_methods !== undefined) {
+      updateFields.payment_methods = payment_methods;
+      hasUpdates = true;
+    }
+    if (business_license !== undefined) {
+      updateFields.business_license = business_license;
+      hasUpdates = true;
+    }
+    if (tax_id !== undefined) {
+      updateFields.tax_id = tax_id;
+      hasUpdates = true;
+    }
+    if (experience_years !== undefined) {
+      updateFields.experience_years = experience_years;
+      hasUpdates = true;
+    }
     if (!hasUpdates) {
       return res.status(400).json({
         success: false,
         message: 'No fields to update'
       });
     }
-
-    // Handle payment_methods array if present
     const arrayFields = {};
     const regularFields = {};
-    
     for (const [key, value] of Object.entries(updateFields)) {
       if (key === 'payment_methods') {
         arrayFields[key] = Array.isArray(value) ? value.map(v => String(v)) : [];
       } else {
-        // Convert empty strings to null for optional text fields
         const optionalTextFields = ['shop_address', 'cnic', 'business_license', 'tax_id', 'seller_bio', 'city', 'state', 'zip_code'];
         let finalValue = value;
         if (value === '' && optionalTextFields.includes(key)) {
@@ -148,23 +208,19 @@ const updateSellerProfile = async (req, res) => {
         regularFields[key] = finalValue;
       }
     }
-    
-    // Use pg library directly for better array handling
-    const { Client } = require('pg');
+    const {
+      Client
+    } = require('pg');
     const client = new Client({
       connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
     });
-    
     try {
       await client.connect();
       await client.query('BEGIN');
-      
-      // Update regular fields
       if (Object.keys(regularFields).length > 0) {
         const regularSetParts = [];
         const regularValues = [];
         let regParamCount = 1;
-        
         for (const [key, value] of Object.entries(regularFields)) {
           regularSetParts.push(`${key} = $${regParamCount}`);
           regularValues.push(value);
@@ -172,26 +228,13 @@ const updateSellerProfile = async (req, res) => {
         }
         regularSetParts.push(`updated_at = CURRENT_TIMESTAMP`);
         regularValues.push(sellerId);
-        
-        await client.query(
-          `UPDATE sellers SET ${regularSetParts.join(', ')} WHERE id = $${regParamCount}`,
-          regularValues
-        );
+        await client.query(`UPDATE sellers SET ${regularSetParts.join(', ')} WHERE id = $${regParamCount}`, regularValues);
       }
-      
-      // Update array fields (payment_methods)
       for (const [key, value] of Object.entries(arrayFields)) {
-        await client.query(
-          `UPDATE sellers SET ${key} = $1::text[] WHERE id = $2`,
-          [value, sellerId]
-        );
+        await client.query(`UPDATE sellers SET ${key} = $1::text[] WHERE id = $2`, [value, sellerId]);
       }
-      
       await client.query('COMMIT');
-      
-      // Fetch updated record
       const result = await client.query('SELECT * FROM sellers WHERE id = $1', [sellerId]);
-
       if (result.rows.length === 0) {
         await client.query('ROLLBACK');
         return res.status(404).json({
@@ -199,7 +242,6 @@ const updateSellerProfile = async (req, res) => {
           message: 'Seller not found'
         });
       }
-      
       return res.json({
         success: true,
         message: 'Seller profile updated successfully',
@@ -209,9 +251,7 @@ const updateSellerProfile = async (req, res) => {
       });
     } catch (error) {
       await client.query('ROLLBACK').catch(() => {});
-      console.error('Update seller profile error:', error);
-      console.error('Error details:', error.message);
-      console.error('Error stack:', error.stack);
+      console.error('seller profile update', error.message);
       res.status(500).json({
         success: false,
         message: 'Error updating seller profile',
@@ -229,7 +269,6 @@ const updateSellerProfile = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   getSellerProfile,
   updateSellerProfile

@@ -1,15 +1,28 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { generateOTP, storeOTP, verifyOTP, deleteOTP } = require('../utils/otpService');
-const { sendEmail } = require('../utils/emailService');
-const { createPlumber, findPlumberByEmail, findPlumberByUsername, updatePlumberPassword, plumberEmailExists } = require('../utils/plumberService');
-
-// Plumber Signup
+const {
+  generateOTP,
+  storeOTP,
+  verifyOTP,
+  deleteOTP
+} = require('../utils/otpService');
+const {
+  sendEmail
+} = require('../utils/emailService');
+const {
+  createPlumber,
+  findPlumberByEmail,
+  findPlumberByUsername,
+  updatePlumberPassword,
+  plumberEmailExists
+} = require('../utils/plumberService');
 const plumberSignup = async (req, res) => {
   try {
-    const { plumber_username, plumber_email, plumber_password } = req.body;
-
-    // Check if plumber already exists
+    const {
+      plumber_username,
+      plumber_email,
+      plumber_password
+    } = req.body;
     const existingPlumberByEmail = await findPlumberByEmail(plumber_email);
     if (existingPlumberByEmail) {
       return res.status(400).json({
@@ -17,7 +30,6 @@ const plumberSignup = async (req, res) => {
         message: 'Plumber with this email already exists'
       });
     }
-
     const existingPlumberByUsername = await findPlumberByUsername(plumber_username);
     if (existingPlumberByUsername) {
       return res.status(400).json({
@@ -25,24 +37,19 @@ const plumberSignup = async (req, res) => {
         message: 'Plumber username is already taken'
       });
     }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(plumber_password, 10);
-
-    // Create plumber
     const plumber = await createPlumber({
       plumber_username,
       plumber_email,
       plumber_password: hashedPassword
     });
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { plumberId: plumber.id, plumber_email: plumber.plumber_email, userType: 'plumber' },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: process.env.JWT_EXPIRE || '7d' }
-    );
-
+    const token = jwt.sign({
+      plumberId: plumber.id,
+      plumber_email: plumber.plumber_email,
+      userType: 'plumber'
+    }, process.env.JWT_SECRET || 'your-secret-key', {
+      expiresIn: process.env.JWT_EXPIRE || '7d'
+    });
     res.status(201).json({
       success: true,
       message: 'Plumber account created successfully',
@@ -63,23 +70,19 @@ const plumberSignup = async (req, res) => {
     });
   }
 };
-
-// Plumber Login
 const plumberLogin = async (req, res) => {
   try {
-    const { plumber_email, plumber_password } = req.body;
-
-    // Find plumber by email only
+    const {
+      plumber_email,
+      plumber_password
+    } = req.body;
     const plumber = await findPlumberByEmail(plumber_email);
-
     if (!plumber) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
-
-    // Verify password
     const isPasswordValid = await bcrypt.compare(plumber_password, plumber.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -87,14 +90,13 @@ const plumberLogin = async (req, res) => {
         message: 'Invalid email or password'
       });
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { plumberId: plumber.id, plumber_email: plumber.plumber_email, userType: 'plumber' },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: process.env.JWT_EXPIRE || '7d' }
-    );
-
+    const token = jwt.sign({
+      plumberId: plumber.id,
+      plumber_email: plumber.plumber_email,
+      userType: 'plumber'
+    }, process.env.JWT_SECRET || 'your-secret-key', {
+      expiresIn: process.env.JWT_EXPIRE || '7d'
+    });
     res.json({
       success: true,
       message: 'Plumber login successful',
@@ -115,13 +117,11 @@ const plumberLogin = async (req, res) => {
     });
   }
 };
-
-// Plumber Forgot Password
 const plumberForgotPassword = async (req, res) => {
   try {
-    const { plumber_email } = req.body;
-
-    // First verify that the email exists in the database
+    const {
+      plumber_email
+    } = req.body;
     const emailExistsInDb = await plumberEmailExists(plumber_email);
     if (!emailExistsInDb) {
       return res.status(404).json({
@@ -129,12 +129,8 @@ const plumberForgotPassword = async (req, res) => {
         message: 'Plumber email not found in our database. Please check your email address or sign up first.'
       });
     }
-
-    // Generate and store OTP
     const otp = generateOTP();
     storeOTP(plumber_email, otp, 'plumber');
-
-    // Send OTP via email
     const emailSent = await sendEmail({
       to: plumber_email,
       subject: 'Password Reset OTP - BP Heating & Plumbing (Plumber)',
@@ -155,14 +151,12 @@ const plumberForgotPassword = async (req, res) => {
         </div>
       `
     });
-
     if (!emailSent) {
       return res.status(500).json({
         success: false,
         message: 'Failed to send OTP. Please try again later.'
       });
     }
-
     res.json({
       success: true,
       message: 'OTP sent to your plumber email address'
@@ -175,13 +169,12 @@ const plumberForgotPassword = async (req, res) => {
     });
   }
 };
-
-// Plumber Verify OTP
 const plumberVerifyOtp = async (req, res) => {
   try {
-    const { plumber_email, otp } = req.body;
-
-    // Verify OTP
+    const {
+      plumber_email,
+      otp
+    } = req.body;
     const isValid = verifyOTP(plumber_email, otp, 'plumber');
     if (!isValid) {
       return res.status(400).json({
@@ -189,7 +182,6 @@ const plumberVerifyOtp = async (req, res) => {
         message: 'Invalid or expired OTP'
       });
     }
-
     res.json({
       success: true,
       message: 'OTP verified successfully'
@@ -202,13 +194,13 @@ const plumberVerifyOtp = async (req, res) => {
     });
   }
 };
-
-// Plumber Reset Password
 const plumberResetPassword = async (req, res) => {
   try {
-    const { plumber_email, otp, new_plumber_password } = req.body;
-
-    // Verify OTP first
+    const {
+      plumber_email,
+      otp,
+      new_plumber_password
+    } = req.body;
     const isValid = verifyOTP(plumber_email, otp, 'plumber');
     if (!isValid) {
       return res.status(400).json({
@@ -216,8 +208,6 @@ const plumberResetPassword = async (req, res) => {
         message: 'Invalid or expired OTP'
       });
     }
-
-    // Check if plumber exists
     const plumber = await findPlumberByEmail(plumber_email);
     if (!plumber) {
       return res.status(404).json({
@@ -225,16 +215,9 @@ const plumberResetPassword = async (req, res) => {
         message: 'Plumber not found'
       });
     }
-
-    // Hash new password
     const hashedPassword = await bcrypt.hash(new_plumber_password, 10);
-
-    // Update password
     await updatePlumberPassword(plumber_email, hashedPassword);
-
-    // Delete OTP after successful reset
     deleteOTP(plumber_email, 'plumber');
-
     res.json({
       success: true,
       message: 'Plumber password reset successfully'
@@ -247,7 +230,6 @@ const plumberResetPassword = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   plumberSignup,
   plumberLogin,

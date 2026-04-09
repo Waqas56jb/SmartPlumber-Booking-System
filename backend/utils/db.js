@@ -1,30 +1,23 @@
-const { sql } = require('@vercel/postgres');
-
-// Helper function to run SQL with error handling
+const {
+  sql
+} = require('@vercel/postgres');
 const runSQL = async (query, description) => {
   try {
     await query;
     return true;
   } catch (error) {
-    console.warn(`   ⚠️  ${description}: ${error.message}`);
+    console.warn(description, error.message);
     return false;
   }
 };
-
-// Initialize database tables
 const initializeDatabase = async () => {
-  // Check if database connection is available
   if (!process.env.POSTGRES_URL) {
-    console.warn('⚠️  POSTGRES_URL is not set. Database operations will fail.');
-    console.warn('   Please set POSTGRES_URL in your .env file.');
+    console.warn('POSTGRES_URL not set');
     return false;
   }
-
   if (process.env.DEBUG_LOGS === 'true') {
-    console.log('🔄 Initializing database tables...');
+    console.log('init db tables');
   }
-
-  // Create users table (for customers) if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -35,8 +28,6 @@ const initializeDatabase = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, 'Creating users table');
-
-  // Create plumbers table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS plumbers (
       id SERIAL PRIMARY KEY,
@@ -53,8 +44,6 @@ const initializeDatabase = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, 'Creating plumbers table');
-
-  // Create sellers table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS sellers (
       id SERIAL PRIMARY KEY,
@@ -70,8 +59,6 @@ const initializeDatabase = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, 'Creating sellers table');
-
-  // Create plumber_services table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS plumber_services (
       id SERIAL PRIMARY KEY,
@@ -86,8 +73,6 @@ const initializeDatabase = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, 'Creating plumber_services table');
-
-  // Create products table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
@@ -123,8 +108,6 @@ const initializeDatabase = async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, 'Creating products table');
-
-  // Create OTPs table if it doesn't exist
   await runSQL(sql`
     CREATE TABLE IF NOT EXISTS otps (
       id SERIAL PRIMARY KEY,
@@ -137,8 +120,6 @@ const initializeDatabase = async () => {
       is_used BOOLEAN DEFAULT FALSE
     )
   `, 'Creating otps table');
-
-  // Create indexes (these are safe to run multiple times)
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(LOWER(email))`, 'Creating users email index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username))`, 'Creating users username index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_plumbers_email ON plumbers(LOWER(plumber_email))`, 'Creating plumbers email index');
@@ -152,13 +133,11 @@ const initializeDatabase = async () => {
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active)`, 'Creating products is_active index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_email ON otps(LOWER(email))`, 'Creating otps email index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_otps_expires_at ON otps(expires_at)`, 'Creating otps expires_at index');
-
   if (process.env.DEBUG_LOGS === 'true') {
-    console.log('✅ Database initialization complete');
+    console.log('db init done');
   }
   return true;
 };
-
 module.exports = {
   sql,
   initializeDatabase

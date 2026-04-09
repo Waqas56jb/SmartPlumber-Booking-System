@@ -1,8 +1,5 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx}",
-  ],
+  content: ["./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
@@ -15,12 +12,12 @@ module.exports = {
         background: '#ffffff',
         'background-alt': '#f8f8f8',
         whatsapp: '#25D366',
-        instagram: '#E4405F',
+        instagram: '#E4405F'
       },
       fontFamily: {
-        primary: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      },
-    },
+        primary: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
+      }
+    }
   },
-  plugins: [],
-}
+  plugins: []
+};

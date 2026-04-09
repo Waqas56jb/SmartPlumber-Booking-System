@@ -1,23 +1,20 @@
-const { sql } = require('../utils/db');
-
-// Get all services for a plumber
+const {
+  sql
+} = require('../utils/db');
 const getPlumberServices = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
-    
     if (!plumberId) {
       return res.status(400).json({
         success: false,
         message: 'Plumber ID is required'
       });
     }
-
     const result = await sql`
       SELECT * FROM plumber_services 
       WHERE plumber_id = ${plumberId}
       ORDER BY created_at DESC
     `;
-
     res.json({
       success: true,
       data: {
@@ -33,23 +30,20 @@ const getPlumberServices = async (req, res) => {
     });
   }
 };
-
-// Get single service
 const getPlumberService = async (req, res) => {
   try {
-    const { serviceId } = req.params;
-    
+    const {
+      serviceId
+    } = req.params;
     const result = await sql`
       SELECT * FROM plumber_services WHERE id = ${serviceId}
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Service not found'
       });
     }
-
     res.json({
       success: true,
       data: {
@@ -65,19 +59,23 @@ const getPlumberService = async (req, res) => {
     });
   }
 };
-
-// Create a new service
 const createPlumberService = async (req, res) => {
   try {
-    const { plumber_id, service_name, service_description, price, price_type, duration_hours, is_active } = req.body;
-    
+    const {
+      plumber_id,
+      service_name,
+      service_description,
+      price,
+      price_type,
+      duration_hours,
+      is_active
+    } = req.body;
     if (!plumber_id || !service_name) {
       return res.status(400).json({
         success: false,
         message: 'Plumber ID and service name are required'
       });
     }
-
     const result = await sql`
       INSERT INTO plumber_services (
         plumber_id, service_name, service_description, price, 
@@ -93,7 +91,6 @@ const createPlumberService = async (req, res) => {
       )
       RETURNING *
     `;
-
     res.status(201).json({
       success: true,
       message: 'Service created successfully',
@@ -110,13 +107,19 @@ const createPlumberService = async (req, res) => {
     });
   }
 };
-
-// Update a service
 const updatePlumberService = async (req, res) => {
   try {
-    const { serviceId } = req.params;
-    const { service_name, service_description, price, price_type, duration_hours, is_active } = req.body;
-    
+    const {
+      serviceId
+    } = req.params;
+    const {
+      service_name,
+      service_description,
+      price,
+      price_type,
+      duration_hours,
+      is_active
+    } = req.body;
     const result = await sql`
       UPDATE plumber_services SET
         service_name = COALESCE(${service_name}, service_name),
@@ -129,14 +132,12 @@ const updatePlumberService = async (req, res) => {
       WHERE id = ${serviceId}
       RETURNING *
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Service not found'
       });
     }
-
     res.json({
       success: true,
       message: 'Service updated successfully',
@@ -153,23 +154,20 @@ const updatePlumberService = async (req, res) => {
     });
   }
 };
-
-// Delete a service
 const deletePlumberService = async (req, res) => {
   try {
-    const { serviceId } = req.params;
-    
+    const {
+      serviceId
+    } = req.params;
     const result = await sql`
       DELETE FROM plumber_services WHERE id = ${serviceId} RETURNING *
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Service not found'
       });
     }
-
     res.json({
       success: true,
       message: 'Service deleted successfully'
@@ -183,31 +181,30 @@ const deletePlumberService = async (req, res) => {
     });
   }
 };
-
-// Toggle service active status
 const toggleServiceStatus = async (req, res) => {
   try {
-    const { serviceId } = req.params;
-    
+    const {
+      serviceId
+    } = req.params;
     const result = await sql`
       UPDATE plumber_services 
       SET is_active = NOT is_active, updated_at = CURRENT_TIMESTAMP
       WHERE id = ${serviceId}
       RETURNING *
     `;
-
     if (!result.rows?.length && !result.length) {
       return res.status(404).json({
         success: false,
         message: 'Service not found'
       });
     }
-
     const service = result.rows?.[0] || result[0];
     res.json({
       success: true,
       message: `Service ${service.is_active ? 'activated' : 'deactivated'} successfully`,
-      data: { service }
+      data: {
+        service
+      }
     });
   } catch (error) {
     console.error('Toggle service status error:', error);
@@ -218,7 +215,6 @@ const toggleServiceStatus = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   getPlumberServices,
   getPlumberService,

@@ -7,10 +7,8 @@ import CTA from '../components/CTA';
 import Footer from '../components/Footer';
 import Lightbox from '../components/Lightbox';
 import Chatbot from '../components/Chatbot';
-
 const Home = () => {
-  return (
-    <>
+  return <>
       <Navbar />
       <Hero />
       <Services />
@@ -19,8 +17,6 @@ const Home = () => {
       <Footer />
       <Lightbox />
       <Chatbot />
-    </>
-  );
+    </>;
 };
-
 export default Home;

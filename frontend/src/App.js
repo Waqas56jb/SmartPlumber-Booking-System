@@ -25,66 +25,42 @@ import SellerLogin from './pages/SellerLogin';
 import SellerSignup from './pages/SellerSignup';
 import SellerForgotPassword from './pages/SellerForgotPassword';
 import SellerResetPassword from './pages/SellerResetPassword';
-
 function AppContent() {
-  const { currentPath, navigate } = useRouter();
-  const { isAuthenticated, user } = useAuth();
-
-  // Define public routes that don't require authentication
-  const publicRoutes = [
-    '/', '/landing',
-    '/login', '/signup', '/forgot-password', '/reset-password',
-    '/plumber-login', '/plumber-signup', '/plumber-forgot-password', '/plumber-reset-password',
-    '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password'
-  ];
-  
-  // Check if it's a public route (includes service detail pages)
+  const {
+    currentPath,
+    navigate
+  } = useRouter();
+  const {
+    isAuthenticated,
+    user
+  } = useAuth();
+  const publicRoutes = ['/', '/landing', '/login', '/signup', '/forgot-password', '/reset-password', '/plumber-login', '/plumber-signup', '/plumber-forgot-password', '/plumber-reset-password', '/seller-login', '/seller-signup', '/seller-forgot-password', '/seller-reset-password'];
   const isPublicRoute = publicRoutes.includes(currentPath) || currentPath.startsWith('/service/');
-  
-  // Protected routes that authenticated users can access
   const protectedRoutes = ['/home', '/plumber-edit-profile', '/plumber-services', '/plumber-bookings', '/plumber-availability', '/seller-products', '/seller-orders', '/seller-edit-profile'];
   const isProtectedRoute = protectedRoutes.includes(currentPath);
-
-  // Initialize hash on first load and handle authentication redirects
   useEffect(() => {
     const hash = window.location.hash.slice(1) || '/';
-    
-    // If no hash is set, start with landing page
     if (!window.location.hash || window.location.hash === '#') {
       window.location.hash = '/';
       return;
     }
-
-    // If authenticated and on landing/login/signup pages, redirect to home
-    if (isAuthenticated && (
-      hash === '/' || hash === '/landing' || 
-      hash === '/login' || hash === '/signup' ||
-      hash === '/plumber-login' || hash === '/plumber-signup' ||
-      hash === '/seller-login' || hash === '/seller-signup'
-    )) {
+    if (isAuthenticated && (hash === '/' || hash === '/landing' || hash === '/login' || hash === '/signup' || hash === '/plumber-login' || hash === '/plumber-signup' || hash === '/seller-login' || hash === '/seller-signup')) {
       navigate('/home');
-    }
-    // Protect routes: redirect to landing if not authenticated and trying to access protected route
-    else if (!isAuthenticated && !isPublicRoute && isProtectedRoute) {
+    } else if (!isAuthenticated && !isPublicRoute && isProtectedRoute) {
       navigate('/');
     }
   }, [isAuthenticated, currentPath, navigate, isPublicRoute, isProtectedRoute]);
-
-  // Determine which home page to show based on user type
   const getUserHomePage = () => {
     if (!isAuthenticated || !user) return <Landing />;
-    
     const userType = user.userType || user.user_type;
-    
     if (userType === 'plumber') {
       return <PlumberHome />;
     } else if (userType === 'seller') {
       return <SellerHome />;
     } else {
-      return <Home />; // Customer default
+      return <Home />;
     }
   };
-
   const renderPage = () => {
     switch (currentPath) {
       case '/':
@@ -92,7 +68,6 @@ function AppContent() {
         return isAuthenticated ? getUserHomePage() : <Landing />;
       case '/home':
         return isAuthenticated ? getUserHomePage() : <Landing />;
-      // Customer routes
       case '/login':
         return <Login />;
       case '/signup':
@@ -101,7 +76,6 @@ function AppContent() {
         return <ForgotPassword />;
       case '/reset-password':
         return <ResetPassword />;
-      // Plumber routes
       case '/plumber-login':
         return <PlumberLogin />;
       case '/plumber-signup':
@@ -111,22 +85,13 @@ function AppContent() {
       case '/plumber-reset-password':
         return <PlumberResetPassword />;
       case '/plumber-edit-profile':
-        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
-          ? <PlumberEditProfile />
-          : <Landing />;
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber') ? <PlumberEditProfile /> : <Landing />;
       case '/plumber-services':
-        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
-          ? <PlumberServices />
-          : <Landing />;
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber') ? <PlumberServices /> : <Landing />;
       case '/plumber-bookings':
-        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
-          ? <PlumberBookings />
-          : <Landing />;
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber') ? <PlumberBookings /> : <Landing />;
       case '/plumber-availability':
-        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber')
-          ? <PlumberAvailability />
-          : <Landing />;
-      // Seller routes
+        return isAuthenticated && (user?.userType === 'plumber' || user?.user_type === 'plumber') ? <PlumberAvailability /> : <Landing />;
       case '/seller-login':
         return <SellerLogin />;
       case '/seller-signup':
@@ -135,24 +100,14 @@ function AppContent() {
         return <SellerForgotPassword />;
       case '/seller-reset-password':
         return <SellerResetPassword />;
-      // Service Detail Page (Public)
-      case (currentPath.startsWith('/service/') ? currentPath : null):
+      case currentPath.startsWith('/service/') ? currentPath : null:
         return <ServiceDetail />;
-      // Seller Products Management
       case '/seller-products':
-        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
-          ? <SellerProducts /> 
-          : <Landing />;
-      // Seller Orders
+        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') ? <SellerProducts /> : <Landing />;
       case '/seller-orders':
-        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
-          ? <SellerOrders /> 
-          : <Landing />;
-      // Seller Edit Profile
+        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') ? <SellerOrders /> : <Landing />;
       case '/seller-edit-profile':
-        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') 
-          ? <SellerEditProfile /> 
-          : <Landing />;
+        return isAuthenticated && (user?.userType === 'seller' || user?.user_type === 'seller') ? <SellerEditProfile /> : <Landing />;
       default:
         if (currentPath.startsWith('/service/')) {
           return <ServiceDetail />;
@@ -160,20 +115,13 @@ function AppContent() {
         return isAuthenticated ? getUserHomePage() : <Landing />;
     }
   };
-
-  return (
-    <div className="App">
+  return <div className="App">
       {renderPage()}
-    </div>
-  );
+    </div>;
 }
-
 function App() {
-  return (
-    <AuthProvider>
+  return <AuthProvider>
       <AppContent />
-    </AuthProvider>
-  );
+    </AuthProvider>;
 }
-
 export default App;

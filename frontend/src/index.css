@@ -18,24 +18,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent horizontal scrolling */
 html, body {
   overflow-x: hidden;
   max-width: 100%;
   position: relative;
 }
 
-/* Ensure all containers respect viewport width */
 * {
   max-width: 100%;
 }
-
-/* Add padding bottom for mobile bar on mobile devices - REMOVED since MobileBar is removed */
-/* @media (max-width: 767px) {
-  body {
-    padding-bottom: 60px;
-  }
-} */
 
 img {
   max-width: 100%;
@@ -47,7 +38,6 @@ a {
   color: inherit;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -168,14 +158,12 @@ a {
   animation: scaleIn 0.5s ease-out forwards;
 }
 
-/* Smooth transitions for interactive elements */
 * {
   transition-property: color, background-color, border-color, transform, opacity, box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
 
-/* Hover effects */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -185,7 +173,6 @@ a {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Scroll animations */
 @media (prefers-reduced-motion: no-preference) {
   .scroll-reveal {
     opacity: 0;
@@ -199,7 +186,6 @@ a {
   }
 }
 
-/* Line clamp utilities */
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -221,32 +207,26 @@ a {
   overflow: hidden;
 }
 
-/* Mobile Optimizations */
 @media (max-width: 768px) {
-  /* Improve touch targets */
   button, a, input, select, textarea {
     min-height: 44px;
     min-width: 44px;
   }
   
-  /* Prevent text size adjustment on iOS */
   input, select, textarea, button {
     font-size: 16px !important;
   }
   
-  /* Better scrolling on mobile */
   * {
     -webkit-overflow-scrolling: touch;
   }
 }
 
-/* Touch manipulation for better mobile performance */
 .touch-manipulation {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Prevent zoom on input focus (iOS Safari) */
 @media screen and (max-width: 768px) {
   input[type="text"],
   input[type="email"],
@@ -259,7 +239,6 @@ a {
   }
 }
 
-/* Responsive image handling */
 img {
   height: auto;
   max-width: 100%;
@@ -267,20 +246,17 @@ img {
   width: 100%;
 }
 
-/* Prevent horizontal overflow */
 section, div, article, aside, main, header, footer, nav {
   max-width: 100%;
   box-sizing: border-box;
 }
 
-/* Ensure no element causes horizontal scroll */
 .container, .max-w-\[1400px\], .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
   overflow-x: hidden;
 }
 
-/* Better form inputs on mobile */
 @media (max-width: 640px) {
   input, textarea, select {
-    font-size: 16px !important; /* Prevents zoom on iOS */
+    font-size: 16px !important;
   }
 }

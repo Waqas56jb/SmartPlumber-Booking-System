@@ -1,12 +1,3 @@
--- ============================================
--- Database Initialization Script
--- Run this script to initialize all tables
--- ============================================
-
--- This file contains the complete schema
--- Import and execute schema.sql for full database setup
-
--- Quick initialization check
 SELECT 
     'Database Tables Status' as info,
     COUNT(*) as total_tables
@@ -14,7 +5,7 @@ FROM information_schema.tables
 WHERE table_schema = 'public' 
 AND table_type = 'BASE TABLE';
 
--- Check if key tables exist
+
 SELECT 
     CASE WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users') THEN '✓' ELSE '✗' END as users,
     CASE WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'plumbers') THEN '✓' ELSE '✗' END as plumbers,

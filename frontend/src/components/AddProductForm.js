@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { FaTimes, FaSave, FaBox, FaPoundSign, FaTruck, FaPercent, FaTag } from 'react-icons/fa';
 import { productAPI } from '../services/apiService';
-
-const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) => {
+const AddProductForm = ({
+  onClose,
+  onSuccess,
+  sellerId,
+  editProduct = null
+}) => {
   const [formData, setFormData] = useState({
     product_name: editProduct?.product_name || '',
     product_description: editProduct?.product_description || '',
@@ -26,49 +30,69 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
   });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-
-  const categories = [
-    { value: 'boiler_installations', label: 'Boiler Installations & Servicing' },
-    { value: 'boiler_repairs', label: 'Boiler Repairs & Fault Finding' },
-    { value: 'central_heating', label: 'Central Heating' },
-    { value: 'general_plumbing', label: 'General Plumbing' },
-    { value: 'gas_safety', label: 'Gas Safety Inspections' },
-    { value: 'leak_detection', label: 'Leak Detection & Repairs' },
-    { value: 'power_flushing', label: 'Power Flushing' },
-    { value: 'water_heaters', label: 'Water Heaters' },
-    { value: 'pipe_installation', label: 'Pipe Installation & Repairs' },
-    { value: 'hot_water_cylinders', label: 'Hot Water Cylinders' },
-    { value: 'appliances_installation', label: 'New Appliances Installations' },
-    { value: 'any_repairs', label: 'Any Repairs' }
-  ];
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const categories = [{
+    value: 'boiler_installations',
+    label: 'Boiler Installations & Servicing'
+  }, {
+    value: 'boiler_repairs',
+    label: 'Boiler Repairs & Fault Finding'
+  }, {
+    value: 'central_heating',
+    label: 'Central Heating'
+  }, {
+    value: 'general_plumbing',
+    label: 'General Plumbing'
+  }, {
+    value: 'gas_safety',
+    label: 'Gas Safety Inspections'
+  }, {
+    value: 'leak_detection',
+    label: 'Leak Detection & Repairs'
+  }, {
+    value: 'power_flushing',
+    label: 'Power Flushing'
+  }, {
+    value: 'water_heaters',
+    label: 'Water Heaters'
+  }, {
+    value: 'pipe_installation',
+    label: 'Pipe Installation & Repairs'
+  }, {
+    value: 'hot_water_cylinders',
+    label: 'Hot Water Cylinders'
+  }, {
+    value: 'appliances_installation',
+    label: 'New Appliances Installations'
+  }, {
+    value: 'any_repairs',
+    label: 'Any Repairs'
+  }];
+  const handleChange = e => {
+    const {
+      name,
+      value
+    } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-
   const calculateDiscount = () => {
     if (formData.original_price && formData.price) {
       const original = parseFloat(formData.original_price);
       const current = parseFloat(formData.price);
       if (original > current) {
-        return Math.round(((original - current) / original) * 100);
+        return Math.round((original - current) / original * 100);
       }
     }
     return 0;
   };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     if (!formData.product_name || !formData.price || !formData.product_category) {
       return;
     }
-
     setLoading(true);
-
     try {
       const productData = {
         ...formData,
@@ -84,14 +108,12 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
         shipping_charges: parseFloat(formData.shipping_charges) || 0,
         discount_percentage: calculateDiscount()
       };
-
       let response;
       if (editProduct) {
         response = await productAPI.updateProduct(editProduct.id, productData);
       } else {
         response = await productAPI.createProduct(productData);
       }
-
       if (response.success) {
         onSuccess();
         onClose();
@@ -102,18 +124,26 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
       setLoading(false);
     }
   };
-
-  const tabs = [
-    { id: 'basic', label: 'Basic Info', icon: FaBox },
-    { id: 'pricing', label: 'Pricing', icon: FaPoundSign },
-    { id: 'details', label: 'Details', icon: FaTag },
-    { id: 'shipping', label: 'Shipping', icon: FaTruck }
-  ];
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  const tabs = [{
+    id: 'basic',
+    label: 'Basic Info',
+    icon: FaBox
+  }, {
+    id: 'pricing',
+    label: 'Pricing',
+    icon: FaPoundSign
+  }, {
+    id: 'details',
+    label: 'Details',
+    icon: FaTag
+  }, {
+    id: 'shipping',
+    label: 'Shipping',
+    icon: FaTruck
+  }];
+  return <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl">
-        {/* Header */}
+        {}
         <div className="bg-gradient-to-r from-[#D2A752] to-[#B8943F] px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-white">
@@ -121,70 +151,40 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
             </h2>
             <p className="text-white/80 text-sm">Fill in the product details</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white"
-          >
+          <button onClick={onClose} className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all text-white">
             <FaTimes size={20} />
           </button>
         </div>
 
-        {/* Tabs */}
+        {}
         <div className="flex border-b border-gray-200 bg-gray-50">
           {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'text-[#D2A752] border-b-2 border-[#D2A752] bg-white'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
+          const Icon = tab.icon;
+          return <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 px-4 py-3 text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === tab.id ? 'text-[#D2A752] border-b-2 border-[#D2A752] bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
                 <Icon size={14} />
                 <span className="hidden sm:inline">{tab.label}</span>
-              </button>
-            );
-          })}
+              </button>;
+        })}
         </div>
 
-        {/* Form Content */}
+        {}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[60vh]">
-          {/* Basic Info Tab */}
-          {activeTab === 'basic' && (
-            <div className="space-y-4">
+          {}
+          {activeTab === 'basic' && <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Product Name *
                 </label>
-                <input
-                  type="text"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleChange}
-                  placeholder="Enter product name"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  required
-                />
+                <input type="text" name="product_name" value={formData.product_name} onChange={handleChange} placeholder="Enter product name" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" required />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Category *
                 </label>
-                <select
-                  name="product_category"
-                  value={formData.product_category}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  required
-                >
+                <select name="product_category" value={formData.product_category} onChange={handleChange} className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" required>
                   <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                  ))}
+                  {categories.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
                 </select>
               </div>
 
@@ -192,14 +192,7 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Description
                 </label>
-                <textarea
-                  name="product_description"
-                  value={formData.product_description}
-                  onChange={handleChange}
-                  placeholder="Describe your product in detail..."
-                  rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all resize-none"
-                />
+                <textarea name="product_description" value={formData.product_description} onChange={handleChange} placeholder="Describe your product in detail..." rows={4} className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all resize-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -207,27 +200,13 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Brand
                   </label>
-                  <input
-                    type="text"
-                    name="product_brand"
-                    value={formData.product_brand}
-                    onChange={handleChange}
-                    placeholder="e.g., Bosch"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="text" name="product_brand" value={formData.product_brand} onChange={handleChange} placeholder="e.g., Bosch" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Model
                   </label>
-                  <input
-                    type="text"
-                    name="product_model"
-                    value={formData.product_model}
-                    onChange={handleChange}
-                    placeholder="e.g., XR-2000"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="text" name="product_model" value={formData.product_model} onChange={handleChange} placeholder="e.g., XR-2000" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
               </div>
 
@@ -235,36 +214,23 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   SKU (Stock Keeping Unit)
                 </label>
-                <input
-                  type="text"
-                  name="sku"
-                  value={formData.sku}
-                  onChange={handleChange}
-                  placeholder="e.g., PRD-001"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                />
+                <input type="text" name="sku" value={formData.sku} onChange={handleChange} placeholder="e.g., PRD-001" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
               </div>
-            </div>
-          )}
+            </div>}
 
-          {/* Pricing Tab */}
-          {activeTab === 'pricing' && (
-            <div className="space-y-4">
+          {}
+          {activeTab === 'pricing' && <div className="space-y-4">
               <div className="bg-gradient-to-r from-[#F5E6D3] to-[#FDF8F3] rounded-xl p-4 border border-[#D2A752]/30">
                 <div className="flex items-center gap-2 mb-3">
                   <FaPercent className="text-[#D2A752]" />
                   <span className="font-semibold text-gray-700">Discount Preview</span>
                 </div>
-                {calculateDiscount() > 0 ? (
-                  <div className="flex items-center gap-4">
+                {calculateDiscount() > 0 ? <div className="flex items-center gap-4">
                     <span className="text-3xl font-bold text-[#D2A752]">{calculateDiscount()}% OFF</span>
                     <span className="text-gray-500">
                       Save {formData.currency} {(parseFloat(formData.original_price) - parseFloat(formData.price)).toFixed(2)}
                     </span>
-                  </div>
-                ) : (
-                  <span className="text-gray-500">Set original price higher than selling price for discount</span>
-                )}
+                  </div> : <span className="text-gray-500">Set original price higher than selling price for discount</span>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -272,12 +238,7 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Currency
                   </label>
-                  <select
-                    name="currency"
-                    value={formData.currency}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  >
+                  <select name="currency" value={formData.currency} onChange={handleChange} className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all">
                     <option value="GBP">GBP (£)</option>
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
@@ -291,15 +252,7 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                       {formData.currency === 'GBP' ? '£' : formData.currency === 'USD' ? '$' : '€'}
                     </span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      name="original_price"
-                      value={formData.original_price}
-                      onChange={handleChange}
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                    />
+                    <input type="number" step="0.01" name="original_price" value={formData.original_price} onChange={handleChange} placeholder="0.00" className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                   </div>
                 </div>
               </div>
@@ -312,16 +265,7 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                     {formData.currency === 'GBP' ? '£' : formData.currency === 'USD' ? '$' : '€'}
                   </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all text-xl font-bold"
-                    required
-                  />
+                  <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} placeholder="0.00" className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all text-xl font-bold" required />
                 </div>
               </div>
 
@@ -330,79 +274,37 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Stock Quantity *
                   </label>
-                  <input
-                    type="number"
-                    name="stock_quantity"
-                    value={formData.stock_quantity}
-                    onChange={handleChange}
-                    placeholder="0"
-                    min="0"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                    required
-                  />
+                  <input type="number" name="stock_quantity" value={formData.stock_quantity} onChange={handleChange} placeholder="0" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" required />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Min Order
                   </label>
-                  <input
-                    type="number"
-                    name="min_order_quantity"
-                    value={formData.min_order_quantity}
-                    onChange={handleChange}
-                    placeholder="1"
-                    min="1"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="number" name="min_order_quantity" value={formData.min_order_quantity} onChange={handleChange} placeholder="1" min="1" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Max Order
                   </label>
-                  <input
-                    type="number"
-                    name="max_order_quantity"
-                    value={formData.max_order_quantity}
-                    onChange={handleChange}
-                    placeholder="No limit"
-                    min="1"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="number" name="max_order_quantity" value={formData.max_order_quantity} onChange={handleChange} placeholder="No limit" min="1" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
 
-          {/* Details Tab */}
-          {activeTab === 'details' && (
-            <div className="space-y-4">
+          {}
+          {activeTab === 'details' && <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Weight (kg)
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="weight_kg"
-                    value={formData.weight_kg}
-                    onChange={handleChange}
-                    placeholder="e.g., 2.5"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="number" step="0.01" name="weight_kg" value={formData.weight_kg} onChange={handleChange} placeholder="e.g., 2.5" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Dimensions (LxWxH)
                   </label>
-                  <input
-                    type="text"
-                    name="dimensions"
-                    value={formData.dimensions}
-                    onChange={handleChange}
-                    placeholder="e.g., 30x20x10 cm"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="text" name="dimensions" value={formData.dimensions} onChange={handleChange} placeholder="e.g., 30x20x10 cm" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
               </div>
 
@@ -411,27 +313,13 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Material
                   </label>
-                  <input
-                    type="text"
-                    name="material"
-                    value={formData.material}
-                    onChange={handleChange}
-                    placeholder="e.g., Stainless Steel"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="text" name="material" value={formData.material} onChange={handleChange} placeholder="e.g., Stainless Steel" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Color
                   </label>
-                  <input
-                    type="text"
-                    name="color"
-                    value={formData.color}
-                    onChange={handleChange}
-                    placeholder="e.g., Chrome, White"
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="text" name="color" value={formData.color} onChange={handleChange} placeholder="e.g., Chrome, White" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
               </div>
 
@@ -439,35 +327,17 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Warranty (months)
                 </label>
-                <input
-                  type="number"
-                  name="warranty_period_months"
-                  value={formData.warranty_period_months}
-                  onChange={handleChange}
-                  placeholder="e.g., 12"
-                  min="0"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                />
+                <input type="number" name="warranty_period_months" value={formData.warranty_period_months} onChange={handleChange} placeholder="e.g., 12" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
               </div>
-            </div>
-          )}
+            </div>}
 
-          {/* Shipping Tab */}
-          {activeTab === 'shipping' && (
-            <div className="space-y-4">
+          {}
+          {activeTab === 'shipping' && <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Estimated Delivery Time (hours)
                 </label>
-                <input
-                  type="number"
-                  name="delivery_time_hours"
-                  value={formData.delivery_time_hours}
-                  onChange={handleChange}
-                  placeholder="e.g., 48"
-                  min="0"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                />
+                <input type="number" name="delivery_time_hours" value={formData.delivery_time_hours} onChange={handleChange} placeholder="e.g., 48" min="0" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 <p className="text-xs text-gray-500 mt-1">Leave empty for standard shipping times</p>
               </div>
 
@@ -479,60 +349,37 @@ const AddProductForm = ({ onClose, onSuccess, sellerId, editProduct = null }) =>
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                     {formData.currency === 'GBP' ? '£' : formData.currency === 'USD' ? '$' : '€'}
                   </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="shipping_charges"
-                    value={formData.shipping_charges}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    min="0"
-                    className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all"
-                  />
+                  <input type="number" step="0.01" name="shipping_charges" value={formData.shipping_charges} onChange={handleChange} placeholder="0.00" min="0" className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D2A752] transition-all" />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Set to 0 for free shipping</p>
               </div>
 
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
                 <p className="text-sm text-blue-700">
-                  💡 <strong>Tip:</strong> Free shipping can increase sales by up to 30%
+                  Tip free shipping often helps sales
                 </p>
               </div>
-            </div>
-          )}
+            </div>}
         </form>
 
-        {/* Footer */}
+        {}
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-3 rounded-xl font-semibold text-gray-600 border-2 border-gray-300 hover:bg-gray-100 transition-all"
-          >
+          <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl font-semibold text-gray-600 border-2 border-gray-300 hover:bg-gray-100 transition-all">
             Cancel
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !formData.product_name || !formData.price || !formData.product_category}
-            className="px-8 py-3 rounded-xl font-semibold text-white transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg"
-            style={{ background: '#D2A752' }}
-          >
-            {loading ? (
-              <>
+          <button onClick={handleSubmit} disabled={loading || !formData.product_name || !formData.price || !formData.product_category} className="px-8 py-3 rounded-xl font-semibold text-white transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg" style={{
+          background: '#D2A752'
+        }}>
+            {loading ? <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 <span>Saving...</span>
-              </>
-            ) : (
-              <>
+              </> : <>
                 <FaSave />
                 <span>{editProduct ? 'Update Product' : 'Add Product'}</span>
-              </>
-            )}
+              </>}
           </button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AddProductForm;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { FiSettings } from 'react-icons/fi';
-
-const Settings = ({ apiBase }) => {
-  return (
-    <div className="space-y-6">
+const Settings = ({
+  apiBase
+}) => {
+  return <div className="space-y-6">
       <header className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -60,9 +60,6 @@ const Settings = ({ apiBase }) => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Settings;
-

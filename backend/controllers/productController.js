@@ -1,13 +1,15 @@
-const { sql } = require('../utils/db');
-
-// Get All Products (with optional filters)
+const {
+  sql
+} = require('../utils/db');
 const getAllProducts = async (req, res) => {
   try {
-    const { seller_id, category, is_active, search } = req.query;
-
-    // Use simple query without complex dynamic filtering for @vercel/postgres
+    const {
+      seller_id,
+      category,
+      is_active,
+      search
+    } = req.query;
     let result;
-    
     if (seller_id && category && search) {
       const searchTerm = `%${search}%`;
       result = await sql`
@@ -71,7 +73,6 @@ const getAllProducts = async (req, res) => {
         LIMIT 100
       `;
     }
-
     res.json({
       success: true,
       data: {
@@ -87,12 +88,11 @@ const getAllProducts = async (req, res) => {
     });
   }
 };
-
-// Get Product by ID
 const getProductById = async (req, res) => {
   try {
-    const { id } = req.params;
-
+    const {
+      id
+    } = req.params;
     const productResult = await sql`
       SELECT 
         p.*,
@@ -102,14 +102,12 @@ const getProductById = async (req, res) => {
       JOIN sellers s ON p.seller_id = s.id
       WHERE p.id = ${id}
     `;
-
     if (productResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
-
     res.json({
       success: true,
       data: {
@@ -124,19 +122,15 @@ const getProductById = async (req, res) => {
     });
   }
 };
-
-// Create Product
 const createProduct = async (req, res) => {
   try {
     const sellerId = req.user?.sellerId || req.body.seller_id;
-    
     if (!sellerId) {
       return res.status(401).json({
         success: false,
         message: 'Seller ID is required'
       });
     }
-
     const {
       product_name,
       product_description,
@@ -159,14 +153,10 @@ const createProduct = async (req, res) => {
       delivery_time_hours,
       shipping_charges
     } = req.body;
-
-    // Calculate discount if not provided
     let finalDiscountPercentage = discount_percentage || 0;
-    
     if (original_price && price && !discount_percentage) {
       finalDiscountPercentage = ((parseFloat(original_price) - parseFloat(price)) / parseFloat(original_price) * 100).toFixed(2);
     }
-
     const result = await sql`
       INSERT INTO products (
         seller_id, product_name, product_description, product_category,
@@ -203,7 +193,6 @@ const createProduct = async (req, res) => {
       )
       RETURNING *
     `;
-
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
@@ -225,24 +214,20 @@ const createProduct = async (req, res) => {
     });
   }
 };
-
-// Update Product
 const updateProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Verify product exists
+    const {
+      id
+    } = req.params;
     const productCheck = await sql`
       SELECT * FROM products WHERE id = ${id}
     `;
-
     if (productCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
-
     const {
       product_name,
       product_description,
@@ -266,13 +251,10 @@ const updateProduct = async (req, res) => {
       shipping_charges,
       is_active
     } = req.body;
-
-    // Calculate discount if not provided
     let finalDiscountPercentage = discount_percentage || 0;
     if (original_price && price && !discount_percentage) {
       finalDiscountPercentage = ((parseFloat(original_price) - parseFloat(price)) / parseFloat(original_price) * 100).toFixed(2);
     }
-
     const result = await sql`
       UPDATE products SET
         product_name = COALESCE(${product_name}, product_name),
@@ -301,7 +283,6 @@ const updateProduct = async (req, res) => {
       WHERE id = ${id}
       RETURNING *
     `;
-
     res.json({
       success: true,
       message: 'Product updated successfully',
@@ -317,28 +298,23 @@ const updateProduct = async (req, res) => {
     });
   }
 };
-
-// Delete Product
 const deleteProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Verify product exists
+    const {
+      id
+    } = req.params;
     const productCheck = await sql`
       SELECT seller_id FROM products WHERE id = ${id}
     `;
-
     if (productCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
-
     await sql`
       DELETE FROM products WHERE id = ${id}
     `;
-
     res.json({
       success: true,
       message: 'Product deleted successfully'
@@ -351,12 +327,11 @@ const deleteProduct = async (req, res) => {
     });
   }
 };
-
-// Get Products by Category (for service pages)
 const getProductsByCategory = async (req, res) => {
   try {
-    const { category } = req.params;
-
+    const {
+      category
+    } = req.params;
     const result = await sql`
       SELECT 
         p.*,
@@ -367,7 +342,6 @@ const getProductsByCategory = async (req, res) => {
       WHERE p.product_category = ${category} AND p.is_active = TRUE AND p.is_in_stock = TRUE
       ORDER BY p.product_rating DESC, p.total_sales DESC
     `;
-
     res.json({
       success: true,
       data: {
@@ -384,7 +358,6 @@ const getProductsByCategory = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   getAllProducts,
   getProductById,
