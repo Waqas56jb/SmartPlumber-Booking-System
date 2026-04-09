@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaStore }
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { sellerAPI } from '../services/apiService';
+// i create seller rows from the public signup form
 const SellerSignup = () => {
   const [formData, setFormData] = useState({
     seller_username: '',

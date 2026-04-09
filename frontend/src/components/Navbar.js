@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes, FaPhone, FaWrench, FaTools, FaShieldAlt, FaCheckCircle, FaEnvelope, FaWhatsapp, FaInstagram, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
+// i render marketing nav for guests and role aware menu when someone is logged in
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

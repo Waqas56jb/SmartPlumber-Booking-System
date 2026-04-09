@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
 import { Link, useRouter, useLocation } from '../utils/router';
 import { authAPI } from '../services/apiService';
+// i read email from location state and post new password after otp step
 const ResetPassword = () => {
   const location = useLocation();
   const {

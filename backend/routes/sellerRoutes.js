@@ -8,6 +8,7 @@ const {
   validateRequest
 } = require('../middleware/validation');
 const router = express.Router();
+// i mount seller auth plus profile here separate from plumber routes
 const sellerSignupValidation = [body('seller_username').trim().isLength({
   min: 3,
   max: 30

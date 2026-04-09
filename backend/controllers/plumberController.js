@@ -16,6 +16,7 @@ const {
   updatePlumberPassword,
   plumberEmailExists
 } = require('../utils/plumberService');
+// i onboard plumbers with jwt same pattern as customers but different table
 const plumberSignup = async (req, res) => {
   try {
     const {
@@ -70,6 +71,7 @@ const plumberSignup = async (req, res) => {
     });
   }
 };
+// i authenticate with plumber email field and tag jwt as plumber role
 const plumberLogin = async (req, res) => {
   try {
     const {
@@ -117,6 +119,7 @@ const plumberLogin = async (req, res) => {
     });
   }
 };
+// i store otp under plumber userType so it never clashes with customer otp
 const plumberForgotPassword = async (req, res) => {
   try {
     const {
@@ -169,6 +172,7 @@ const plumberForgotPassword = async (req, res) => {
     });
   }
 };
+// i mirror customer verify but pass plumber_email into the shared otp map
 const plumberVerifyOtp = async (req, res) => {
   try {
     const {
@@ -194,6 +198,7 @@ const plumberVerifyOtp = async (req, res) => {
     });
   }
 };
+// i finish reset on plumbers table and clear otp for plumber key
 const plumberResetPassword = async (req, res) => {
   try {
     const {

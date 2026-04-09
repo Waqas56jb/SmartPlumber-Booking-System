@@ -3,6 +3,7 @@ import { useRouter } from '../utils/router';
 import { productAPI, plumberAPI } from '../services/apiService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+// i map url slugs to backend category keys and brand colors for the hero tile
 const serviceCategories = {
   'boiler-installations': {
     name: 'Boiler Installations & Servicing',
@@ -77,7 +78,9 @@ const serviceCategories = {
     color: '#D2A752'
   }
 };
+// i use inline svg so plumber cards never break when external cdn is down
 const PLUMBER_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23D2A752'/%3E%3Ccircle cx='50' cy='35' r='18' fill='%23fff'/%3E%3Cellipse cx='50' cy='75' rx='28' ry='22' fill='%23fff'/%3E%3C/svg%3E";
+// i show products for one service category plus optional plumber finder modal
 const ServiceDetail = () => {
   const {
     currentPath,
@@ -115,6 +118,7 @@ const ServiceDetail = () => {
       setLoading(false);
     }
   }, []);
+  // i lazy load plumbers only when the modal opens to save bandwidth
   const fetchPlumbers = useCallback(async () => {
     try {
       setLoadingPlumbers(true);
@@ -132,6 +136,7 @@ const ServiceDetail = () => {
       setLoadingPlumbers(false);
     }
   }, []);
+  // i parse the hash once to know which service object and category to fetch
   useEffect(() => {
     if (initialized) return;
     const hash = window.location.hash.slice(1);
@@ -159,6 +164,7 @@ const ServiceDetail = () => {
   }, [showPlumbers, fetchPlumbers]);
   const handleAddToCart = _product => undefined;
   const handleContactPlumber = _plumber => undefined;
+  // i chain search sort and price filters client side so the api stays simple
   const filteredProducts = products.filter(p => {
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -178,6 +184,7 @@ const ServiceDetail = () => {
     if (sortBy === 'rating') return (parseFloat(b.seller_rating) || 0) - (parseFloat(a.seller_rating) || 0);
     return 0;
   });
+  // i filter plumbers in memory for modal search and availability toggle
   const filteredPlumbers = plumbers.filter(p => {
     if (availableOnly && !p.is_available) {
       return false;

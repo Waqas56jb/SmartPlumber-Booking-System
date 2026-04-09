@@ -1,6 +1,7 @@
 const {
   sql
 } = require('../utils/db');
+// i build different joins and filters from query string so one handler serves shop and marketplace
 const getAllProducts = async (req, res) => {
   try {
     const {
@@ -88,6 +89,7 @@ const getAllProducts = async (req, res) => {
     });
   }
 };
+// i return single product with seller meta for detail pages
 const getProductById = async (req, res) => {
   try {
     const {
@@ -122,6 +124,7 @@ const getProductById = async (req, res) => {
     });
   }
 };
+// i trust seller id from jwt first then body for admin style calls
 const createProduct = async (req, res) => {
   try {
     const sellerId = req.user?.sellerId || req.body.seller_id;
@@ -214,6 +217,7 @@ const createProduct = async (req, res) => {
     });
   }
 };
+// i verify row exists then patch only fields the seller sent
 const updateProduct = async (req, res) => {
   try {
     const {
@@ -298,6 +302,7 @@ const updateProduct = async (req, res) => {
     });
   }
 };
+// i hard delete products because inventory rows are not soft archived yet
 const deleteProduct = async (req, res) => {
   try {
     const {
@@ -327,6 +332,7 @@ const deleteProduct = async (req, res) => {
     });
   }
 };
+// i power the service detail page grid with category slug from the url
 const getProductsByCategory = async (req, res) => {
   try {
     const {

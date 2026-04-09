@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaEnvelope, FaArrowRight, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { authAPI } from '../services/apiService';
+// i trigger customer otp email and pass email forward through router state
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);

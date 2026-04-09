@@ -3,6 +3,7 @@ import { FaPhone, FaEnvelope, FaClock, FaShieldAlt, FaCheckCircle, FaArrowRight 
 import { FaWhatsapp } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+// i bottom call to action strip with phone whatsapp and email links
 const CTA = () => {
   const sectionRef = useScrollAnimation();
   return <section ref={sectionRef} id="contact" className="py-16 sm:py-20 md:py-28 bg-gradient-to-br from-primary via-secondary to-primary text-white relative overflow-hidden w-full">

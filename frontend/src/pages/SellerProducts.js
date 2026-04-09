@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { productAPI } from '../services/apiService';
 import AddProductForm from '../components/AddProductForm';
+// i let sellers browse filter and edit their own sku rows from one screen
 const SellerProducts = () => {
   const {
     user
@@ -60,10 +61,12 @@ const SellerProducts = () => {
     value: 'any_repairs',
     label: 'Any Repairs'
   }];
+  // i map enum values to friendly labels for filters and table chips
   const getCategoryLabel = value => {
     const cat = categories.find(c => c.value === value);
     return cat ? cat.label : value;
   };
+  // i refetch whenever seller category or search changes via stable callback
   const fetchProducts = useCallback(async () => {
     if (!user?.id) return;
     try {

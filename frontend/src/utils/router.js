@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 const STATE_KEY = 'router_state';
+// i sync react state with location hash because hosting is static without browser router
 export const useRouter = () => {
   const [currentPath, setCurrentPath] = useState(() => {
     const hash = window.location.hash.slice(1);
@@ -16,6 +17,7 @@ export const useRouter = () => {
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+  // i stash small state in session when navigating so reset password keeps email
   const navigate = (path, state = {}) => {
     if (Object.keys(state).length > 0) {
       try {
@@ -31,6 +33,7 @@ export const useRouter = () => {
     navigate
   };
 };
+// i read one shot navigation state then clear on unmount to avoid stale data
 export const useLocation = () => {
   const [state] = useState(() => {
     try {
@@ -55,6 +58,7 @@ export const useLocation = () => {
     state
   };
 };
+// i wrap anchor clicks to set hash without full reload
 export const Link = ({
   to,
   children,

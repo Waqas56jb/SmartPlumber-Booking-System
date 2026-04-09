@@ -2,6 +2,7 @@ import React from 'react';
 import { FaWrench, FaUser, FaStore, FaStar, FaCheckCircle, FaClock, FaShieldAlt, FaCreditCard, FaMapMarkerAlt, FaPhone, FaEnvelope, FaArrowRight, FaHandshake } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
+// i show public marketing and role entry points before anyone signs in
 const Landing = () => {
   const {
     isAuthenticated

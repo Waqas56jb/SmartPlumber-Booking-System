@@ -10,6 +10,7 @@ const {
   validateRequest
 } = require('../middleware/validation');
 const router = express.Router();
+// i group auth profile services and bookings under one prefix for the plumber app
 const plumberSignupValidation = [body('plumber_username').trim().isLength({
   min: 3,
   max: 30

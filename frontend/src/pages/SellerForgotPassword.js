@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaEnvelope, FaArrowRight, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
+// i email otp for seller reset using seller specific routes
 const SellerForgotPassword = () => {
   const [seller_email, setSellerEmail] = useState('');
   const [loading, setLoading] = useState(false);

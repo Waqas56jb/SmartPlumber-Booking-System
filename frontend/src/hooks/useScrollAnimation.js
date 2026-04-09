@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+// i fade sections in when they enter view so landing feels less static
 export const useScrollAnimation = () => {
   const ref = useRef(null);
   useEffect(() => {

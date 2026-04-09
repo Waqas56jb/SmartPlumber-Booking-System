@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+// i build the gmail smtp client from env because i do not want secrets in code
 const createTransporter = () => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
     throw new Error('Email configuration is missing. Please set EMAIL_USER and EMAIL_PASSWORD in .env file.');
@@ -13,6 +14,7 @@ const createTransporter = () => {
     }
   });
 };
+// i send html or text mail and strip tags for the plain fallback
 const sendEmail = async ({
   to,
   subject,
@@ -42,6 +44,7 @@ const sendEmail = async ({
     return false;
   }
 };
+// i ping smtp on startup so i know otp flows will work before users hit forgot password
 const verifyEmailConfig = async () => {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {

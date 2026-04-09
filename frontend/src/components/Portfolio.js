@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaChevronDown, FaImages, FaEye, FaPlay, FaCheckCircle, FaTimes, FaWrench, FaCalendar, FaUser, FaMapMarkerAlt } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+// i seed gallery items locally before any cms hookup exists
 const initialProjects = [{
   id: 0,
   src: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&h=600&fit=crop&q=90',
@@ -201,6 +202,7 @@ const extraProjects = [{
   date: 'July 2023',
   duration: '5 Days'
 }];
+// i merge static and extra projects then sync gallery for lightbox events
 const Portfolio = () => {
   const sectionRef = useScrollAnimation();
   const [showMore, setShowMore] = useState(false);

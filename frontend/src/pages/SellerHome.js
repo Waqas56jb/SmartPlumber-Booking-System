@@ -3,6 +3,7 @@ import { FaStore, FaMapMarkerAlt, FaTruck, FaCreditCard, FaMoneyBillWave, FaStar
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
+// i surface seller shop stats shortcuts same idea as plumber home
 const SellerHome = () => {
   const {
     user,

@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// i centralize urls so changing host for prod is one env flip
 export const API_ENDPOINTS = {
   SIGNUP: `${API_BASE_URL}/api/auth/signup`,
   LOGIN: `${API_BASE_URL}/api/auth/login`,

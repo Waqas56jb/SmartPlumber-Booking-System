@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { FiSettings, FiTrendingUp } from 'react-icons/fi';
+// i fetch chart endpoints and render recharts with dark theme colors
 const Analytics = ({
   apiBase
 }) => {

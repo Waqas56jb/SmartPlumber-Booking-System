@@ -4,6 +4,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+// i replay schema.sql statement by statement so neon accepts the full dump
 async function initializeDatabase() {
   try {
     console.log('init db');

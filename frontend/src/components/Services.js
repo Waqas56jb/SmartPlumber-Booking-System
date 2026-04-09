@@ -3,6 +3,7 @@ import { FaWrench, FaTools, FaShieldAlt, FaFire, FaTint, FaCog, FaCheckCircle, F
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { Link } from '../utils/router';
 import { publicAPI } from '../services/apiService';
+// i grey out cards when no plumber listed that service name from the api
 const Services = () => {
   const sectionRef = useScrollAnimation();
   const [availableNames, setAvailableNames] = React.useState(null);

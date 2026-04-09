@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiShoppingBag, FiTag, FiTruck } from 'react-icons/fi';
+// i edit sanitary products across sellers from one admin grid
 const Sanitary = ({
   apiBase
 }) => {

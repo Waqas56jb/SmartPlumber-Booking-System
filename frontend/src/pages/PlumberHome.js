@@ -3,7 +3,9 @@ import { FaWrench, FaMapMarkerAlt, FaPoundSign, FaStar, FaPhone, FaEnvelope, FaE
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
+// i reuse a static avatar url for plumber cards until upload is wired
 const PLUMBER_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+// i show plumber dashboard snapshot with quick links to jobs and profile
 const PlumberHome = () => {
   const {
     user,

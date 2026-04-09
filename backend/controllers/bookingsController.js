@@ -1,6 +1,7 @@
 const {
   sql
 } = require('../utils/db');
+// i use raw pg client here for dynamic filters on booking list
 const getPlumberBookings = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
@@ -71,6 +72,7 @@ const getPlumberBookings = async (req, res) => {
     });
   }
 };
+// i aggregate counts in sql so the dashboard cards stay cheap
 const getBookingStats = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
@@ -120,6 +122,7 @@ const getBookingStats = async (req, res) => {
     });
   }
 };
+// i bump plumber job counters when status hits completed or cancelled
 const updateBookingStatus = async (req, res) => {
   try {
     const {
@@ -181,6 +184,7 @@ const updateBookingStatus = async (req, res) => {
     });
   }
 };
+// i join customer service and plumber for the expanded booking view
 const getBookingDetails = async (req, res) => {
   try {
     const {
@@ -222,6 +226,7 @@ const getBookingDetails = async (req, res) => {
     });
   }
 };
+// i insert a new row and tie customer plumber and service ids together
 const createBooking = async (req, res) => {
   try {
     const {

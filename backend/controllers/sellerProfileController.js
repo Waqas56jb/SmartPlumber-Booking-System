@@ -7,6 +7,7 @@ const {
 const {
   processBase64Image
 } = require('../utils/imageService');
+// i read seller row for dashboard settings using jwt id or explicit param
 const getSellerProfile = async (req, res) => {
   try {
     const sellerId = req.params.id || req.user?.sellerId;
@@ -53,6 +54,7 @@ const getSellerProfile = async (req, res) => {
     });
   }
 };
+// i merge text fields and optional base64 shop image in one transaction flow
 const updateSellerProfile = async (req, res) => {
   try {
     const sellerId = req.params.id || req.user?.sellerId;

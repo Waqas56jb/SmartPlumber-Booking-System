@@ -1,6 +1,7 @@
 const {
   validationResult
 } = require('express-validator');
+// i turn validator errors into one json shape the frontend can read
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

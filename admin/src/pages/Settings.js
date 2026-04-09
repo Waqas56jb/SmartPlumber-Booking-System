@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiSettings } from 'react-icons/fi';
+// i show static stack info and api base hint for operators
 const Settings = ({
   apiBase
 }) => {

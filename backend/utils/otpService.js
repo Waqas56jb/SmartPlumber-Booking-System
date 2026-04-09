@@ -1,8 +1,10 @@
 const otpStore = new Map();
 const OTP_EXPIRY_TIME = 60 * 1000;
+// i use six digits so sms and email stay simple for users
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
+// i key by email and role so plumber and customer otps never collide
 const storeOTP = (email, otp, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   const expiryTime = Date.now() + OTP_EXPIRY_TIME;
@@ -24,6 +26,7 @@ const storeOTP = (email, otp, userType = 'customer') => {
     console.log('otp stored', email, userType);
   }
 };
+// i check expiry and attempts here so brute force dies after three tries
 const verifyOTP = (email, otp, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   const stored = otpStore.get(key);
@@ -58,6 +61,7 @@ const verifyOTP = (email, otp, userType = 'customer') => {
   }
   return true;
 };
+// i clear the key after success so the same code cannot be reused
 const deleteOTP = (email, userType = 'customer') => {
   const key = `${email.toLowerCase()}_${userType}`;
   if (otpStore.has(key)) {
@@ -67,6 +71,7 @@ const deleteOTP = (email, userType = 'customer') => {
     }
   }
 };
+// i sweep the map on a timer so memory does not grow forever in dev
 const cleanupExpiredOTPs = () => {
   const now = Date.now();
   for (const [email, data] of otpStore.entries()) {

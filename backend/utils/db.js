@@ -1,6 +1,7 @@
 const {
   sql
 } = require('@vercel/postgres');
+// i run one sql statement and swallow errors so startup never crashes the whole app
 const runSQL = async (query, description) => {
   try {
     await query;
@@ -10,6 +11,7 @@ const runSQL = async (query, description) => {
     return false;
   }
 };
+// i ensure core tables exist on boot so local and vercel both get a usable schema
 const initializeDatabase = async () => {
   if (!process.env.POSTGRES_URL) {
     console.warn('POSTGRES_URL not set');
@@ -120,6 +122,7 @@ const initializeDatabase = async () => {
       is_used BOOLEAN DEFAULT FALSE
     )
   `, 'Creating otps table');
+  // i add indexes here so login and lookups stay fast on email and foreign keys
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(LOWER(email))`, 'Creating users email index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username))`, 'Creating users username index');
   await runSQL(sql`CREATE INDEX IF NOT EXISTS idx_plumbers_email ON plumbers(LOWER(plumber_email))`, 'Creating plumbers email index');

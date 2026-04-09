@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+// i fake a support agent with keyword replies so the site feels alive without ai apis
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([{
@@ -10,6 +11,7 @@ const Chatbot = () => {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  // i keep the latest message visible when the thread grows
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
@@ -23,6 +25,7 @@ const Chatbot = () => {
       inputRef.current.focus();
     }
   }, [isOpen]);
+  // i branch on simple keywords because full nlp is out of scope here
   const getBotResponse = userMessage => {
     const message = userMessage.toLowerCase().trim();
     if (message.includes('contact') || message.includes('phone') || message.includes('call') || message.includes('number') || message.includes('email') || message.includes('address')) {
@@ -84,6 +87,7 @@ const Chatbot = () => {
     }
     return 'Thanks for your message\n\nPhone +44 7777 998381 for services contact quotes or emergencies';
   };
+  // i append user text then fake delay before bot answer for natural rhythm
   const handleSendMessage = e => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -107,6 +111,7 @@ const Chatbot = () => {
       setMessages(prev => [...prev, botMessage]);
     }, 800);
   };
+  // i hide the launcher while panel is open so only one control shows
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
   };

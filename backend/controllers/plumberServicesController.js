@@ -1,6 +1,7 @@
 const {
   sql
 } = require('../utils/db');
+// i list all services for one plumber id for the manage services page
 const getPlumberServices = async (req, res) => {
   try {
     const plumberId = req.params.plumberId;
@@ -30,6 +31,7 @@ const getPlumberServices = async (req, res) => {
     });
   }
 };
+// i fetch a single row by service id for edit forms
 const getPlumberService = async (req, res) => {
   try {
     const {
@@ -59,6 +61,7 @@ const getPlumberService = async (req, res) => {
     });
   }
 };
+// i insert with defaults for price type and active flag when body omits them
 const createPlumberService = async (req, res) => {
   try {
     const {
@@ -107,6 +110,7 @@ const createPlumberService = async (req, res) => {
     });
   }
 };
+// i use coalesce pattern so partial updates do not wipe untouched columns
 const updatePlumberService = async (req, res) => {
   try {
     const {
@@ -154,6 +158,7 @@ const updatePlumberService = async (req, res) => {
     });
   }
 };
+// i delete by id and rely on cascade rules if bookings reference it
 const deletePlumberService = async (req, res) => {
   try {
     const {
@@ -181,6 +186,7 @@ const deletePlumberService = async (req, res) => {
     });
   }
 };
+// i flip boolean active without sending the full row from the client
 const toggleServiceStatus = async (req, res) => {
   try {
     const {

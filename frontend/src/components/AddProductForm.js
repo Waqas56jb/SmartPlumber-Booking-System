@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaTimes, FaSave, FaBox, FaPoundSign, FaTruck, FaPercent, FaTag } from 'react-icons/fa';
 import { productAPI } from '../services/apiService';
+// i reuse one form for create and edit seller products with big field set
 const AddProductForm = ({
   onClose,
   onSuccess,

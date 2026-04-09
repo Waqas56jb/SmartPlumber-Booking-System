@@ -2,6 +2,7 @@ import React from 'react';
 import { FaPhone, FaEnvelope } from 'react-icons/fa';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
+// i sticky four icon bar for phones to reach contact fast
 const MobileBar = () => {
   return <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border grid grid-cols-4 shadow-lg z-[1000] md:hidden">
       <a href="tel:+447777998381" className="flex flex-col items-center justify-center py-3 gap-1 text-text transition-colors active:bg-background-alt">

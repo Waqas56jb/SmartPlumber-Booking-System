@@ -1,6 +1,7 @@
 const {
   sql
 } = require('./db');
+// i mirror customer signup rules so plumbers get unique email and handle
 const createPlumber = async plumberData => {
   try {
     const existingPlumberByEmail = await sql`
@@ -36,6 +37,7 @@ const createPlumber = async plumberData => {
     throw new Error('Error creating plumber account');
   }
 };
+// i fetch by email for login and password reset flows
 const findPlumberByEmail = async plumber_email => {
   try {
     const result = await sql`
@@ -58,6 +60,7 @@ const findPlumberByEmail = async plumber_email => {
     return null;
   }
 };
+// i fetch by username when they log in with handle instead of email
 const findPlumberByUsername = async plumber_username => {
   try {
     const result = await sql`
@@ -80,6 +83,7 @@ const findPlumberByUsername = async plumber_username => {
     return null;
   }
 };
+// i reset plumber password after otp passes
 const updatePlumberPassword = async (plumber_email, hashedPassword) => {
   try {
     const result = await sql`
@@ -103,6 +107,7 @@ const updatePlumberPassword = async (plumber_email, hashedPassword) => {
     throw error;
   }
 };
+// i use this on signup to show email taken without throwing sql errors
 const plumberEmailExists = async plumber_email => {
   try {
     const result = await sql`

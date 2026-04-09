@@ -1,6 +1,7 @@
 const {
   sql
 } = require('./db');
+// i block duplicate email and username before insert so the api can return clear errors
 const createUser = async userData => {
   try {
     const existingUserByEmail = await sql`
@@ -36,6 +37,7 @@ const createUser = async userData => {
     throw new Error('Error creating user');
   }
 };
+// i normalize email with lower so login matches signup regardless of caps
 const findUserByEmail = async email => {
   try {
     const result = await sql`
@@ -58,6 +60,7 @@ const findUserByEmail = async email => {
     return null;
   }
 };
+// i use this for username login paths the same way as email
 const findUserByUsername = async username => {
   try {
     const result = await sql`
@@ -80,6 +83,7 @@ const findUserByUsername = async username => {
     return null;
   }
 };
+// i update after bcrypt in the controller so the db never sees plain text
 const updateUserPassword = async (email, hashedPassword) => {
   try {
     const result = await sql`
@@ -103,6 +107,7 @@ const updateUserPassword = async (email, hashedPassword) => {
     throw error;
   }
 };
+// i cheap check before signup to avoid a noisy insert error
 const emailExists = async email => {
   try {
     const result = await sql`

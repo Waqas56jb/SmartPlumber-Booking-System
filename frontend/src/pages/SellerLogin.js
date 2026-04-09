@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { sellerAPI } from '../services/apiService';
+// i authenticate sellers and tag userType seller in context
 const SellerLogin = () => {
   const [formData, setFormData] = useState({
     seller_email: '',

@@ -3,6 +3,7 @@ import { FaCalendarAlt, FaArrowLeft, FaClock, FaMapMarkerAlt, FaUser, FaPhone, F
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
+// i load plumber job list stats and status updates from booking apis
 const PlumberBookings = () => {
   const {
     user

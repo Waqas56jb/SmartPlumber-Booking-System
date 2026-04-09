@@ -1,4 +1,5 @@
 import React from 'react';
+// i render nav buttons from config so App owns labels and icons only
 const Sidebar = ({
   items,
   active,

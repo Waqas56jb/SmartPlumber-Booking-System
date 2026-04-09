@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaWrench, FaCheckCircle, FaExcla
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { plumberAPI } from '../services/apiService';
+// i log plumbers in and normalize user shape for shared auth storage
 const PlumberLogin = () => {
   const [formData, setFormData] = useState({
     plumber_email: '',

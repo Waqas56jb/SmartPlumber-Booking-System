@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaExclama
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/apiService';
+// i validate customer signup client side then call auth signup api
 const Signup = () => {
   const [formData, setFormData] = useState({
     username: '',

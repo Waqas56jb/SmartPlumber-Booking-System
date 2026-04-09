@@ -10,6 +10,7 @@ const {
   validateRequest
 } = require('../middleware/validation');
 const router = express.Router();
+// i keep auth rules next to routes so controllers stay thin
 const signupValidation = [body('username').trim().isLength({
   min: 3,
   max: 30
@@ -42,6 +43,7 @@ const resetPasswordValidation = [body('email').trim().isEmail().normalizeEmail()
   }
   return true;
 })];
+// i chain validator then controller on each customer auth endpoint
 router.post('/signup', signupValidation, validateRequest, authController.signup);
 router.post('/login', loginValidation, validateRequest, authController.login);
 router.post('/forgot-password', forgotPasswordValidation, validateRequest, authController.forgotPassword);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiUsers } from 'react-icons/fi';
+// i manage customer users table with same edit pattern as plumbers
 const Customers = ({
   apiBase
 }) => {

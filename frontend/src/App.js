@@ -25,6 +25,7 @@ import SellerLogin from './pages/SellerLogin';
 import SellerSignup from './pages/SellerSignup';
 import SellerForgotPassword from './pages/SellerForgotPassword';
 import SellerResetPassword from './pages/SellerResetPassword';
+// i map hash routes to screens and guard plumber seller and customer areas separately
 function AppContent() {
   const {
     currentPath,
@@ -50,6 +51,7 @@ function AppContent() {
       navigate('/');
     }
   }, [isAuthenticated, currentPath, navigate, isPublicRoute, isProtectedRoute]);
+  // i send each role to its own dashboard shell after login
   const getUserHomePage = () => {
     if (!isAuthenticated || !user) return <Landing />;
     const userType = user.userType || user.user_type;
@@ -61,6 +63,7 @@ function AppContent() {
       return <Home />;
     }
   };
+  // i centralize the big switch so adding a route is one case block
   const renderPage = () => {
     switch (currentPath) {
       case '/':
@@ -119,6 +122,7 @@ function AppContent() {
       {renderPage()}
     </div>;
 }
+// i wrap the tree in auth provider so any page can read user and token
 function App() {
   return <AuthProvider>
       <AppContent />

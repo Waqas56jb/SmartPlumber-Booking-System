@@ -1,3 +1,4 @@
+// i parse data urls and enforce type plus size before profiles store base64
 const processBase64Image = (base64String, maxSizeMB = 5) => {
   try {
     if (!base64String || typeof base64String !== 'string') {
@@ -44,9 +45,11 @@ const processBase64Image = (base64String, maxSizeMB = 5) => {
     };
   }
 };
+// i rebuild a data url when the db only keeps raw base64 and mime
 const createDataUrl = (base64Data, mimeType) => {
   return `data:${mimeType};base64,${base64Data}`;
 };
+// i guard multipart uploads the same way as inline base64
 const validateImageFile = (file, maxSizeMB = 5) => {
   if (!file) {
     return {

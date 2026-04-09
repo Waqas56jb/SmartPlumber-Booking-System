@@ -16,6 +16,7 @@ const {
   updateSellerPassword,
   sellerEmailExists
 } = require('../utils/sellerService');
+// i create seller accounts and return jwt for shop dashboard access
 const sellerSignup = async (req, res) => {
   try {
     const {
@@ -70,6 +71,7 @@ const sellerSignup = async (req, res) => {
     });
   }
 };
+// i log sellers in with sellerId claim so product routes know who owns stock
 const sellerLogin = async (req, res) => {
   try {
     const {
@@ -117,6 +119,7 @@ const sellerLogin = async (req, res) => {
     });
   }
 };
+// i send seller branded otp email and tag memory store as seller
 const sellerForgotPassword = async (req, res) => {
   try {
     const {
@@ -169,6 +172,7 @@ const sellerForgotPassword = async (req, res) => {
     });
   }
 };
+// i validate seller otp before the reset screen unlocks
 const sellerVerifyOtp = async (req, res) => {
   try {
     const {
@@ -194,6 +198,7 @@ const sellerVerifyOtp = async (req, res) => {
     });
   }
 };
+// i hash new seller password wipe otp and keep response same as plumber flow
 const sellerResetPassword = async (req, res) => {
   try {
     const {

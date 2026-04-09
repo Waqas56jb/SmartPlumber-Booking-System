@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaLock, FaArrowLeft, FaCheckCircle, FaEnvelope, FaStore } from 'react-icons/fa';
 import { Link, useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
+// i reset seller password after otp with seller field names
 const SellerResetPassword = () => {
   const {
     navigate

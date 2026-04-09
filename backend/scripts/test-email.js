@@ -2,6 +2,7 @@ const {
   verifyEmailConfig
 } = require('../utils/emailService');
 require('dotenv').config();
+// i sanity check gmail app password before deploying forgot password
 async function testEmail() {
   try {
     console.log('test email');

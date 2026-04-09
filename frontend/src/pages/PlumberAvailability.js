@@ -3,6 +3,7 @@ import { FaClock, FaArrowLeft, FaSave, FaCalendarAlt } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
+// i save weekly hour grid into availability_schedule jsonb field
 const PlumberAvailability = () => {
   const {
     user

@@ -1,6 +1,7 @@
 const {
   sql
 } = require('./db');
+// i keep seller email and shop username unique like the other roles
 const createSeller = async sellerData => {
   try {
     const existingSellerByEmail = await sql`
@@ -36,6 +37,7 @@ const createSeller = async sellerData => {
     throw new Error('Error creating seller account');
   }
 };
+// i load seller row for login by email
 const findSellerByEmail = async seller_email => {
   try {
     const result = await sql`
@@ -58,6 +60,7 @@ const findSellerByEmail = async seller_email => {
     return null;
   }
 };
+// i load seller row when they sign in with username
 const findSellerByUsername = async seller_username => {
   try {
     const result = await sql`
@@ -80,6 +83,7 @@ const findSellerByUsername = async seller_username => {
     return null;
   }
 };
+// i patch password after seller completes reset flow
 const updateSellerPassword = async (seller_email, hashedPassword) => {
   try {
     const result = await sql`
@@ -103,6 +107,7 @@ const updateSellerPassword = async (seller_email, hashedPassword) => {
     throw error;
   }
 };
+// i boolean check for duplicate email on register
 const sellerEmailExists = async seller_email => {
   try {
     const result = await sql`

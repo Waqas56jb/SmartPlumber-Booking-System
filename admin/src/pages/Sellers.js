@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiShoppingBag, FiMapPin } from 'react-icons/fi';
+// i admin seller shops with rating and location fields editable
 const Sellers = ({
   apiBase
 }) => {

@@ -8,6 +8,7 @@ import Customers from './pages/Customers';
 import Analytics from './pages/Analytics';
 import Sellers from './pages/Sellers';
 import AdminLogin from './pages/AdminLogin';
+// i keep admin as a single page app with sidebar state and fake login gate
 const App = () => {
   const [activePage, setActivePage] = useState('dashboard');
   const [overview, setOverview] = useState(null);
@@ -20,6 +21,7 @@ const App = () => {
     }
   });
   const API_BASE_URL = process.env.REACT_APP_ADMIN_API_URL || 'http://localhost:5000';
+  // i prefetch overview counts once so dashboard and sidebar stats share them
   useEffect(() => {
     const fetchOverview = async () => {
       try {
@@ -37,12 +39,14 @@ const App = () => {
     };
     fetchOverview();
   }, [API_BASE_URL]);
+  // i clear the local flag only because auth is demo grade here
   const handleLogout = () => {
     try {
       localStorage.removeItem('admin_logged_in');
     } catch {}
     setLoggedIn(false);
   };
+  // i switch inner page without react router to keep deploy simple
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard':

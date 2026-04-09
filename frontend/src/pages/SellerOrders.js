@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaShoppingBag, FaArrowLeft, FaSearch, FaEye, FaCheck, FaTimes, FaTruck, FaBox, FaClock, FaUser, FaMapMarkerAlt, FaPhone, FaCreditCard, FaPoundSign } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
+// i keep rich demo orders so payment ui can render before live orders api ships
 const mockOrders = [{
   id: 1,
   order_number: 'ORD-2026-001',
@@ -191,6 +192,7 @@ const mockOrders = [{
   },
   created_at: '2026-01-21T08:42:00Z'
 }];
+// i merge mock data with any real fetch later for seller order management view
 const SellerOrders = () => {
   useAuth();
   const {

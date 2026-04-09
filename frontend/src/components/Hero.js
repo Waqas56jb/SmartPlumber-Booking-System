@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaPhone, FaWrench, FaShieldAlt, FaClock, FaCheckCircle, FaTools, FaAward, FaStar } from 'react-icons/fa';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+// i hero banner with scroll animation hook for fade in
 const Hero = () => {
   const sectionRef = useScrollAnimation();
   return <section ref={sectionRef} id="home" className="relative py-6 sm:py-8 md:py-12 pb-16 sm:pb-20 md:pb-28 bg-gradient-to-br from-background-alt via-white to-background-alt overflow-hidden w-full">

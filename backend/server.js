@@ -1,3 +1,4 @@
+// i keep all api routes in one express app with manual cors so vercel and local both work
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -13,6 +14,7 @@ const {
 } = require('./utils/db');
 dotenv.config();
 const app = express();
+// i whitelist known frontends and reflect origin on options so cookies can work when allowed
 const allowedOrigins = ['http://localhost:3000', 'https://smart-plumber-booking-system-7cbo.vercel.app', 'https://smart-plumber-booking-system.vercel.app', process.env.FRONTEND_URL].filter(Boolean);
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -38,6 +40,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   next();
 });
+// i parse json and forms with a high limit so avatar uploads in base64 do not fail
 app.use(express.json({
   limit: '10mb'
 }));
@@ -45,6 +48,7 @@ app.use(express.urlencoded({
   extended: true,
   limit: '10mb'
 }));
+// i answer preflight for any path so browsers get credentials headers before the real call
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin) || origin && origin.includes('vercel.app')) {
@@ -58,16 +62,19 @@ app.options('*', (req, res) => {
   res.header('Access-Control-Max-Age', '86400');
   return res.sendStatus(204);
 });
+// i mount feature routers so auth plumber seller and catalog stay in separate files
 app.use('/api/auth', authRoutes);
 app.use('/api/plumber', plumberRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/products', require('./routes/productRoutes'));
+// i expose a tiny health json for uptime checks and deploy smoke tests
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     message: 'Server is running'
   });
 });
+// i derive distinct active service names so the home page grid can hide empty categories
 app.get('/api/services/available', async (req, res) => {
   try {
     const result = await sql`
@@ -90,6 +97,7 @@ app.get('/api/services/available', async (req, res) => {
     });
   }
 });
+// i aggregate counts across users plumbers sellers products for the admin dashboard cards
 app.get('/api/admin/overview', async (req, res) => {
   try {
     const [userResult, plumberResult, sellerResult, productResult] = await Promise.all([sql`SELECT COUNT(*)::int AS count FROM users`, sql`SELECT 
@@ -121,6 +129,7 @@ app.get('/api/admin/overview', async (req, res) => {
     });
   }
 });
+// i return every plumber row newest first for the admin plumbers screen
 app.get('/api/admin/plumbers', async (req, res) => {
   try {
     const result = await sql`
@@ -155,6 +164,7 @@ app.get('/api/admin/plumbers', async (req, res) => {
     });
   }
 });
+// i cap customers at two hundred so the list loads quick on slow connections
 app.get('/api/admin/customers', async (req, res) => {
   try {
     const result = await sql`
@@ -181,6 +191,7 @@ app.get('/api/admin/customers', async (req, res) => {
     });
   }
 });
+// i list seller shops with order stats so admin can spot inactive vendors
 app.get('/api/admin/sellers', async (req, res) => {
   try {
     const result = await sql`
@@ -214,6 +225,7 @@ app.get('/api/admin/sellers', async (req, res) => {
     });
   }
 });
+// i join seller onto products so admin sees shop name next to each listing
 app.get('/api/admin/products', async (req, res) => {
   try {
     const result = await sql`
@@ -253,6 +265,7 @@ app.get('/api/admin/products', async (req, res) => {
     });
   }
 });
+// i patch plumber fields with coalesce so omitted keys keep old values
 app.patch('/api/admin/plumbers/:id', async (req, res) => {
   try {
     const {
@@ -300,6 +313,7 @@ app.patch('/api/admin/plumbers/:id', async (req, res) => {
     });
   }
 });
+// i let support fix customer username or email without touching passwords here
 app.patch('/api/admin/customers/:id', async (req, res) => {
   try {
     const {
@@ -337,6 +351,7 @@ app.patch('/api/admin/customers/:id', async (req, res) => {
     });
   }
 });
+// i update seller shop metadata and verification flags from one form
 app.patch('/api/admin/sellers/:id', async (req, res) => {
   try {
     const {
@@ -384,6 +399,7 @@ app.patch('/api/admin/sellers/:id', async (req, res) => {
     });
   }
 });
+// i sync is_in_stock when stock changes so storefront logic stays honest
 app.patch('/api/admin/products/:id', async (req, res) => {
   try {
     const {
@@ -430,6 +446,7 @@ app.patch('/api/admin/products/:id', async (req, res) => {
     });
   }
 });
+// i hard delete a plumber when admin confirms removal
 app.delete('/api/admin/plumbers/:id', async (req, res) => {
   try {
     const {
@@ -447,6 +464,7 @@ app.delete('/api/admin/plumbers/:id', async (req, res) => {
     });
   }
 });
+// i remove a customer user row for gdpr style purge flows
 app.delete('/api/admin/customers/:id', async (req, res) => {
   try {
     const {
@@ -464,6 +482,7 @@ app.delete('/api/admin/customers/:id', async (req, res) => {
     });
   }
 });
+// i delete seller account from admin when the shop must disappear
 app.delete('/api/admin/sellers/:id', async (req, res) => {
   try {
     const {
@@ -481,6 +500,7 @@ app.delete('/api/admin/sellers/:id', async (req, res) => {
     });
   }
 });
+// i delete a product listing when admin pulls it from the catalog
 app.delete('/api/admin/products/:id', async (req, res) => {
   try {
     const {
@@ -498,6 +518,7 @@ app.delete('/api/admin/products/:id', async (req, res) => {
     });
   }
 });
+// i group user signups by week for the last twelve weeks on the chart
 app.get('/api/admin/analytics/users-per-week', async (req, res) => {
   try {
     const result = await sql`
@@ -529,6 +550,7 @@ app.get('/api/admin/analytics/users-per-week', async (req, res) => {
     });
   }
 });
+// i aggregate booking counts by day and fall back to empty series if table missing
 app.get('/api/admin/analytics/bookings-per-day', async (req, res) => {
   try {
     const result = await sql`
@@ -560,6 +582,7 @@ app.get('/api/admin/analytics/bookings-per-day', async (req, res) => {
     });
   }
 });
+// i surface top four plumbers by completed jobs for the analytics highlight
 app.get('/api/admin/analytics/top-plumbers', async (req, res) => {
   try {
     const result = await sql`
@@ -591,6 +614,7 @@ app.get('/api/admin/analytics/top-plumbers', async (req, res) => {
     });
   }
 });
+// i rank products by total sales for the admin bestsellers strip
 app.get('/api/admin/analytics/top-products', async (req, res) => {
   try {
     const result = await sql`
@@ -621,6 +645,7 @@ app.get('/api/admin/analytics/top-products', async (req, res) => {
     });
   }
 });
+// i send json 404 for unknown api paths so the client always parses the body
 app.use((req, res) => {
   if (process.env.DEBUG_LOGS === 'true') {
     console.log('404', req.method, req.path);
@@ -630,6 +655,7 @@ app.use((req, res) => {
     message: `Route ${req.method} ${req.path} not found`
   });
 });
+// i catch sync errors and async rejections in one place for consistent api errors
 app.use((err, req, res, next) => {
   console.error('handler', err.message);
   res.status(err.status || 500).json({
@@ -640,6 +666,7 @@ app.use((err, req, res, next) => {
 module.exports = app;
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
+  // i boot db and email verify after listen so logs show port even if db lags
   app.listen(PORT, async () => {
     console.log('port', PORT);
     try {

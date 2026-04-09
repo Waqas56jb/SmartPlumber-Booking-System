@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiUsers, FiTool, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
 const number = v => typeof v === 'number' ? v : 0;
+// i show overview cards and derived ratios from the shared overview prop
 const Dashboard = ({
   overview,
   loading,

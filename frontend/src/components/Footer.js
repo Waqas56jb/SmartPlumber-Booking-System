@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp, FaInstagram, FaWrench, FaShieldAlt, FaAward, FaCheckCircle, FaTools, FaCertificate, FaStar, FaHome, FaUser, FaBriefcase, FaImages } from 'react-icons/fa';
+// i repeat contact and service links for seo and quick mobile taps
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const services = [{

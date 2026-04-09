@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiTool, FiMapPin, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
+// i list plumbers from admin api and allow inline edit plus delete
 const Plumbers = ({
   apiBase
 }) => {

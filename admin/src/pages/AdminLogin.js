@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { FiLock, FiMail } from 'react-icons/fi';
+// i keep admin credentials client side for demo only not production grade
 const ADMIN_EMAIL = 'adminbasit123@gmail.com';
 const ADMIN_PASSWORD = 'UK@12345!';
+// i compare form values locally then flip parent logged in flag
 const AdminLogin = ({
   onSuccess
 }) => {

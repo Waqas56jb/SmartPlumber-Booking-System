@@ -2,6 +2,7 @@ import React from 'react';
 import { FaPhone, FaEnvelope } from 'react-icons/fa';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
+// i thin top bar with click to call and socials on every page
 const ContactStrip = () => {
   return <div className="bg-primary text-white py-2 sm:py-3 text-xs sm:text-sm">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-8">

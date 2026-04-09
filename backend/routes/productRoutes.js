@@ -7,6 +7,7 @@ const {
   validateRequest
 } = require('../middleware/validation');
 const router = express.Router();
+// i validate create body once then reuse crud handlers for catalog apis
 const createProductValidation = [body('product_name').trim().notEmpty().withMessage('Product name is required').isLength({
   max: 255
 }).withMessage('Product name must be less than 255 characters'), body('product_description').optional().trim(), body('product_category').trim().notEmpty().withMessage('Product category is required'), body('price').isFloat({

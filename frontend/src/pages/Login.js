@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaCheckCircle, FaExclamationCirc
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/apiService';
+// i collect customer credentials and stash jwt through auth context
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',

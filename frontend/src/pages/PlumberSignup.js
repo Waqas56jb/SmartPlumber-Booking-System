@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaCheckCircle, FaWrench 
 import { Link, useRouter } from '../utils/router';
 import { useAuth } from '../contexts/AuthContext';
 import { plumberAPI } from '../services/apiService';
+// i register plumber accounts with confirm password checks like customer flow
 const PlumberSignup = () => {
   const [formData, setFormData] = useState({
     plumber_username: '',

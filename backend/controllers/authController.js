@@ -16,6 +16,7 @@ const {
   updateUserPassword,
   emailExists
 } = require('../utils/userService');
+// i register customers with hashed password and hand back jwt for instant login
 const signup = async (req, res) => {
   try {
     const {
@@ -69,6 +70,7 @@ const signup = async (req, res) => {
     });
   }
 };
+// i compare bcrypt and issue the same jwt shape as signup
 const login = async (req, res) => {
   try {
     const {
@@ -115,6 +117,7 @@ const login = async (req, res) => {
     });
   }
 };
+// i generate otp store it for customer type and email html so user can continue reset
 const forgotPassword = async (req, res) => {
   try {
     const {
@@ -167,6 +170,7 @@ const forgotPassword = async (req, res) => {
     });
   }
 };
+// i only check memory store here and let reset do the real password write
 const verifyOtp = async (req, res) => {
   try {
     const {
@@ -192,6 +196,7 @@ const verifyOtp = async (req, res) => {
     });
   }
 };
+// i verify otp again hash new password update row and wipe otp so it is one shot
 const resetPassword = async (req, res) => {
   try {
     const {

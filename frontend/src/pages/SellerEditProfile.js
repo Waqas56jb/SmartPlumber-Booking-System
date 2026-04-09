@@ -3,6 +3,7 @@ import { FaStore, FaArrowLeft, FaSave, FaCamera, FaPhone, FaEnvelope, FaMapMarke
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { sellerAPI } from '../services/apiService';
+// i update seller shop fields and optional base64 banner through profile api
 const SellerEditProfile = () => {
   const {
     user

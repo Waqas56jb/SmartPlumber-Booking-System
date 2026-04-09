@@ -3,6 +3,7 @@ import { FaWrench, FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaArrowLeft
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from '../utils/router';
 import { plumberAPI } from '../services/apiService';
+// i crud plumber service rows and toggle active for marketplace visibility
 const PlumberServices = () => {
   const {
     user

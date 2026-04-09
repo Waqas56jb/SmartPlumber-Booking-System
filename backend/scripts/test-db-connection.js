@@ -2,6 +2,7 @@ const {
   sql
 } = require('@vercel/postgres');
 require('dotenv').config();
+// i run this from npm to prove env and network reach the real postgres
 async function testConnection() {
   try {
     console.log('test db');

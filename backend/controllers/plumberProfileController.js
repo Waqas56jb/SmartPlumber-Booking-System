@@ -1,6 +1,7 @@
 const {
   sql
 } = require('../utils/db');
+// i allow param id or jwt plumber id so admin and self service both work
 const getPlumberProfile = async (req, res) => {
   try {
     const plumberId = req.params.id || req.user?.plumberId;
@@ -46,6 +47,7 @@ const getPlumberProfile = async (req, res) => {
     });
   }
 };
+// i run per field updates in a transaction because vercel sql helper is too rigid for this shape
 const updatePlumberProfile = async (req, res) => {
   try {
     const plumberId = req.params.id || req.user?.plumberId;
@@ -201,6 +203,7 @@ const updatePlumberProfile = async (req, res) => {
     });
   }
 };
+// i list every plumber for the customer marketplace modal
 const getAllPlumbers = async (req, res) => {
   try {
     const result = await sql`
